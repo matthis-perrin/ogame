@@ -1,5 +1,5 @@
 import {Building} from '@shared/models/building';
-import {Coordinate} from '@shared/models/coordinate';
+import {Coordinates} from '@shared/models/coordinates';
 import {Defense} from '@shared/models/defense';
 import {Ship} from '@shared/models/ships';
 
@@ -14,8 +14,7 @@ export interface Planet {
 }
 
 export interface PlanetMetadata {
-  coordinate: Coordinate;
+  coordinates: Coordinates;
   fields: number;
-  temperatureMin: number;
-  temperatureMax: number;
+  temperature: number;
 }

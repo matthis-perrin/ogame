@@ -4,6 +4,7 @@ export interface Universe {
   researchSpeed: number;
   planetSizeBonus: number;
   numberOfGalaxy: number;
+  numberOfSystem: number;
   shipInDebrisFieldRatio: number;
   defenseInDebrisFieldRatio: number;
   circularGalaxy: boolean;
@@ -17,6 +18,7 @@ export const Rosalind: Universe = {
   researchSpeed: 12,
   planetSizeBonus: 25,
   numberOfGalaxy: 5,
+  numberOfSystem: 499,
   shipInDebrisFieldRatio: 0.3,
   defenseInDebrisFieldRatio: 0,
   circularGalaxy: true,
