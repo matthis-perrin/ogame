@@ -1,14 +1,7 @@
 import {Shipyard} from '@shared/models/building';
-import {makeResources, Resources} from '@shared/models/resource';
-import {Ship} from '@shared/models/ships';
+import {makeResources} from '@shared/models/resource';
 import {
-  ArmourTechnology,
-  CombustionDrive,
   EnergyTechnology,
-  EspionageTechnology,
-  HyperspaceDrive,
-  HyperspaceTechnology,
-  ImpulseDrive,
   IonTechnology,
   LaserTechnology,
   PlasmaTechnology,
