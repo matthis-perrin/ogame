@@ -129,7 +129,15 @@ export const PlasmaTurret: Defense = {
     {entity: PlasmaTechnology, level: 7},
   ],
 };
-
 /* eslint-enable @typescript-eslint/no-magic-numbers */
 
-export const AllDefenses: Defense[] = [];
+export const AllDefenses: Defense[] = [
+  RocketLauncher,
+  LightLaser,
+  HeavyLaser,
+  IonCannon,
+  SmallShieldDome,
+  LargeShieldDome,
+  GaussCannon,
+  PlasmaTurret,
+];

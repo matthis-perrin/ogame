@@ -393,4 +393,21 @@ export const Reaper: Ship = {
 
 /* eslint-enable @typescript-eslint/no-magic-numbers */
 
-export const AllShips: Ship[] = [];
+export const AllShips: Ship[] = [
+  EspionageProbe,
+  SolarSatellite,
+  Crawler,
+  SmallCargo,
+  LargeCargo,
+  Recycler,
+  ColonyShip,
+  LightFighter,
+  Cruiser,
+  HeavyFighter,
+  Pathfinder,
+  Battleship,
+  BattleCruiser,
+  Destroyer,
+  Bomber,
+  Reaper,
+];
