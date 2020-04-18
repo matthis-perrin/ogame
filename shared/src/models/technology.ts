@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
-import {BuildableBase, BuildableRequirement} from '@shared/models/buildable';
-import {ResearchLab} from '@shared/models/building';
+import {BuildableBase} from '@shared/models/buildable';
 import {
   CrystalAmount,
   DeuteriumAmount,

@@ -6,5 +6,5 @@ export interface Account {
   universe: Universe;
   planets: Planet[];
   technologyLevels: Map<Technology, number>;
-  inProgressTechnologies: {technology: Technology; quantity: number}[];
+  inProgressTechnology?: {technology: Technology; level: number};
 }

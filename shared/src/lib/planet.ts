@@ -23,7 +23,6 @@ export function createMainPlanet(universe: Universe): Planet {
       temperature: getPlanetTemperature(position),
     },
     buildingLevels: new Map<Building, number>(),
-    inProgressBuildings: [],
     defense: new Map<Defense, number>(),
     inProgressDefenses: [],
     ships: new Map<Ship, number>(),

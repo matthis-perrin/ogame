@@ -8,6 +8,5 @@ export function createNewAccount(universe: Universe): Account {
     universe,
     planets: [createMainPlanet(universe)],
     technologyLevels: new Map<Technology, number>(),
-    inProgressTechnologies: [],
   };
 }

@@ -6,7 +6,7 @@ import {Ship} from '@shared/models/ships';
 export interface Planet {
   metadata: PlanetMetadata;
   buildingLevels: Map<Building, number>;
-  inProgressBuildings: {building: Building; quantity: number}[];
+  inProgressBuilding?: {building: Building; level: number};
   defense: Map<Defense, number>;
   inProgressDefenses: {defense: Defense; quantity: number}[];
   ships: Map<Ship, number>;

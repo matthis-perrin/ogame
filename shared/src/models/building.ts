@@ -94,7 +94,7 @@ export const NaniteFactory = makeBuilding(
   2
 );
 
-export const Allbuildings: Building[] = [
+export const AllBuildings: Building[] = [
   MetalMine,
   MetalStorage,
   CrystalMine,
