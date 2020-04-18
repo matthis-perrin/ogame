@@ -1,6 +1,5 @@
-import {BuildableBase} from '@shared/models/buildable';
 import {Shipyard} from '@shared/models/building';
-import {makeResources, Resources} from '@shared/models/resource';
+import {makeResources} from '@shared/models/resource';
 import {
   ArmourTechnology,
   CombustionDrive,
@@ -13,18 +12,14 @@ import {
   PlasmaTechnology,
   ShieldingTechnology,
 } from '@shared/models/technology';
+import {Unit} from '@shared/models/unit';
 
 /* eslint-disable @typescript-eslint/no-magic-numbers */
-export interface Ship extends BuildableBase {
+export interface Ship extends Unit {
   type: 'ship';
-  cost: Resources;
-  structuralintegrity: number;
-  shieldPower: number;
-  weaponPower: number;
   cargoCapacity: number;
   baseSpeed: number;
   fuelConsumption: number;
-  rapidFire: Map<Ship, number>;
 }
 
 export const BattleCruiser: Ship = {
@@ -37,7 +32,7 @@ export const BattleCruiser: Ship = {
   cargoCapacity: 750,
   baseSpeed: 10000,
   fuelConsumption: 250,
-  rapidFire: new Map<Ship, number>(),
+  rapidFire: new Map<Unit, number>(),
   requirements: [
     {entity: HyperspaceTechnology, level: 5},
     {entity: HyperspaceDrive, level: 5},
@@ -56,7 +51,7 @@ export const Battleship: Ship = {
   cargoCapacity: 1500,
   baseSpeed: 10000,
   fuelConsumption: 500,
-  rapidFire: new Map<Ship, number>(),
+  rapidFire: new Map<Unit, number>(),
   requirements: [
     {entity: HyperspaceDrive, level: 4},
     {entity: Shipyard, level: 7},
@@ -73,7 +68,7 @@ export const Bomber: Ship = {
   cargoCapacity: 500,
   baseSpeed: 4000,
   fuelConsumption: 700,
-  rapidFire: new Map<Ship, number>(),
+  rapidFire: new Map<Unit, number>(),
   requirements: [
     {entity: PlasmaTechnology, level: 5},
     {entity: ImpulseDrive, level: 6},
@@ -91,7 +86,7 @@ export const ColonyShip: Ship = {
   cargoCapacity: 7500,
   baseSpeed: 2500,
   fuelConsumption: 1000,
-  rapidFire: new Map<Ship, number>(),
+  rapidFire: new Map<Unit, number>(),
   requirements: [
     {entity: ImpulseDrive, level: 3},
     {entity: Shipyard, level: 4},
@@ -108,7 +103,7 @@ export const Crawler: Ship = {
   cargoCapacity: 0,
   baseSpeed: 0,
   fuelConsumption: 0,
-  rapidFire: new Map<Ship, number>(),
+  rapidFire: new Map<Unit, number>(),
   requirements: [
     {entity: Shipyard, level: 5},
     {entity: CombustionDrive, level: 4},
@@ -127,7 +122,7 @@ export const Cruiser: Ship = {
   cargoCapacity: 800,
   baseSpeed: 15000,
   fuelConsumption: 300,
-  rapidFire: new Map<Ship, number>(),
+  rapidFire: new Map<Unit, number>(),
   requirements: [
     {entity: Shipyard, level: 5},
     {entity: ImpulseDrive, level: 4},
@@ -145,7 +140,7 @@ export const Destroyer: Ship = {
   cargoCapacity: 2000,
   baseSpeed: 5000,
   fuelConsumption: 1000,
-  rapidFire: new Map<Ship, number>(),
+  rapidFire: new Map<Unit, number>(),
   requirements: [
     {entity: Shipyard, level: 9},
     {entity: HyperspaceDrive, level: 6},
@@ -163,7 +158,7 @@ export const EspionageProbe: Ship = {
   cargoCapacity: 1, // TODO - 5 on some universes
   baseSpeed: 100000000,
   fuelConsumption: 1,
-  rapidFire: new Map<Ship, number>(),
+  rapidFire: new Map<Unit, number>(),
   requirements: [
     {entity: Shipyard, level: 3},
     {entity: CombustionDrive, level: 3},
@@ -181,7 +176,7 @@ export const HeavyFighter: Ship = {
   cargoCapacity: 100,
   baseSpeed: 10000,
   fuelConsumption: 75,
-  rapidFire: new Map<Ship, number>(),
+  rapidFire: new Map<Unit, number>(),
   requirements: [
     {entity: Shipyard, level: 3},
     {entity: ArmourTechnology, level: 2},
@@ -199,7 +194,7 @@ export const LightFighter: Ship = {
   cargoCapacity: 50,
   baseSpeed: 12500,
   fuelConsumption: 20,
-  rapidFire: new Map<Ship, number>(),
+  rapidFire: new Map<Unit, number>(),
   requirements: [
     {entity: Shipyard, level: 1},
     {entity: CombustionDrive, level: 1},
@@ -216,7 +211,7 @@ export const LargeCargoShip: Ship = {
   cargoCapacity: 25000,
   baseSpeed: 7500,
   fuelConsumption: 50,
-  rapidFire: new Map<Ship, number>(),
+  rapidFire: new Map<Unit, number>(),
   requirements: [
     {entity: Shipyard, level: 4},
     {entity: CombustionDrive, level: 6},
@@ -233,7 +228,7 @@ export const SmallCargoShip: Ship = {
   cargoCapacity: 5000,
   baseSpeed: 5000,
   fuelConsumption: 10,
-  rapidFire: new Map<Ship, number>(),
+  rapidFire: new Map<Unit, number>(),
   requirements: [
     {entity: Shipyard, level: 2},
     {entity: CombustionDrive, level: 2},
@@ -250,7 +245,7 @@ export const Pathfinder: Ship = {
   cargoCapacity: 10000,
   baseSpeed: 12000,
   fuelConsumption: 300,
-  rapidFire: new Map<Ship, number>(),
+  rapidFire: new Map<Unit, number>(),
   requirements: [
     {entity: Shipyard, level: 5},
     {entity: HyperspaceDrive, level: 2},
@@ -270,7 +265,7 @@ export const Reaper: Ship = {
   cargoCapacity: 10000,
   baseSpeed: 7000,
   fuelConsumption: 1100,
-  rapidFire: new Map<Ship, number>(),
+  rapidFire: new Map<Unit, number>(),
   requirements: [
     {entity: Shipyard, level: 10},
     {entity: HyperspaceTechnology, level: 6},
@@ -290,7 +285,7 @@ export const Recycler: Ship = {
   cargoCapacity: 20000,
   baseSpeed: 2000,
   fuelConsumption: 300,
-  rapidFire: new Map<Ship, number>(),
+  rapidFire: new Map<Unit, number>(),
   requirements: [
     {entity: Shipyard, level: 4},
     {entity: CombustionDrive, level: 6},
@@ -298,6 +293,7 @@ export const Recycler: Ship = {
   ],
 };
 
+// TODO - Produce energy
 export const SolarSatellite: Ship = {
   name: 'Satellite solaire',
   type: 'ship',
@@ -308,7 +304,7 @@ export const SolarSatellite: Ship = {
   cargoCapacity: 0,
   baseSpeed: 0,
   fuelConsumption: 0,
-  rapidFire: new Map<Ship, number>(),
+  rapidFire: new Map<Unit, number>(),
   requirements: [{entity: Shipyard, level: 1}],
 };
 

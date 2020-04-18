@@ -47,7 +47,7 @@ export const EspionageTechnology = makeTechnology(
   [{entity: ResearchLab, level: 3}]
 );
 
-export const WeaponsTechnology = makeTechnology('Armes', makeResources({m: 800, c: 200, d: 0}), [
+export const WeaponTechnology = makeTechnology('Armes', makeResources({m: 800, c: 200, d: 0}), [
   {entity: ResearchLab, level: 4},
 ]);
 
@@ -151,7 +151,7 @@ export const AstrophysicsTechnology = makeTechnology(
 export const AllTechnologies: Technology[] = [
   EspionageTechnology,
   ComputerTechnology,
-  WeaponsTechnology,
+  WeaponTechnology,
   ShieldingTechnology,
   ArmourTechnology,
   EnergyTechnology,
