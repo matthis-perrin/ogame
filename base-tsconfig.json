@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "@shared/*": ["../../shared/src/*"],
+      "@src/*": ["./*"],
+      "*": ["./node_modules/*"]
+    },
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "downlevelIteration": true,
+    "sourceMap": true
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "name": "ogame",
+  "private": true,
+  "scripts": {
+    "setup": "npm install && cd build && npm install && cd .. && cd server && npm install && cd .. && cd frontend && npm install && cd ..",
+    "watch": "cd build && npm run watch && cd .."
+  },
+  "dependencies": {
+    "@types/prettier": "2.0.0",
+    "@typescript-eslint/eslint-plugin": "2.19.2",
+    "@typescript-eslint/parser": "2.19.2",
+    "eslint": "6.8.0",
+    "eslint-config-prettier": "6.10.0",
+    "eslint-plugin-import": "2.20.1",
+    "eslint-plugin-no-null": "1.0.2",
+    "eslint-plugin-prettier": "3.1.2",
+    "eslint-plugin-react": "7.18.3",
+    "eslint-plugin-react-hooks": "2.3.0",
+    "eslint-plugin-simple-import-sort": "5.0.1",
+    "eslint-plugin-unicorn": "16.1.1",
+    "prettier": "1.19.1",
+    "source-map-support": "0.5.16",
+    "typescript": "3.8.3"
+  }
+}

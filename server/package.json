@@ -1,0 +1,16 @@
+{
+  "name": "web_server",
+  "private": true,
+  "engines": {
+    "node": ">12.10"
+  },
+  "dependencies": {
+    "lodash": "4.17.15",
+    "source-map-support": "0.5.16"
+  },
+  "devDependencies": {
+    "@types/lodash": "4.14.149",
+    "@types/node": "13.7.1",
+    "typescript": "3.8.3"
+  }
+}

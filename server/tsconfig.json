@@ -1,0 +1,7 @@
+{
+  "extends": "../base-tsconfig.json",
+  "compilerOptions": {
+    "target": "es2019",
+    "baseUrl": "src"
+  }
+}
