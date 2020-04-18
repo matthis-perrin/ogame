@@ -14,11 +14,7 @@ export interface Technology extends BuildableBase {
   cost(level: number): Resources;
 }
 
-function makeTechnology(
-  name: string,
-  baseCost: Resources,
-  costExponential = 2
-): Technology {
+function makeTechnology(name: string, baseCost: Resources, costExponential = 2): Technology {
   return {
     type: 'technology',
     name,
@@ -33,46 +29,46 @@ function makeTechnology(
 
 export const ComputerTechnology = makeTechnology(
   'Ordinateur',
-  makeResources({m: 0, c: 400, d: 600}),
+  makeResources({m: 0, c: 400, d: 600})
 );
 
 export const EnergyTechnology = makeTechnology('Energie', makeResources({m: 0, c: 800, d: 400}));
 
 export const EspionageTechnology = makeTechnology(
   'Espionnage',
-  makeResources({m: 200, c: 1000, d: 200}),
+  makeResources({m: 200, c: 1000, d: 200})
 );
 
 export const WeaponTechnology = makeTechnology('Armes', makeResources({m: 800, c: 200, d: 0}));
 
 export const ShieldingTechnology = makeTechnology(
   'Bouclier',
-  makeResources({m: 200, c: 600, d: 0}),
+  makeResources({m: 200, c: 600, d: 0})
 );
 
 export const ArmourTechnology = makeTechnology(
   'Protection des vaisseaux',
-  makeResources({m: 1000, c: 0, d: 0}),
+  makeResources({m: 1000, c: 0, d: 0})
 );
 
 export const HyperspaceTechnology = makeTechnology(
   'Hyperspace',
-  makeResources({m: 0, c: 4000, d: 2000}),
+  makeResources({m: 0, c: 4000, d: 2000})
 );
 
 export const CombustionDrive = makeTechnology(
   'Réacteur à combustion',
-  makeResources({m: 400, c: 0, d: 600}),
+  makeResources({m: 400, c: 0, d: 600})
 );
 
 export const ImpulseDrive = makeTechnology(
   'Réacteur à impulsion',
-  makeResources({m: 2000, c: 4000, d: 600}),
+  makeResources({m: 2000, c: 4000, d: 600})
 );
 
 export const HyperspaceDrive = makeTechnology(
   'Propulsion hyperespace',
-  makeResources({m: 10000, c: 20000, d: 6000}),
+  makeResources({m: 10000, c: 20000, d: 6000})
 );
 
 export const LaserTechnology = makeTechnology('Laser', makeResources({m: 200, c: 100, d: 0}));
@@ -81,17 +77,17 @@ export const IonTechnology = makeTechnology('Ions', makeResources({m: 1000, c: 3
 
 export const PlasmaTechnology = makeTechnology(
   'Plasma',
-  makeResources({m: 2000, c: 4000, d: 1000}),
+  makeResources({m: 2000, c: 4000, d: 1000})
 );
 
 export const IntergalacticResearchNetworkTechnology = makeTechnology(
   'Réseau de recherche intergalactique',
-  makeResources({m: 240000, c: 400000, d: 160000}),
+  makeResources({m: 240000, c: 400000, d: 160000})
 );
 
 export const AstrophysicsTechnology = makeTechnology(
   'Astrophysique',
-  makeResources({m: 4000, c: 8000, d: 4000}),,
+  makeResources({m: 4000, c: 8000, d: 4000}),
   1.75
 );
 
