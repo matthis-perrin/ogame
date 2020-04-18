@@ -10,6 +10,7 @@ import {ComputerTechnology, EnergyTechnology} from '@shared/models/technology';
 
 export interface Building extends BuildableBase {
   type: 'building';
+  cost(level: number): Resources;
   // isUseful: (level: number) => boolean;
 }
 
@@ -86,8 +87,8 @@ export const FusionReactor = makeBuilding(
   'Centrale électrique de fusion',
   makeResources({m: 900, c: 360, d: 180}),
   [
-    {buildable: DeuteriumSynthesizer, level: 5},
-    {buildable: EnergyTechnology, level: 3},
+    {entity: DeuteriumSynthesizer, level: 5},
+    {entity: EnergyTechnology, level: 3},
   ],
   1.8
 );
@@ -109,7 +110,7 @@ export const RoboticsFactory = makeBuilding(
 export const Shipyard = makeBuilding(
   'Chantier spatial',
   makeResources({m: 400, c: 200, d: 100}),
-  [{buildable: RoboticsFactory, level: 2}],
+  [{entity: RoboticsFactory, level: 2}],
   1.8
 );
 
@@ -117,8 +118,8 @@ export const NaniteFactory = makeBuilding(
   'Usine de nanites',
   makeResources({m: 1000000, c: 500000, d: 100000}),
   [
-    {buildable: RoboticsFactory, level: 10},
-    {buildable: ComputerTechnology, level: 10},
+    {entity: RoboticsFactory, level: 10},
+    {entity: ComputerTechnology, level: 10},
   ],
   2
 );
