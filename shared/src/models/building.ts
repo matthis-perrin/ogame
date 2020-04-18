@@ -11,7 +11,6 @@ import {ComputerTechnology, EnergyTechnology} from '@shared/models/technology';
 export interface Building extends BuildableBase {
   type: 'building';
   cost(level: number): Resources;
-  // isUseful: (level: number) => boolean;
 }
 
 function makeBuilding(
