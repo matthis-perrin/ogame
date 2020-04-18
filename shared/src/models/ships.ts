@@ -1,28 +1,7 @@
-import {Shipyard} from '@shared/models/building';
-import {
-  GaussCannon,
-  HeavyLaser,
-  IonCannon,
-  LightLaser,
-  PlasmaTurret,
-  RocketLauncher,
-} from '@shared/models/defense';
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import {makeResources} from '@shared/models/resource';
-import {
-  ArmourTechnology,
-  CombustionDrive,
-  EspionageTechnology,
-  HyperspaceDrive,
-  HyperspaceTechnology,
-  ImpulseDrive,
-  IonTechnology,
-  LaserTechnology,
-  PlasmaTechnology,
-  ShieldingTechnology,
-} from '@shared/models/technology';
 import {Unit} from '@shared/models/unit';
 
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 export interface Ship extends Unit {
   type: 'ship';
   cargoCapacity: number;
@@ -41,11 +20,7 @@ export const EspionageProbe: Ship = {
   baseSpeed: 100000000,
   fuelConsumption: 1,
   rapidFire: new Map<Unit, number>(),
-  requirements: [
-    {entity: Shipyard, level: 3},
-    {entity: CombustionDrive, level: 3},
-    {entity: EspionageTechnology, level: 2},
-  ],
+  requirements: [],
 };
 
 // TODO - Produce energy
@@ -60,7 +35,7 @@ export const SolarSatellite: Ship = {
   baseSpeed: 0,
   fuelConsumption: 0,
   rapidFire: new Map<Unit, number>(),
-  requirements: [{entity: Shipyard, level: 1}],
+  requirements: [],
 };
 
 export const Crawler: Ship = {
@@ -74,12 +49,7 @@ export const Crawler: Ship = {
   baseSpeed: 0,
   fuelConsumption: 0,
   rapidFire: new Map<Unit, number>(),
-  requirements: [
-    {entity: Shipyard, level: 5},
-    {entity: CombustionDrive, level: 4},
-    {entity: ArmourTechnology, level: 4},
-    {entity: LaserTechnology, level: 4},
-  ],
+  requirements: [],
 };
 
 export const SmallCargo: Ship = {
@@ -92,15 +62,8 @@ export const SmallCargo: Ship = {
   cargoCapacity: 5000,
   baseSpeed: 5000,
   fuelConsumption: 10,
-  rapidFire: new Map<Unit, number>([
-    [EspionageProbe, 5],
-    [SolarSatellite, 5],
-    [Crawler, 5],
-  ]),
-  requirements: [
-    {entity: Shipyard, level: 2},
-    {entity: CombustionDrive, level: 2},
-  ],
+  rapidFire: new Map<Unit, number>(),
+  requirements: [],
 };
 
 export const LargeCargo: Ship = {
@@ -113,15 +76,8 @@ export const LargeCargo: Ship = {
   cargoCapacity: 25000,
   baseSpeed: 7500,
   fuelConsumption: 50,
-  rapidFire: new Map<Unit, number>([
-    [EspionageProbe, 5],
-    [SolarSatellite, 5],
-    [Crawler, 5],
-  ]),
-  requirements: [
-    {entity: Shipyard, level: 4},
-    {entity: CombustionDrive, level: 6},
-  ],
+  rapidFire: new Map<Unit, number>(),
+  requirements: [],
 };
 
 // TODO - Can recycle 100% of debris fields
@@ -135,16 +91,8 @@ export const Recycler: Ship = {
   cargoCapacity: 20000,
   baseSpeed: 2000,
   fuelConsumption: 300,
-  rapidFire: new Map<Unit, number>([
-    [EspionageProbe, 5],
-    [SolarSatellite, 5],
-    [Crawler, 5],
-  ]),
-  requirements: [
-    {entity: Shipyard, level: 4},
-    {entity: CombustionDrive, level: 6},
-    {entity: ShieldingTechnology, level: 2},
-  ],
+  rapidFire: new Map<Unit, number>(),
+  requirements: [],
 };
 
 export const ColonyShip: Ship = {
@@ -157,15 +105,8 @@ export const ColonyShip: Ship = {
   cargoCapacity: 7500,
   baseSpeed: 2500,
   fuelConsumption: 1000,
-  rapidFire: new Map<Unit, number>([
-    [EspionageProbe, 5],
-    [SolarSatellite, 5],
-    [Crawler, 5],
-  ]),
-  requirements: [
-    {entity: ImpulseDrive, level: 3},
-    {entity: Shipyard, level: 4},
-  ],
+  rapidFire: new Map<Unit, number>(),
+  requirements: [],
 };
 
 export const LightFighter: Ship = {
@@ -178,15 +119,8 @@ export const LightFighter: Ship = {
   cargoCapacity: 50,
   baseSpeed: 12500,
   fuelConsumption: 20,
-  rapidFire: new Map<Unit, number>([
-    [EspionageProbe, 5],
-    [SolarSatellite, 5],
-    [Crawler, 5],
-  ]),
-  requirements: [
-    {entity: Shipyard, level: 1},
-    {entity: CombustionDrive, level: 1},
-  ],
+  rapidFire: new Map<Unit, number>(),
+  requirements: [],
 };
 
 export const Cruiser: Ship = {
@@ -199,18 +133,8 @@ export const Cruiser: Ship = {
   cargoCapacity: 800,
   baseSpeed: 15000,
   fuelConsumption: 300,
-  rapidFire: new Map<Unit, number>([
-    [EspionageProbe, 5],
-    [SolarSatellite, 5],
-    [LightFighter, 6],
-    [Crawler, 5],
-    [RocketLauncher, 10],
-  ]),
-  requirements: [
-    {entity: Shipyard, level: 5},
-    {entity: ImpulseDrive, level: 4},
-    {entity: IonTechnology, level: 2},
-  ],
+  rapidFire: new Map<Unit, number>(),
+  requirements: [],
 };
 
 export const HeavyFighter: Ship = {
@@ -223,17 +147,8 @@ export const HeavyFighter: Ship = {
   cargoCapacity: 100,
   baseSpeed: 10000,
   fuelConsumption: 75,
-  rapidFire: new Map<Unit, number>([
-    [SmallCargo, 3],
-    [EspionageProbe, 5],
-    [SolarSatellite, 5],
-    [Crawler, 5],
-  ]),
-  requirements: [
-    {entity: Shipyard, level: 3},
-    {entity: ArmourTechnology, level: 2},
-    {entity: ImpulseDrive, level: 2},
-  ],
+  rapidFire: new Map<Unit, number>(),
+  requirements: [],
 };
 
 export const Pathfinder: Ship = {
@@ -246,20 +161,8 @@ export const Pathfinder: Ship = {
   cargoCapacity: 10000,
   baseSpeed: 12000,
   fuelConsumption: 300,
-  rapidFire: new Map<Unit, number>([
-    [EspionageProbe, 5],
-    [SolarSatellite, 5],
-    [Crawler, 5],
-    [Cruiser, 3],
-    [LightFighter, 3],
-    [HeavyFighter, 2],
-  ]),
-  requirements: [
-    {entity: Shipyard, level: 5},
-    {entity: HyperspaceDrive, level: 2},
-    {entity: ShieldingTechnology, level: 4},
-    // TODO - Requires the "classe explorateur"
-  ],
+  rapidFire: new Map<Unit, number>(),
+  requirements: [],
 };
 
 export const Battleship: Ship = {
@@ -272,16 +175,8 @@ export const Battleship: Ship = {
   cargoCapacity: 1500,
   baseSpeed: 10000,
   fuelConsumption: 500,
-  rapidFire: new Map<Unit, number>([
-    [EspionageProbe, 5],
-    [SolarSatellite, 5],
-    [Crawler, 5],
-    [Pathfinder, 5],
-  ]),
-  requirements: [
-    {entity: HyperspaceDrive, level: 4},
-    {entity: Shipyard, level: 7},
-  ],
+  rapidFire: new Map<Unit, number>(),
+  requirements: [],
 };
 
 export const BattleCruiser: Ship = {
@@ -294,22 +189,8 @@ export const BattleCruiser: Ship = {
   cargoCapacity: 750,
   baseSpeed: 10000,
   fuelConsumption: 250,
-  rapidFire: new Map<Unit, number>([
-    [EspionageProbe, 5],
-    [SolarSatellite, 5],
-    [SmallCargo, 3],
-    [LargeCargo, 3],
-    [HeavyFighter, 4],
-    [Cruiser, 4],
-    [Battleship, 7],
-    [Crawler, 5],
-  ]),
-  requirements: [
-    {entity: HyperspaceTechnology, level: 5},
-    {entity: HyperspaceDrive, level: 5},
-    {entity: Shipyard, level: 8},
-    {entity: LaserTechnology, level: 12},
-  ],
+  rapidFire: new Map<Unit, number>(),
+  requirements: [],
 };
 
 export const Destroyer: Ship = {
@@ -322,18 +203,8 @@ export const Destroyer: Ship = {
   cargoCapacity: 2000,
   baseSpeed: 5000,
   fuelConsumption: 1000,
-  rapidFire: new Map<Unit, number>([
-    [EspionageProbe, 5],
-    [SolarSatellite, 5],
-    [BattleCruiser, 2],
-    [Crawler, 5],
-    [LightLaser, 10],
-  ]),
-  requirements: [
-    {entity: Shipyard, level: 9},
-    {entity: HyperspaceDrive, level: 6},
-    {entity: HyperspaceTechnology, level: 5},
-  ],
+  rapidFire: new Map<Unit, number>(),
+  requirements: [],
 };
 
 export const Bomber: Ship = {
@@ -346,22 +217,8 @@ export const Bomber: Ship = {
   cargoCapacity: 500,
   baseSpeed: 4000,
   fuelConsumption: 700,
-  rapidFire: new Map<Unit, number>([
-    [EspionageProbe, 5],
-    [SolarSatellite, 5],
-    [Crawler, 5],
-    [RocketLauncher, 20],
-    [LightLaser, 20],
-    [HeavyLaser, 10],
-    [IonCannon, 10],
-    [GaussCannon, 5],
-    [PlasmaTurret, 5],
-  ]),
-  requirements: [
-    {entity: PlasmaTechnology, level: 5},
-    {entity: ImpulseDrive, level: 6},
-    {entity: Shipyard, level: 8},
-  ],
+  rapidFire: new Map<Unit, number>(),
+  requirements: [],
 };
 
 // TODO - Can recycle 25% of debris fields
@@ -375,23 +232,9 @@ export const Reaper: Ship = {
   cargoCapacity: 10000,
   baseSpeed: 7000,
   fuelConsumption: 1100,
-  rapidFire: new Map<Unit, number>([
-    [EspionageProbe, 5],
-    [SolarSatellite, 5],
-    [Crawler, 5],
-    [Battleship, 7],
-    [Bomber, 4],
-    [Destroyer, 3],
-  ]),
-  requirements: [
-    {entity: Shipyard, level: 10},
-    {entity: HyperspaceTechnology, level: 6},
-    {entity: HyperspaceDrive, level: 7},
-    {entity: ShieldingTechnology, level: 6},
-  ],
+  rapidFire: new Map<Unit, number>(),
+  requirements: [],
 };
-
-/* eslint-enable @typescript-eslint/no-magic-numbers */
 
 export const AllShips: Ship[] = [
   EspionageProbe,

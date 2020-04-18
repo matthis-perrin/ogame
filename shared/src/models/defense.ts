@@ -1,16 +1,7 @@
-import {Shipyard} from '@shared/models/building';
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import {makeResources} from '@shared/models/resource';
-import {
-  EnergyTechnology,
-  IonTechnology,
-  LaserTechnology,
-  PlasmaTechnology,
-  ShieldingTechnology,
-  WeaponTechnology,
-} from '@shared/models/technology';
 import {Unit} from '@shared/models/unit';
 
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 export interface Defense extends Unit {
   type: 'defense';
 }
@@ -23,7 +14,7 @@ export const RocketLauncher: Defense = {
   shieldPower: 20,
   weaponPower: 80,
   rapidFire: new Map<Unit, number>(),
-  requirements: [{entity: Shipyard, level: 1}],
+  requirements: [],
 };
 
 export const LightLaser: Defense = {
@@ -34,11 +25,7 @@ export const LightLaser: Defense = {
   shieldPower: 25,
   weaponPower: 100,
   rapidFire: new Map<Unit, number>(),
-  requirements: [
-    {entity: EnergyTechnology, level: 1},
-    {entity: Shipyard, level: 2},
-    {entity: LaserTechnology, level: 3},
-  ],
+  requirements: [],
 };
 
 export const HeavyLaser: Defense = {
@@ -49,11 +36,7 @@ export const HeavyLaser: Defense = {
   shieldPower: 100,
   weaponPower: 250,
   rapidFire: new Map<Unit, number>(),
-  requirements: [
-    {entity: EnergyTechnology, level: 3},
-    {entity: Shipyard, level: 4},
-    {entity: LaserTechnology, level: 6},
-  ],
+  requirements: [],
 };
 
 export const IonCannon: Defense = {
@@ -64,10 +47,7 @@ export const IonCannon: Defense = {
   shieldPower: 500,
   weaponPower: 150,
   rapidFire: new Map<Unit, number>(),
-  requirements: [
-    {entity: Shipyard, level: 4},
-    {entity: IonTechnology, level: 4},
-  ],
+  requirements: [],
 };
 
 // TODO - Max 1 by planet
@@ -79,10 +59,7 @@ export const SmallShieldDome: Defense = {
   shieldPower: 2000,
   weaponPower: 1,
   rapidFire: new Map<Unit, number>(),
-  requirements: [
-    {entity: Shipyard, level: 1},
-    {entity: ShieldingTechnology, level: 2},
-  ],
+  requirements: [],
 };
 
 // TODO - Max 1 by planet
@@ -94,10 +71,7 @@ export const LargeShieldDome: Defense = {
   shieldPower: 10000,
   weaponPower: 1,
   rapidFire: new Map<Unit, number>(),
-  requirements: [
-    {entity: Shipyard, level: 6},
-    {entity: ShieldingTechnology, level: 6},
-  ],
+  requirements: [],
 };
 
 export const GaussCannon: Defense = {
@@ -108,12 +82,7 @@ export const GaussCannon: Defense = {
   shieldPower: 200,
   weaponPower: 1100,
   rapidFire: new Map<Unit, number>(),
-  requirements: [
-    {entity: Shipyard, level: 6},
-    {entity: EnergyTechnology, level: 6},
-    {entity: WeaponTechnology, level: 3},
-    {entity: ShieldingTechnology, level: 1},
-  ],
+  requirements: [],
 };
 
 export const PlasmaTurret: Defense = {
@@ -124,12 +93,8 @@ export const PlasmaTurret: Defense = {
   shieldPower: 300,
   weaponPower: 3000,
   rapidFire: new Map<Unit, number>(),
-  requirements: [
-    {entity: Shipyard, level: 8},
-    {entity: PlasmaTechnology, level: 7},
-  ],
+  requirements: [],
 };
-/* eslint-enable @typescript-eslint/no-magic-numbers */
 
 export const AllDefenses: Defense[] = [
   RocketLauncher,
