@@ -29,3 +29,11 @@ export const MAX_TECHNOLOGIES = [
   Tech.Shipyard,
   Tech.NaniteFactory,
 ];
+
+export const TECHNOLOGY_PAGES = [
+  'component=supplies',
+  'component=facilities',
+  'component=defenses',
+  'component=shipyard',
+  'component=research',
+];

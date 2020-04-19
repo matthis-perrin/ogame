@@ -1,12 +1,10 @@
+import {TECHNOLOGY_PAGES} from '@src/models/constants';
 import {PlanetId} from '@src/models/planets';
 import {Technology} from '@src/models/technologies';
-import {parseDefenses} from '@src/parsers/defenses';
-import {parseFacilities} from '@src/parsers/facilities';
-import {parseFleet} from '@src/parsers/fleet';
 import {parseMeta} from '@src/parsers/meta';
 import {parsePlanets} from '@src/parsers/planets';
 import {parseResources} from '@src/parsers/resources';
-import {parseSupplies} from '@src/parsers/supplies';
+import {parseTechnologies} from '@src/parsers/technologies';
 import {addPlanet} from '@src/stores/account';
 
 /* eslint-disable no-console */
@@ -26,14 +24,15 @@ export function parseUI(): void {
   const planets = parsePlanets();
 
   let technologies: Technology[] = [];
-  if (document.location.search.includes('component=supplies')) {
-    technologies = parseSupplies();
-  } else if (document.location.search.includes('component=facilities')) {
-    technologies = parseFacilities();
-  } else if (document.location.search.includes('component=defenses')) {
-    technologies = parseDefenses();
-  } else if (document.location.search.includes('component=shipyard')) {
-    technologies = parseFleet();
+  let shouldParseTechnologies = false;
+  for (const page of TECHNOLOGY_PAGES) {
+    if (document.location.search.includes(page)) {
+      shouldParseTechnologies = true;
+      break;
+    }
+  }
+  if (shouldParseTechnologies) {
+    technologies = parseTechnologies();
   }
 
   addPlanet(planets, planetId, resources, technologies);
