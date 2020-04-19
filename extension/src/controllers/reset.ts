@@ -7,4 +7,5 @@ export function resetUI(): void {
     $(element).bind('mouseenter', e => e.stopPropagation());
   });
   $('#planetbarcomponent #rechts #myPlanets .smallplanet').css('height', '59px');
+  $('#banner_skyscraper').hide();
 }
