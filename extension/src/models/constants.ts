@@ -36,6 +36,7 @@ export const TECHNOLOGY_PAGES = [
   'component=defenses',
   'component=shipyard',
   'component=research',
+  'component=fleetdispatch',
 ];
 
 export const ACCOUNT_TECHNOLOGIES = [

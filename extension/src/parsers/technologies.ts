@@ -5,7 +5,7 @@ import {Technology, TechnologyValue} from '@src/models/technologies';
 
 export function parseTechnologies(): Technology[] {
   const res: Technology[] = [];
-  $('html > body > #pageContent > #middle #technologies li').each((_, element) => {
+  $('html > body #pageContent #technologies li').each((_, element) => {
     const technology = element.getAttribute('data-technology');
     // eslint-disable-next-line no-null/no-null
     if (technology !== null) {

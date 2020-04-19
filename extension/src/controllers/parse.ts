@@ -1,6 +1,8 @@
 import {TECHNOLOGY_PAGES} from '@src/models/constants';
+import {Fleet} from '@src/models/fleets';
 import {PlanetId} from '@src/models/planets';
 import {Technology} from '@src/models/technologies';
+import {parseFleets} from '@src/parsers/fleets';
 import {parseMeta} from '@src/parsers/meta';
 import {parsePlanets} from '@src/parsers/planets';
 import {parseResources} from '@src/parsers/resources';
@@ -40,10 +42,15 @@ export function parseUI(): void {
   if (shouldParseTechnologies) {
     technologies = parseTechnologies();
   }
-
   console.log(`Technologies parsed ${technologies.length}`);
+
+  let fleets: Fleet[] = [];
+  if (document.location.search.includes('component=movement')) {
+    fleets = parseFleets();
+  }
+  console.log(`Fleets parsed ${fleets.length}`);
 
   console.log('OK');
 
-  addPlanet(planets, planetId, resources, technologies);
+  addPlanet(planets, planetId, resources, technologies, fleets);
 }

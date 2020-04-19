@@ -3,6 +3,7 @@ import {useEffect, useState} from 'react';
 import {persist} from '@src/controllers/storage';
 import {Account} from '@src/models/account';
 import {ACCOUNT_TECHNOLOGIES, MAX_TECHNOLOGIES, SUM_PLANET} from '@src/models/constants';
+import {Fleet, ReturnFlight} from '@src/models/fleets';
 import {Planet, PlanetCoords, PlanetId, PlanetName} from '@src/models/planets';
 import {ResourceAmount, Resources} from '@src/models/resources';
 import {Tech} from '@src/models/tech';
@@ -26,14 +27,20 @@ export function addPlanet(
   planetList: Planet[],
   id: PlanetId,
   resources: Resources,
-  technologies: Technology[]
+  technologies: Technology[],
+  fleets: Fleet[]
 ): void {
   const account: Account = {
     planetList,
     planetDetails: currentAccount?.planetDetails ?? {},
     maxTechnologies: currentAccount?.maxTechnologies ?? {},
     accountTechnologies: currentAccount?.accountTechnologies ?? {},
+    fleets: currentAccount?.fleets ?? {},
   };
+
+  for (const fleet of fleets) {
+    account.fleets[fleet.fleetId] = fleet;
+  }
 
   const technologiesObj = currentAccount?.planetDetails[id]?.technologies ?? {};
   for (const technology of technologies) {
@@ -52,6 +59,19 @@ export function addPlanet(
     }
   }
 
+  const productionCoefficient =
+    resources.resources.energy.amount >= 0
+      ? 1
+      : sum([
+          resources.techs[Tech.SolarPlant].production.energy,
+          resources.techs[Tech.SolarSatellite].production.energy,
+        ]) /
+        sum([
+          resources.techs[Tech.MetalMine].consumption.energy,
+          resources.techs[Tech.CrystalMine].consumption.energy,
+          resources.techs[Tech.DeuteriumSynthesizer].consumption.energy,
+        ]);
+
   account.planetDetails[id] = {
     id,
     resources: {
@@ -68,15 +88,15 @@ export function addPlanet(
     productions: {
       metal: sum([
         resources.resources.metal.baseProduction,
-        resources.techs[Tech.MetalMine].production.metal,
+        resources.techs[Tech.MetalMine].production.metal * productionCoefficient,
       ]),
       crystal: sum([
         resources.resources.crystal.baseProduction,
-        resources.techs[Tech.CrystalMine].production.crystal,
+        resources.techs[Tech.CrystalMine].production.crystal * productionCoefficient,
       ]),
       deuterium: sum([
         resources.resources.deuterium.baseProduction,
-        resources.techs[Tech.DeuteriumSynthesizer].production.deuterium,
+        resources.techs[Tech.DeuteriumSynthesizer].production.deuterium * productionCoefficient,
       ]),
     },
     technologies: technologiesObj,
@@ -163,6 +183,7 @@ function applyProduction(): void {
     planetDetails: {},
     maxTechnologies: currentAccount.maxTechnologies,
     accountTechnologies: currentAccount.accountTechnologies,
+    fleets: {},
   };
 
   for (const planetId in currentAccount.planetDetails) {
@@ -180,6 +201,22 @@ function applyProduction(): void {
         storages: planet.storages,
         technologies: planet.technologies,
       };
+    }
+  }
+
+  const now = Math.floor(new Date().getTime() / 1000);
+  for (const fleetId in currentAccount.fleets) {
+    if (currentAccount.fleets.hasOwnProperty(fleetId)) {
+      const fleet = currentAccount.fleets[fleetId];
+      if (now >= fleet.midTime) {
+        if (fleet.returnFlight) {
+          // TODO: Handle resource drop
+          continue;
+        }
+        fleet.returnFlight = true as ReturnFlight;
+        fleet.midTime = fleet.arrivalTime;
+      }
+      account.fleets[fleetId] = fleet;
     }
   }
 
