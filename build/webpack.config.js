@@ -130,22 +130,24 @@ function getWebpackConfig(directory, entryPoint, isFrontend) {
     optimization: isFrontend
       ? {
           minimize: true,
-          splitChunks: {chunks: 'all'},
+          splitChunks: {chunks: 'all', name: 'vendors'},
         }
       : {
           minimize: true,
         },
-    externals: isFrontend ? undefined : [
-      function(context, request, callback) {
-        if (request === entryPoint) {
-          return callback();
-        }
-        if (['@src', '@shared'].includes(request.split('/', 2)[0])) {
-          return callback();
-        }
-        callback(null, 'commonjs ' + request);
-      },
-    ],
+    externals: isFrontend
+      ? undefined
+      : [
+          function(context, request, callback) {
+            if (request === entryPoint) {
+              return callback();
+            }
+            if (['@src', '@shared'].includes(request.split('/', 2)[0])) {
+              return callback();
+            }
+            callback(null, 'commonjs ' + request);
+          },
+        ],
     resolveLoader: {
       modules: [nodeModulesDir],
     },
@@ -158,5 +160,6 @@ function getWebpackConfig(directory, entryPoint, isFrontend) {
 
 module.exports = [
   getWebpackConfig(join(root, 'frontend'), join(root, 'frontend', 'src', 'index.tsx'), true),
+  getWebpackConfig(join(root, 'extension'), join(root, 'extension', 'src', 'index.tsx'), true),
   getWebpackConfig(join(root, 'server'), join(root, 'server', 'src', 'index.ts'), false),
 ];
