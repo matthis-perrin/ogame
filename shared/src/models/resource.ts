@@ -9,6 +9,7 @@ export enum ResourceType {
 export type MetalAmount = Brand<number, 'MetalAmount'>;
 export type CrystalAmount = Brand<number, 'CrystalAmount'>;
 export type DeuteriumAmount = Brand<number, 'DeuteriumAmount'>;
+export type StandardUnitAmount = Brand<number, 'StandardUnitAmount'>;
 
 export function makeResources(values: {m?: number; c?: number; d?: number}): Resources {
   const {m = 0, c = 0, d = 0} = values;

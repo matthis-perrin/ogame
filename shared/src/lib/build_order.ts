@@ -1,6 +1,14 @@
 import {Account} from '@shared/models/account';
 import {Buildable} from '@shared/models/buildable';
-import {AllBuildings, Building} from '@shared/models/building';
+import {
+  AllBuildings,
+  Building,
+  CrystalStorage,
+  DeuteriumTank,
+  FusionReactor,
+  MetalStorage,
+  SolarPlant,
+} from '@shared/models/building';
 import {Planet} from '@shared/models/planet';
 import {AllTechnologies, Technology} from '@shared/models/technology';
 
@@ -8,6 +16,12 @@ export interface BuildOrderItem {
   entity: Building | Technology;
   level: number;
   planet: Planet;
+}
+
+export function buildOrderItemAreEqual(item1: BuildOrderItem, item2: BuildOrderItem): boolean {
+  return (
+    item1.entity === item2.entity && item1.level === item2.level && item1.planet === item2.planet
+  );
 }
 
 function isBuildable(account: Account, planet: Planet, buildable: Buildable): boolean {
@@ -28,12 +42,13 @@ function isBuildable(account: Account, planet: Planet, buildable: Buildable): bo
   return true;
 }
 
-export function getAllPossibleBuildOrderItemForPlanet(
-  account: Account,
-  planet: Planet
-): BuildOrderItem[] {
+const buildingWhitelist = AllBuildings.filter(
+  b => ![SolarPlant, FusionReactor, MetalStorage, CrystalStorage, DeuteriumTank].includes(b)
+);
+
+export function getAvailableBuildingsForPlanet(account: Account, planet: Planet): BuildOrderItem[] {
   const items: BuildOrderItem[] = [];
-  for (const building of AllBuildings) {
+  for (const building of buildingWhitelist) {
     if (planet.inProgressBuilding?.building === building) {
       continue;
     }
@@ -44,7 +59,14 @@ export function getAllPossibleBuildOrderItemForPlanet(
       items.push({entity: building, level: 1, planet});
     }
   }
+  return items;
+}
 
+export function getAvailableTechnologiesForAccount(
+  account: Account,
+  planet: Planet
+): BuildOrderItem[] {
+  const items: BuildOrderItem[] = [];
   if (account.inProgressTechnology === undefined) {
     for (const technology of AllTechnologies) {
       const currentLevel = account.technologyLevels.get(technology) ?? 0;
@@ -56,4 +78,8 @@ export function getAllPossibleBuildOrderItemForPlanet(
     }
   }
   return items;
+}
+
+export function buildOrderItemToDebugString(item: BuildOrderItem): string {
+  return `${item.entity.name} lvl ${item.level}`;
 }

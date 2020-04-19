@@ -1,47 +1,113 @@
 import React, {FC} from 'react';
 import styled from 'styled-components';
 
-import {createNewAccount} from '@shared/lib/account';
-import {BuildOrderItem, getAllPossibleBuildOrderItemForPlanet} from '@shared/lib/build_order';
+import {applyBuildItem, createNewAccount} from '@shared/lib/account';
+import {
+  BuildOrderItem,
+  buildOrderItemAreEqual,
+  buildOrderItemToDebugString,
+  getAvailableBuildingsForPlanet,
+  getAvailableTechnologiesForAccount,
+} from '@shared/lib/build_order';
 import {
   computeRequirementTree,
   getRequirementTreeLeaves,
   removeRequirementFromTree,
 } from '@shared/lib/requirement_tree';
+import {toStandardUnits} from '@shared/lib/resources';
 import {setupRapidFire, setupRequirements} from '@shared/models/dependencies';
-import {AstrophysicsTechnology} from '@shared/models/technology';
+import {Destroyer} from '@shared/models/ships';
 import {Rosalind} from '@shared/models/universe';
 import {arrayJoin} from '@shared/utils/array_utils';
-import {rand} from '@shared/utils/rand';
 
-import {BuildOrderItemView} from '@src/components/buildable_order_item_view';
+import {BuildOrderItemView} from '@src/components/build_order_item_view';
 
 setupRapidFire();
 setupRequirements();
 
 const account = createNewAccount(Rosalind);
 const mainPlanet = account.planets[0];
-const buildTree = computeRequirementTree(AstrophysicsTechnology);
+// mainPlanet.buildingLevels.set(ResearchLab, 2);
 
-const essentialBuilds: BuildOrderItem[] = [];
-while (buildTree.children.length > 0) {
-  const leaves = getRequirementTreeLeaves(buildTree);
-  const leaf = leaves[rand(0, leaves.length - 1)];
-  essentialBuilds.push({...leaf, planet: mainPlanet});
-  removeRequirementFromTree(buildTree, leaf);
+function nextBuildOrderItem(): BuildOrderItem {
+  const availableBuildings: BuildOrderItem[] = getAvailableBuildingsForPlanet(account, mainPlanet);
+  const availableTechonologies: BuildOrderItem[] = getAvailableTechnologiesForAccount(
+    account,
+    mainPlanet
+  );
+  const availableItems = [...availableBuildings, ...availableTechonologies];
+  let totalScore = 0;
+  const availableItemsAndScore: [BuildOrderItem, number][] = availableItems.map(item => {
+    const score = 10e9 / toStandardUnits(account, item.entity.cost(item.level));
+    totalScore += score;
+    return [item, score];
+  });
+
+  const r = Math.random() * totalScore;
+  let current = 0;
+  for (const [item, score] of availableItemsAndScore) {
+    current += score;
+    if (r < current) {
+      return item;
+    }
+  }
+
+  throw new Error(`Failure to pick a build order item`);
 }
-const availableBuilds: BuildOrderItem[] = getAllPossibleBuildOrderItemForPlanet(
-  account,
-  mainPlanet
-);
+
+const buildOrder: BuildOrderItem[] = [];
+const buildTree = computeRequirementTree(Destroyer);
+
+while (buildTree.children.length > 0) {
+  let leaves = getRequirementTreeLeaves(buildTree).map(leaf => ({...leaf, planet: mainPlanet}));
+  while (leaves.length > 0) {
+    const next = nextBuildOrderItem();
+    const newLeaves = leaves.filter(leaf => !buildOrderItemAreEqual(leaf, next));
+    applyBuildItem(account, next);
+    if (newLeaves.length !== leaves.length) {
+      removeRequirementFromTree(buildTree, next);
+      leaves = getRequirementTreeLeaves(buildTree).map(leaf => ({...leaf, planet: mainPlanet}));
+    }
+    buildOrder.push(next);
+  }
+}
+
+if (buildTree.target.type === 'building' || buildTree.target.type === 'technology') {
+  while (true) {
+    const next = nextBuildOrderItem();
+    buildOrder.push(next);
+    if (buildOrderItemAreEqual(next, {entity: buildTree.target, level: 1, planet: mainPlanet})) {
+      break;
+    }
+  }
+}
+
+// while (buildTree.children.length > 0) {
+//   const leaves = getRequirementTreeLeaves(buildTree);
+//   const leaf = leaves[rand(0, leaves.length - 1)];
+//   essentialBuilds.push({...leaf, planet: mainPlanet});
+//   removeRequirementFromTree(buildTree, leaf);
+// }
 
 export const App: FC = () => (
   <Wrapper>
     <Column>
-      <ColumnTitle>Essential builds order</ColumnTitle>
+      <ColumnTitle>Build Order</ColumnTitle>
       <Separator />
       {arrayJoin(
-        essentialBuilds.map(item => (
+        buildOrder.map(item => (
+          <BuildOrderItemView key={`${item.entity.name}-${item.level}`} item={item} />
+        )),
+        i => (
+          <Separator key={i} />
+        )
+      )}
+    </Column>
+    {/* <Column>
+      <ColumnTitle>Available buildings on main planet</ColumnTitle>
+      <Separator />
+      {arrayJoin(
+        availableBuildings.map(item => (
           <BuildOrderItemView key={`${item.entity.name}-${item.level}`} item={item} />
         )),
         i => (
@@ -50,17 +116,17 @@ export const App: FC = () => (
       )}
     </Column>
     <Column>
-      <ColumnTitle>Available on main planet</ColumnTitle>
+      <ColumnTitle>Available technologies</ColumnTitle>
       <Separator />
       {arrayJoin(
-        availableBuilds.map(item => (
+        availableTechonologies.map(item => (
           <BuildOrderItemView key={`${item.entity.name}-${item.level}`} item={item} />
         )),
         i => (
           <Separator key={i} />
         )
       )}
-    </Column>
+    </Column> */}
   </Wrapper>
 );
 App.displayName = 'App';
@@ -68,19 +134,21 @@ App.displayName = 'App';
 const Wrapper = styled.div`
   display: flex;
   justify-content: space-evenly;
+  margin-top: 24px;
 `;
 
 const Column = styled.div`
   font-family: Verdana, sans-serif;
   display: flex;
   flex-direction: column;
-  width: 300px;
+  /* width: 320px; */
 `;
 const ColumnTitle = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  text-align: center;
+  font-size: 14px;
   font-weight: 600;
   padding: 8px;
   background-color: #dddddd;

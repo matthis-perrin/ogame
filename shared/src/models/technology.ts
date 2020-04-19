@@ -18,9 +18,11 @@ function makeTechnology(name: string, baseCost: Resources, costExponential = 2):
     type: 'technology',
     name,
     cost: (level: number) => ({
-      metal: (baseCost.metal * Math.pow(costExponential, level - 1)) as MetalAmount,
-      crystal: (baseCost.crystal * Math.pow(costExponential, level - 1)) as CrystalAmount,
-      deuterium: (baseCost.deuterium * Math.pow(costExponential, level - 1)) as DeuteriumAmount,
+      metal: Math.floor(baseCost.metal * Math.pow(costExponential, level - 1)) as MetalAmount,
+      crystal: Math.floor(baseCost.crystal * Math.pow(costExponential, level - 1)) as CrystalAmount,
+      deuterium: Math.floor(
+        baseCost.deuterium * Math.pow(costExponential, level - 1)
+      ) as DeuteriumAmount,
     }),
     requirements: [],
   };
