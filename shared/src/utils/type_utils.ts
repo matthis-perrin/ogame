@@ -152,3 +152,11 @@ export interface FlatObject {
 export type Untrusted<T> = {
   [P in keyof T]: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 };
+
+export function sum<T>(...args: Brand<number, T>[]): Brand<number, T> {
+  let total = 0;
+  for (const arg of args) {
+    total += arg;
+  }
+  return total as Brand<number, T>;
+}
