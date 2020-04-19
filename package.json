@@ -2,7 +2,7 @@
   "name": "ogame",
   "private": true,
   "scripts": {
-    "setup": "npm install && cd build && npm install && cd .. && cd server && npm install && cd .. && cd frontend && npm install && cd .. && cd extension && npm install && cd ..",
+    "setup": "npm install && cd build && npm install && cd .. && cd shared && npm install && cd .. && cd server && npm install && cd .. && cd frontend && npm install && cd .. && cd extension && npm install && cd ..",
     "watch": "cd build && npm run watch && cd .."
   },
   "dependencies": {

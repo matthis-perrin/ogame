@@ -1,0 +1,10 @@
+{
+  "name": "frontend",
+  "private": true,
+  "dependencies": {
+    "core-js": "3.6.4"
+  },
+  "devDependencies": {
+    "typescript": "3.8.3"
+  }
+}
