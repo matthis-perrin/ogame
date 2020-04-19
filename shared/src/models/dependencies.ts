@@ -65,6 +65,8 @@ export function setupRequirements(): void {
     {entity: RoboticsFactory, level: 10},
     {entity: ComputerTechnology, level: 10}
   );
+  ResearchLab.requirements.push({entity: DeuteriumSynthesizer, level: 1});
+  RoboticsFactory.requirements.push({entity: DeuteriumSynthesizer, level: 1});
 
   // Technologies
   ComputerTechnology.requirements.push({entity: ResearchLab, level: 1});

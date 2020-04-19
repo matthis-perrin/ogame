@@ -1,3 +1,4 @@
+import {uniqBy} from 'lodash-es';
 import React, {FC} from 'react';
 import styled from 'styled-components';
 
@@ -5,7 +6,7 @@ import {applyBuildItem, createNewAccount} from '@shared/lib/account';
 import {
   BuildOrderItem,
   buildOrderItemAreEqual,
-  buildOrderItemToDebugString,
+  buildOrderItemToString,
   getAvailableBuildingsForPlanet,
   getAvailableTechnologiesForAccount,
 } from '@shared/lib/build_order';
@@ -15,6 +16,7 @@ import {
   removeRequirementFromTree,
 } from '@shared/lib/requirement_tree';
 import {toStandardUnits} from '@shared/lib/resources';
+import {PlasmaTurret} from '@shared/models/defense';
 import {setupRapidFire, setupRequirements} from '@shared/models/dependencies';
 import {Destroyer} from '@shared/models/ships';
 import {Rosalind} from '@shared/models/universe';
@@ -28,17 +30,19 @@ setupRequirements();
 const account = createNewAccount(Rosalind);
 const mainPlanet = account.planets[0];
 // mainPlanet.buildingLevels.set(ResearchLab, 2);
-
-function nextBuildOrderItem(): BuildOrderItem {
+function nextBuildOrderItem(nextEssentialBuilds: BuildOrderItem[]): BuildOrderItem {
   const availableBuildings: BuildOrderItem[] = getAvailableBuildingsForPlanet(account, mainPlanet);
   const availableTechonologies: BuildOrderItem[] = getAvailableTechnologiesForAccount(
     account,
     mainPlanet
   );
-  const availableItems = [...availableBuildings, ...availableTechonologies];
+  const availableItems = uniqBy(
+    [...availableBuildings, ...availableTechonologies, ...nextEssentialBuilds],
+    buildOrderItemToString
+  );
   let totalScore = 0;
   const availableItemsAndScore: [BuildOrderItem, number][] = availableItems.map(item => {
-    const score = 10e9 / toStandardUnits(account, item.entity.cost(item.level));
+    const score = 1 / toStandardUnits(account, item.entity.cost(item.level));
     totalScore += score;
     return [item, score];
   });
@@ -56,12 +60,12 @@ function nextBuildOrderItem(): BuildOrderItem {
 }
 
 const buildOrder: BuildOrderItem[] = [];
-const buildTree = computeRequirementTree(Destroyer);
+const buildTree = computeRequirementTree(PlasmaTurret);
 
 while (buildTree.children.length > 0) {
   let leaves = getRequirementTreeLeaves(buildTree).map(leaf => ({...leaf, planet: mainPlanet}));
   while (leaves.length > 0) {
-    const next = nextBuildOrderItem();
+    const next = nextBuildOrderItem(leaves);
     const newLeaves = leaves.filter(leaf => !buildOrderItemAreEqual(leaf, next));
     applyBuildItem(account, next);
     if (newLeaves.length !== leaves.length) {
@@ -73,10 +77,11 @@ while (buildTree.children.length > 0) {
 }
 
 if (buildTree.target.type === 'building' || buildTree.target.type === 'technology') {
+  const lastEssential = {entity: buildTree.target, level: 1, planet: mainPlanet};
   while (true) {
-    const next = nextBuildOrderItem();
+    const next = nextBuildOrderItem([lastEssential]);
     buildOrder.push(next);
-    if (buildOrderItemAreEqual(next, {entity: buildTree.target, level: 1, planet: mainPlanet})) {
+    if (buildOrderItemAreEqual(next, lastEssential)) {
       break;
     }
   }

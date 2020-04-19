@@ -1,3 +1,4 @@
+import {coordinateToString} from '@shared/lib/coordinate';
 import {Account} from '@shared/models/account';
 import {Buildable} from '@shared/models/buildable';
 import {
@@ -62,13 +63,15 @@ export function getAvailableBuildingsForPlanet(account: Account, planet: Planet)
   return items;
 }
 
+const technologyWhitelist = AllTechnologies.filter(t => t.isUseful);
+
 export function getAvailableTechnologiesForAccount(
   account: Account,
   planet: Planet
 ): BuildOrderItem[] {
   const items: BuildOrderItem[] = [];
   if (account.inProgressTechnology === undefined) {
-    for (const technology of AllTechnologies) {
+    for (const technology of technologyWhitelist) {
       const currentLevel = account.technologyLevels.get(technology) ?? 0;
       if (currentLevel > 0) {
         items.push({entity: technology, level: currentLevel + 1, planet});
@@ -80,6 +83,8 @@ export function getAvailableTechnologiesForAccount(
   return items;
 }
 
-export function buildOrderItemToDebugString(item: BuildOrderItem): string {
-  return `${item.entity.name} lvl ${item.level}`;
+export function buildOrderItemToString(item: BuildOrderItem): string {
+  return `${item.entity.name} lvl ${item.level} on ${coordinateToString(
+    item.planet.metadata.coordinates
+  )}`;
 }
