@@ -2,7 +2,7 @@ import {useEffect, useState} from 'react';
 
 import {persist} from '@src/controllers/storage';
 import {Account} from '@src/models/account';
-import {SUM_PLANET} from '@src/models/constants';
+import {MAX_TECHNOLOGIES, SUM_PLANET} from '@src/models/constants';
 import {Planet, PlanetCoords, PlanetId, PlanetName} from '@src/models/planets';
 import {ResourceAmount, Resources} from '@src/models/resources';
 import {Tech} from '@src/models/tech';
@@ -31,11 +31,20 @@ export function addPlanet(
   const account: Account = {
     planetList,
     planetDetails: currentAccount?.planetDetails ?? {},
+    maxTechnologies: currentAccount?.maxTechnologies ?? {},
   };
 
   const technologiesObj = currentAccount?.planetDetails[id]?.technologies ?? {};
   for (const technology of technologies) {
     technologiesObj[technology.techId] = technology;
+    if (MAX_TECHNOLOGIES.includes(technology.techId)) {
+      if (
+        !account.maxTechnologies.hasOwnProperty(technology.techId) ||
+        technology.value > account.maxTechnologies[technology.techId]
+      ) {
+        account.maxTechnologies[technology.techId] = technology.value;
+      }
+    }
   }
 
   account.planetDetails[id] = {
@@ -138,6 +147,7 @@ function applyProduction(): void {
   const account: Account = {
     planetList: currentAccount.planetList,
     planetDetails: {},
+    maxTechnologies: currentAccount.maxTechnologies,
   };
 
   for (const planetId in currentAccount.planetDetails) {

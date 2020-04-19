@@ -3,19 +3,13 @@ import styled from 'styled-components';
 
 import {
   ALO_RATIO,
-  CRYSTAL_REQ,
   DEBRIS_PERCENTAGE,
-  DEUTERIUM_REQ,
   GAU_RATIO,
   GT_FRET,
   INACTIVITY_TIME,
   LM_RATIO,
-  METAL_REQ,
   PLA_RATIO,
-  ROBOTS_REQ,
   SAT_DEBRIS,
-  SILO_REQ,
-  SPA_REQ,
   SUM_PLANET,
 } from '@src/models/constants';
 import {Tech} from '@src/models/tech';
@@ -131,19 +125,31 @@ export const App: FC = () => {
                               name="M"
                               technologies={planet.technologies}
                               techId={Tech.MetalMine}
-                              required={METAL_REQ}
+                              required={
+                                account.maxTechnologies.hasOwnProperty(Tech.MetalMine)
+                                  ? account.maxTechnologies[Tech.MetalMine]
+                                  : undefined
+                              }
                             />
                             <TechnologyC
                               name="C"
                               technologies={planet.technologies}
                               techId={Tech.CrystalMine}
-                              required={CRYSTAL_REQ}
+                              required={
+                                account.maxTechnologies.hasOwnProperty(Tech.CrystalMine)
+                                  ? account.maxTechnologies[Tech.CrystalMine]
+                                  : undefined
+                              }
                             />
                             <TechnologyC
                               name="D"
                               technologies={planet.technologies}
                               techId={Tech.DeuteriumSynthesizer}
-                              required={DEUTERIUM_REQ}
+                              required={
+                                account.maxTechnologies.hasOwnProperty(Tech.DeuteriumSynthesizer)
+                                  ? account.maxTechnologies[Tech.DeuteriumSynthesizer]
+                                  : undefined
+                              }
                             />
                           </Line>
                         )}
@@ -157,6 +163,11 @@ export const App: FC = () => {
                               name="Sol"
                               technologies={planet.technologies}
                               techId={Tech.SolarPlant}
+                              required={
+                                account.maxTechnologies.hasOwnProperty(Tech.SolarPlant)
+                                  ? account.maxTechnologies[Tech.SolarPlant]
+                                  : undefined
+                              }
                             />
                             <TechnologyC
                               name="Sat"
@@ -176,22 +187,41 @@ export const App: FC = () => {
                               name="M"
                               technologies={planet.technologies}
                               techId={Tech.MetalStorage}
+                              required={
+                                account.maxTechnologies.hasOwnProperty(Tech.MetalStorage)
+                                  ? account.maxTechnologies[Tech.MetalStorage]
+                                  : undefined
+                              }
                             />
                             <TechnologyC
                               name="C"
                               technologies={planet.technologies}
                               techId={Tech.CrystalStorage}
+                              required={
+                                account.maxTechnologies.hasOwnProperty(Tech.CrystalStorage)
+                                  ? account.maxTechnologies[Tech.CrystalStorage]
+                                  : undefined
+                              }
                             />
                             <TechnologyC
                               name="D"
                               technologies={planet.technologies}
                               techId={Tech.DeuteriumStorage}
+                              required={
+                                account.maxTechnologies.hasOwnProperty(Tech.DeuteriumStorage)
+                                  ? account.maxTechnologies[Tech.DeuteriumStorage]
+                                  : undefined
+                              }
                             />
                             <TechnologyC
                               name="Silo"
                               technologies={planet.technologies}
                               techId={Tech.MissileSilo}
-                              required={SILO_REQ}
+                              required={
+                                account.maxTechnologies.hasOwnProperty(Tech.MissileSilo)
+                                  ? account.maxTechnologies[Tech.MissileSilo]
+                                  : undefined
+                              }
                             />
                           </Line>
                         )}
@@ -205,13 +235,21 @@ export const App: FC = () => {
                               name="Rob"
                               technologies={planet.technologies}
                               techId={Tech.RoboticsFactory}
-                              required={ROBOTS_REQ}
+                              required={
+                                account.maxTechnologies.hasOwnProperty(Tech.RoboticsFactory)
+                                  ? account.maxTechnologies[Tech.RoboticsFactory]
+                                  : undefined
+                              }
                             />
                             <TechnologyC
                               name="Spa"
                               technologies={planet.technologies}
                               techId={Tech.Shipyard}
-                              required={SPA_REQ}
+                              required={
+                                account.maxTechnologies.hasOwnProperty(Tech.Shipyard)
+                                  ? account.maxTechnologies[Tech.Shipyard]
+                                  : undefined
+                              }
                             />
                             <TechnologyC
                               name="Lab"
@@ -222,6 +260,11 @@ export const App: FC = () => {
                               name="Nan"
                               technologies={planet.technologies}
                               techId={Tech.NaniteFactory}
+                              required={
+                                account.maxTechnologies.hasOwnProperty(Tech.NaniteFactory)
+                                  ? account.maxTechnologies[Tech.NaniteFactory]
+                                  : undefined
+                              }
                             />
                           </Line>
                         )}

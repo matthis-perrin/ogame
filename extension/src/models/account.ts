@@ -5,6 +5,7 @@ import {Technology} from '@src/models/technologies';
 export interface Account {
   planetList: Planet[];
   planetDetails: {[planetId: string]: AccountPlanet};
+  maxTechnologies: {[techId: string]: number};
 }
 
 export interface AccountPlanet {
