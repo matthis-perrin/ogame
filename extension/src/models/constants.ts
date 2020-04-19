@@ -12,10 +12,6 @@ export const PLA_RATIO = 50 / 1000000;
 
 // Sum of units that goes into debris field (all but deut)
 export const SAT_DEBRIS = 2000;
-export const PT_DEBRIS = 4000;
-export const GT_DEBRIS = 12000;
-export const REC_DEBRIS = 16000;
-export const ESP_DEBRIS = 1000;
 
 // Required buildings
 export const METAL_REQ = 22;

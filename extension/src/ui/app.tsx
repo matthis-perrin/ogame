@@ -25,7 +25,7 @@ import {Loot} from '@src/ui/loot';
 import {Production} from '@src/ui/production';
 import {Resource} from '@src/ui/resource';
 import {TechnologyC} from '@src/ui/technology';
-import {calcFleetLoot, sum} from '@src/ui/utils';
+import {sum} from '@src/ui/utils';
 
 export const App: FC = () => {
   const [account] = useAccount();
@@ -67,8 +67,7 @@ export const App: FC = () => {
                       SAT_DEBRIS *
                       DEBRIS_PERCENTAGE
                     : 0;
-                  const fleetLoot = 0; //calcFleetLoot(planet.technologies);
-                  const totalLoot = inactivityLoot + satelliteLoot + fleetLoot;
+                  const totalLoot = inactivityLoot + satelliteLoot;
                   const resourcesSum = sum([
                     planet.resources.metal,
                     planet.resources.crystal,
@@ -326,7 +325,6 @@ export const App: FC = () => {
                           <Line>
                             <Loot name="Prod" amount={inactivityLoot} />
                             <Loot name="Sats" amount={satelliteLoot} />
-                            <Loot name="Fleet" amount={fleetLoot} />
                             <Loot name="Total" amount={totalLoot} />
                           </Line>
                         )}
