@@ -19,12 +19,14 @@ export function parseUI(): void {
 
   const metas = parseMeta();
   const id = metas.find(_ => _.name === 'ogame-planet-id')?.content;
-  if (id === undefined) {
+  const timestamp = metas.find(_ => _.name === 'ogame-timestamp')?.content;
+  if (id === undefined || timestamp === undefined) {
     return;
   }
+  const planetId = `planet-${id}` as PlanetId;
+  const serverTimeSeconds = parseFloat(timestamp);
   console.log(`Meta parsed ${metas.length}`);
 
-  const planetId = `planet-${id}` as PlanetId;
   const planets = parsePlanets();
   if (planets.length === 0) {
     return;
@@ -52,5 +54,5 @@ export function parseUI(): void {
 
   console.log('OK');
 
-  addPlanet(planets, planetId, resources, technologies, fleets);
+  addPlanet(serverTimeSeconds, planets, planetId, resources, technologies, fleets);
 }

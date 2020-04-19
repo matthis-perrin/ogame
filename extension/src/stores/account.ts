@@ -2,7 +2,7 @@ import {useEffect, useState} from 'react';
 
 import {persist} from '@src/controllers/storage';
 import {Account, AccountPlanet} from '@src/models/account';
-import {ACCOUNT_TECHNOLOGIES, MAX_TECHNOLOGIES} from '@src/models/constants';
+import {ACCOUNT_TECHNOLOGIES, MAX_TECHNOLOGIES, UI_REFRESH_RATE} from '@src/models/constants';
 import {Fleet, ReturnFlight} from '@src/models/fleets';
 import {Planet, PlanetId} from '@src/models/planets';
 import {ResourceAmount, Resources} from '@src/models/resources';
@@ -43,6 +43,12 @@ function calcPlanetSum(planetDetails: {[planetId: string]: AccountPlanet}): Acco
 
   return {
     id: 'SUM' as PlanetId,
+    truth: {
+      serverTimeSeconds: 0,
+      metal: 0 as ResourceAmount,
+      crystal: 0 as ResourceAmount,
+      deuterium: 0 as ResourceAmount,
+    },
     resources: {
       metal: metalResources as ResourceAmount,
       crystal: cystalResources as ResourceAmount,
@@ -74,6 +80,7 @@ export function setAccount(account: Account, persistent = true): void {
 }
 
 export function addPlanet(
+  serverTimeSeconds: number,
   planetList: Planet[],
   id: PlanetId,
   resources: Resources,
@@ -125,6 +132,12 @@ export function addPlanet(
 
   account.planetDetails[id] = {
     id,
+    truth: {
+      serverTimeSeconds,
+      metal: resources.resources.metal.amount,
+      crystal: resources.resources.crystal.amount,
+      deuterium: resources.resources.deuterium.amount,
+    },
     resources: {
       metal: resources.resources.metal.amount,
       crystal: resources.resources.crystal.amount,
@@ -186,15 +199,20 @@ function applyProduction(): void {
     planetSum: undefined,
   };
 
+  const nowMillis = new Date().getTime();
+  const nowSeconds = Math.floor(nowMillis / 1000);
+
   for (const planetId in currentAccount.planetDetails) {
     if (currentAccount.planetDetails.hasOwnProperty(planetId)) {
       const planet = currentAccount.planetDetails[planetId];
+      const elaspedSeconds = (nowMillis - planet.truth.serverTimeSeconds * 1000) / 1000;
       account.planetDetails[planetId] = {
         id: planet.id,
+        truth: planet.truth,
         resources: {
-          metal: sum([planet.resources.metal, planet.productions.metal]),
-          crystal: sum([planet.resources.crystal, planet.productions.crystal]),
-          deuterium: sum([planet.resources.deuterium, planet.productions.deuterium]),
+          metal: sum([planet.truth.metal, planet.productions.metal * elaspedSeconds]),
+          crystal: sum([planet.truth.crystal, planet.productions.crystal * elaspedSeconds]),
+          deuterium: sum([planet.truth.deuterium, planet.productions.deuterium * elaspedSeconds]),
           energy: planet.resources.energy,
         },
         productions: planet.productions,
@@ -204,11 +222,10 @@ function applyProduction(): void {
     }
   }
 
-  const now = Math.floor(new Date().getTime() / 1000);
   for (const fleetId in currentAccount.fleets) {
     if (currentAccount.fleets.hasOwnProperty(fleetId)) {
       const fleet = currentAccount.fleets[fleetId];
-      if (now >= fleet.midTime) {
+      if (nowSeconds >= fleet.midTime) {
         if (fleet.returnFlight) {
           // TODO: Handle resource drop
           continue;
@@ -225,4 +242,4 @@ function applyProduction(): void {
   setAccount(account);
 }
 
-setInterval(applyProduction, 1000);
+setInterval(applyProduction, UI_REFRESH_RATE);

@@ -14,6 +14,12 @@ export interface Account {
 
 export interface AccountPlanet {
   id: PlanetId;
+  truth: {
+    serverTimeSeconds: number;
+    metal: ResourceAmount;
+    crystal: ResourceAmount;
+    deuterium: ResourceAmount;
+  };
   resources: {
     metal: ResourceAmount;
     crystal: ResourceAmount;

@@ -4,6 +4,7 @@ import {Tech} from '@src/models/tech';
 export const INACTIVITY_TIME = 6.5; // 6h30m
 export const DEBRIS_PERCENTAGE = 0.3;
 export const GT_FRET = 31250;
+export const UI_REFRESH_RATE = 500;
 
 // Defense ratio for 1M lootable resource
 export const LM_RATIO = 2000 / 1000000;

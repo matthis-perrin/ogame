@@ -12,7 +12,6 @@ export const Production: FC<ResourceProps> = ({name, production}) => (
   <Fragment>
     <div>
       {name}: +{snum(production * 3600)}/h
-      {/* {name}: +{production * 3600}/h */}
     </div>
   </Fragment>
 );
