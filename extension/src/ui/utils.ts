@@ -24,3 +24,18 @@ export function snum(value: number): string {
   }
   return `${units}${unitName}`;
 }
+
+export function padTime(value: number, length = 2): string {
+  let res = value.toString();
+  while (res.length < length) {
+    res = `0${res}`;
+  }
+  return res;
+}
+
+export function time(totalSeconds: number): string {
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds - hours * 3600) / 60);
+  const seconds = totalSeconds - hours * 3600 - minutes * 60;
+  return `${padTime(hours)}:${padTime(minutes)}:${padTime(seconds)}`;
+}

@@ -1,6 +1,5 @@
 export type HonorScore = number & {_: 'HonorScore'};
 export type ResourceAmount = number & {_: 'ResourceAmount'};
-export type ResourceStorage = number & {_: 'ResourceStorage'};
 export type TechId = number & {_: 'TechId'};
 
 export interface Resources {
@@ -18,6 +17,7 @@ export interface Resources {
 export interface ResourceInfo {
   amount: ResourceAmount;
   storage: ResourceAmount;
+  baseProduction: ResourceAmount;
 }
 
 export interface TechInfo {

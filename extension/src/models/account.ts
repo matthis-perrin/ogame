@@ -6,6 +6,7 @@ export interface Account {
   planetList: Planet[];
   planetDetails: {[planetId: string]: AccountPlanet};
   maxTechnologies: {[techId: string]: number};
+  accountTechnologies: {[techId: string]: Technology};
 }
 
 export interface AccountPlanet {

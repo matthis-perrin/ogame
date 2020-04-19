@@ -13,15 +13,21 @@ export function parseUI(): void {
   if (resources === undefined) {
     return;
   }
+  console.log('Resources parsed');
 
   const metas = parseMeta();
   const id = metas.find(_ => _.name === 'ogame-planet-id')?.content;
   if (id === undefined) {
     return;
   }
+  console.log(`Meta parsed ${metas.length}`);
 
   const planetId = `planet-${id}` as PlanetId;
   const planets = parsePlanets();
+  if (planets.length === 0) {
+    return;
+  }
+  console.log(`Planets parsed ${planets.length}`);
 
   let technologies: Technology[] = [];
   let shouldParseTechnologies = false;
@@ -34,6 +40,10 @@ export function parseUI(): void {
   if (shouldParseTechnologies) {
     technologies = parseTechnologies();
   }
+
+  console.log(`Technologies parsed ${technologies.length}`);
+
+  console.log('OK');
 
   addPlanet(planets, planetId, resources, technologies);
 }

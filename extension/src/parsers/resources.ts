@@ -6,11 +6,14 @@ const regex = /reloadResources\((.*)\);/;
 
 export function parseResources(): Resources | undefined {
   let res: Resources | undefined;
-  $('html > body > #pageContent > #top > #resourcesbarcomponent > script').each((_, element) => {
+  $('html > body #resourcesbarcomponent script').each((_, element) => {
     const match = regex.exec(element.innerText);
     // eslint-disable-next-line no-null/no-null
     if (match !== null) {
-      res = JSON.parse(match[1]);
+      try {
+        res = JSON.parse(match[1]) as Resources;
+        // eslint-disable-next-line no-empty
+      } catch {}
     }
   });
   return res;

@@ -2,7 +2,7 @@ import {useEffect, useState} from 'react';
 
 import {persist} from '@src/controllers/storage';
 import {Account} from '@src/models/account';
-import {MAX_TECHNOLOGIES, SUM_PLANET} from '@src/models/constants';
+import {ACCOUNT_TECHNOLOGIES, MAX_TECHNOLOGIES, SUM_PLANET} from '@src/models/constants';
 import {Planet, PlanetCoords, PlanetId, PlanetName} from '@src/models/planets';
 import {ResourceAmount, Resources} from '@src/models/resources';
 import {Tech} from '@src/models/tech';
@@ -32,17 +32,22 @@ export function addPlanet(
     planetList,
     planetDetails: currentAccount?.planetDetails ?? {},
     maxTechnologies: currentAccount?.maxTechnologies ?? {},
+    accountTechnologies: currentAccount?.accountTechnologies ?? {},
   };
 
   const technologiesObj = currentAccount?.planetDetails[id]?.technologies ?? {};
   for (const technology of technologies) {
-    technologiesObj[technology.techId] = technology;
-    if (MAX_TECHNOLOGIES.includes(technology.techId)) {
-      if (
-        !account.maxTechnologies.hasOwnProperty(technology.techId) ||
-        technology.value > account.maxTechnologies[technology.techId]
-      ) {
-        account.maxTechnologies[technology.techId] = technology.value;
+    if (ACCOUNT_TECHNOLOGIES.includes(technology.techId)) {
+      account.accountTechnologies[technology.techId] = technology;
+    } else {
+      technologiesObj[technology.techId] = technology;
+      if (MAX_TECHNOLOGIES.includes(technology.techId)) {
+        if (
+          !account.maxTechnologies.hasOwnProperty(technology.techId) ||
+          technology.value > account.maxTechnologies[technology.techId]
+        ) {
+          account.maxTechnologies[technology.techId] = technology.value;
+        }
       }
     }
   }
@@ -61,9 +66,18 @@ export function addPlanet(
       deuterium: resources.resources.deuterium.storage,
     },
     productions: {
-      metal: resources.techs[Tech.MetalMine].production.metal,
-      crystal: resources.techs[Tech.CrystalMine].production.crystal,
-      deuterium: resources.techs[Tech.DeuteriumSynthesizer].production.deuterium,
+      metal: sum([
+        resources.resources.metal.baseProduction,
+        resources.techs[Tech.MetalMine].production.metal,
+      ]),
+      crystal: sum([
+        resources.resources.crystal.baseProduction,
+        resources.techs[Tech.CrystalMine].production.crystal,
+      ]),
+      deuterium: sum([
+        resources.resources.deuterium.baseProduction,
+        resources.techs[Tech.DeuteriumSynthesizer].production.deuterium,
+      ]),
     },
     technologies: technologiesObj,
   };
@@ -148,6 +162,7 @@ function applyProduction(): void {
     planetList: currentAccount.planetList,
     planetDetails: {},
     maxTechnologies: currentAccount.maxTechnologies,
+    accountTechnologies: currentAccount.accountTechnologies,
   };
 
   for (const planetId in currentAccount.planetDetails) {

@@ -4,7 +4,7 @@ import {Planet, PlanetCoords, PlanetId, PlanetName} from '@src/models/planets';
 
 export function parsePlanets(): Planet[] {
   const res: Planet[] = [];
-  $('html > body > #pageContent > #right #planetList > div').each((_, element) => {
+  $('html > body #planetList > div').each((_, element) => {
     res.push({
       id: element.id as PlanetId,
       name: $(element)

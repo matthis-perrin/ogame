@@ -37,3 +37,22 @@ export const TECHNOLOGY_PAGES = [
   'component=shipyard',
   'component=research',
 ];
+
+export const ACCOUNT_TECHNOLOGIES = [
+  Tech.EspionageTechnology,
+  Tech.ComputerTechnology,
+  Tech.WeaponsTechnology,
+  Tech.ShieldingTechnology,
+  Tech.ArmorTechnology,
+  Tech.EnergyTechnology,
+  Tech.HyperspaceTechnology,
+  Tech.CombustionDriveTechnology,
+  Tech.ImpulseDriveTechnology,
+  Tech.HyperspaceDriveTechnology,
+  Tech.LaserTechnology,
+  Tech.IonTechnology,
+  Tech.PlasmaTechnology,
+  Tech.AstrophysicsTechnology,
+  Tech.ResearchNetworkTechnology,
+  Tech.GravitonTechnology,
+];
