@@ -6,4 +6,5 @@ export interface Technology {
   techId: TechId;
   value: TechnologyValue;
   target?: TechnologyValue;
+  targetEndSeconds?: number;
 }

@@ -26,10 +26,15 @@ export function parseTechnologies(): Technology[] {
             .find('.targetamount[data-value]')
             .attr('data-value');
         }
+        const targetEndSeconds = $(element)
+          .find('.countdown[data-end]')
+          .attr('data-end');
         res.push({
           techId: parseFloat(technology) as TechId,
           value: parseFloat(value) as TechnologyValue,
           target: target !== undefined ? (parseFloat(target) as TechnologyValue) : undefined,
+          targetEndSeconds:
+            targetEndSeconds !== undefined ? parseFloat(targetEndSeconds) : undefined,
         });
       }
     }
