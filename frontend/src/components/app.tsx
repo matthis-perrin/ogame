@@ -2,7 +2,7 @@ import {uniqBy} from 'lodash-es';
 import React, {FC} from 'react';
 import styled from 'styled-components';
 
-import {applyBuildItem, createNewAccount} from '@shared/lib/account';
+import {applyBuildItem, createBenjAccount, createNewAccount} from '@shared/lib/account';
 import {
   BuildOrderItem,
   buildOrderItemAreEqual,
@@ -10,6 +10,7 @@ import {
   getAvailableBuildingsForPlanet,
   getAvailableTechnologiesForAccount,
 } from '@shared/lib/build_order';
+import {getAccountProductionPerHour, getPlanetProductionPerHour} from '@shared/lib/production';
 import {
   computeRequirementTree,
   getRequirementTreeLeaves,
@@ -28,6 +29,14 @@ setupRapidFire();
 setupRequirements();
 
 const account = createNewAccount(Rosalind);
+// console.log(getAccountProductionPerHour(account));
+
+const benjAccount = createBenjAccount();
+console.log(getAccountProductionPerHour(benjAccount));
+for (const p of benjAccount.planets) {
+  console.log(getPlanetProductionPerHour(benjAccount, p));
+}
+
 const mainPlanet = account.planets[0];
 // mainPlanet.buildingLevels.set(ResearchLab, 2);
 function nextBuildOrderItem(nextEssentialBuilds: BuildOrderItem[]): BuildOrderItem {
@@ -68,6 +77,7 @@ while (buildTree.children.length > 0) {
     const next = nextBuildOrderItem(leaves);
     const newLeaves = leaves.filter(leaf => !buildOrderItemAreEqual(leaf, next));
     applyBuildItem(account, next);
+    // console.log(getAccountProductionPerHour(account));
     if (newLeaves.length !== leaves.length) {
       removeRequirementFromTree(buildTree, next);
       leaves = getRequirementTreeLeaves(buildTree).map(leaf => ({...leaf, planet: mainPlanet}));

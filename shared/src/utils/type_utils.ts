@@ -153,6 +153,10 @@ export type Untrusted<T> = {
   [P in keyof T]: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 };
 
-export function sum<T>(n1: Brand<number, T>, n2: Brand<number, T>): Brand<number, T> {
-  return ((n1 as number) + (n2 as number)) as Brand<number, T>;
+export function sum<T>(...args: Brand<number, T>[]): Brand<number, T> {
+  let total = 0;
+  for (const arg of args) {
+    total += arg;
+  }
+  return total as Brand<number, T>;
 }
