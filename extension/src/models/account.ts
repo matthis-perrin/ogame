@@ -9,6 +9,7 @@ export interface Account {
   maxTechnologies: {[techId: string]: number};
   accountTechnologies: {[techId: string]: Technology};
   fleets: {[fleetId: string]: Fleet};
+  planetSum: AccountPlanet | undefined;
 }
 
 export interface AccountPlanet {

@@ -12,13 +12,21 @@ interface TechnologyProps {
 }
 
 export const TechnologyC: FC<TechnologyProps> = ({name, technologies, techId, required}) => {
+  let technology: Technology | undefined;
+  if (technologies.hasOwnProperty(techId)) {
+    technology = technologies[techId];
+  }
+
   let missingAmount: number | undefined;
   let className = '';
-  if (required !== undefined && technologies.hasOwnProperty(techId)) {
-    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-    missingAmount = required - technologies[techId].value;
+
+  if (required !== undefined && technology !== undefined) {
+    const target = technology.target === undefined ? technology.value : technology.target;
+    missingAmount = required - target;
     if (missingAmount > 0) {
       className = 'red';
+    } else if (technology.target !== undefined) {
+      className = 'orange';
     }
   }
 
@@ -26,10 +34,10 @@ export const TechnologyC: FC<TechnologyProps> = ({name, technologies, techId, re
     <Fragment>
       <TechnologyContainer className={className}>
         {name}:{' '}
-        {technologies.hasOwnProperty(techId)
-          ? `${technologies[techId].value}${
-              missingAmount === undefined || missingAmount <= 0 ? '' : ` (${missingAmount})`
-            }`
+        {technology !== undefined
+          ? `${technology.value}${
+              technology.target !== undefined ? `+${technology.target - technology.value}` : ''
+            }${missingAmount === undefined || missingAmount <= 0 ? '' : ` (${missingAmount})`}`
           : '-'}
       </TechnologyContainer>
     </Fragment>
@@ -39,5 +47,8 @@ export const TechnologyC: FC<TechnologyProps> = ({name, technologies, techId, re
 const TechnologyContainer = styled.div`
   &.red {
     color: #d43635;
+  }
+  &.orange {
+    color: #d29d00;
   }
 `;

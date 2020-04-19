@@ -12,11 +12,10 @@ import {
   LM_RATIO,
   PLA_RATIO,
   SAT_DEBRIS,
-  SUM_PLANET,
 } from '@src/models/constants';
 import {Tech} from '@src/models/tech';
 import {useAccount} from '@src/stores/account';
-import {Astrophysics} from '@src/ui/atrophysics';
+import {Astrophysics} from '@src/ui/astrophysics';
 import {Energy} from '@src/ui/energy';
 import {Loot} from '@src/ui/loot';
 import {Production} from '@src/ui/production';
@@ -139,260 +138,228 @@ export const App: FC = () => {
                           </Line>
                         </td>
                         <td>
-                          {p.id === SUM_PLANET ? (
-                            ''
-                          ) : (
-                            <Line>
-                              <TechnologyC
-                                name="M"
-                                technologies={planet.technologies}
-                                techId={Tech.MetalMine}
-                                required={
-                                  account.maxTechnologies.hasOwnProperty(Tech.MetalMine)
-                                    ? account.maxTechnologies[Tech.MetalMine]
-                                    : undefined
-                                }
-                              />
-                              <TechnologyC
-                                name="C"
-                                technologies={planet.technologies}
-                                techId={Tech.CrystalMine}
-                                required={
-                                  account.maxTechnologies.hasOwnProperty(Tech.CrystalMine)
-                                    ? account.maxTechnologies[Tech.CrystalMine]
-                                    : undefined
-                                }
-                              />
-                              <TechnologyC
-                                name="D"
-                                technologies={planet.technologies}
-                                techId={Tech.DeuteriumSynthesizer}
-                                required={
-                                  account.maxTechnologies.hasOwnProperty(Tech.DeuteriumSynthesizer)
-                                    ? account.maxTechnologies[Tech.DeuteriumSynthesizer]
-                                    : undefined
-                                }
-                              />
-                            </Line>
-                          )}
+                          <Line>
+                            <TechnologyC
+                              name="M"
+                              technologies={planet.technologies}
+                              techId={Tech.MetalMine}
+                              required={
+                                account.maxTechnologies.hasOwnProperty(Tech.MetalMine)
+                                  ? account.maxTechnologies[Tech.MetalMine]
+                                  : undefined
+                              }
+                            />
+                            <TechnologyC
+                              name="C"
+                              technologies={planet.technologies}
+                              techId={Tech.CrystalMine}
+                              required={
+                                account.maxTechnologies.hasOwnProperty(Tech.CrystalMine)
+                                  ? account.maxTechnologies[Tech.CrystalMine]
+                                  : undefined
+                              }
+                            />
+                            <TechnologyC
+                              name="D"
+                              technologies={planet.technologies}
+                              techId={Tech.DeuteriumSynthesizer}
+                              required={
+                                account.maxTechnologies.hasOwnProperty(Tech.DeuteriumSynthesizer)
+                                  ? account.maxTechnologies[Tech.DeuteriumSynthesizer]
+                                  : undefined
+                              }
+                            />
+                          </Line>
                         </td>
                         <td>
-                          {p.id === SUM_PLANET ? (
-                            ''
-                          ) : (
-                            <Line>
-                              <TechnologyC
-                                name="Sol"
-                                technologies={planet.technologies}
-                                techId={Tech.SolarPlant}
-                                required={
-                                  account.maxTechnologies.hasOwnProperty(Tech.SolarPlant)
-                                    ? account.maxTechnologies[Tech.SolarPlant]
-                                    : undefined
-                                }
-                              />
-                              <TechnologyC
-                                name="Sat"
-                                technologies={planet.technologies}
-                                techId={Tech.SolarSatellite}
-                              />
-                              <Energy name="E" amount={planet.resources.energy} />
-                            </Line>
-                          )}
+                          <Line>
+                            <TechnologyC
+                              name="Sol"
+                              technologies={planet.technologies}
+                              techId={Tech.SolarPlant}
+                              required={
+                                account.maxTechnologies.hasOwnProperty(Tech.SolarPlant)
+                                  ? account.maxTechnologies[Tech.SolarPlant]
+                                  : undefined
+                              }
+                            />
+                            <TechnologyC
+                              name="Sat"
+                              technologies={planet.technologies}
+                              techId={Tech.SolarSatellite}
+                            />
+                            <Energy name="E" amount={planet.resources.energy} />
+                          </Line>
                         </td>
                         <td>
-                          {p.id === SUM_PLANET ? (
-                            ''
-                          ) : (
-                            <Line>
-                              <TechnologyC
-                                name="M"
-                                technologies={planet.technologies}
-                                techId={Tech.MetalStorage}
-                                required={
-                                  account.maxTechnologies.hasOwnProperty(Tech.MetalStorage)
-                                    ? account.maxTechnologies[Tech.MetalStorage]
-                                    : undefined
-                                }
-                              />
-                              <TechnologyC
-                                name="C"
-                                technologies={planet.technologies}
-                                techId={Tech.CrystalStorage}
-                                required={
-                                  account.maxTechnologies.hasOwnProperty(Tech.CrystalStorage)
-                                    ? account.maxTechnologies[Tech.CrystalStorage]
-                                    : undefined
-                                }
-                              />
-                              <TechnologyC
-                                name="D"
-                                technologies={planet.technologies}
-                                techId={Tech.DeuteriumStorage}
-                                required={
-                                  account.maxTechnologies.hasOwnProperty(Tech.DeuteriumStorage)
-                                    ? account.maxTechnologies[Tech.DeuteriumStorage]
-                                    : undefined
-                                }
-                              />
-                              <TechnologyC
-                                name="Silo"
-                                technologies={planet.technologies}
-                                techId={Tech.MissileSilo}
-                                required={
-                                  account.maxTechnologies.hasOwnProperty(Tech.MissileSilo)
-                                    ? account.maxTechnologies[Tech.MissileSilo]
-                                    : undefined
-                                }
-                              />
-                            </Line>
-                          )}
+                          <Line>
+                            <TechnologyC
+                              name="M"
+                              technologies={planet.technologies}
+                              techId={Tech.MetalStorage}
+                              required={
+                                account.maxTechnologies.hasOwnProperty(Tech.MetalStorage)
+                                  ? account.maxTechnologies[Tech.MetalStorage]
+                                  : undefined
+                              }
+                            />
+                            <TechnologyC
+                              name="C"
+                              technologies={planet.technologies}
+                              techId={Tech.CrystalStorage}
+                              required={
+                                account.maxTechnologies.hasOwnProperty(Tech.CrystalStorage)
+                                  ? account.maxTechnologies[Tech.CrystalStorage]
+                                  : undefined
+                              }
+                            />
+                            <TechnologyC
+                              name="D"
+                              technologies={planet.technologies}
+                              techId={Tech.DeuteriumStorage}
+                              required={
+                                account.maxTechnologies.hasOwnProperty(Tech.DeuteriumStorage)
+                                  ? account.maxTechnologies[Tech.DeuteriumStorage]
+                                  : undefined
+                              }
+                            />
+                            <TechnologyC
+                              name="Silo"
+                              technologies={planet.technologies}
+                              techId={Tech.MissileSilo}
+                              required={
+                                account.maxTechnologies.hasOwnProperty(Tech.MissileSilo)
+                                  ? account.maxTechnologies[Tech.MissileSilo]
+                                  : undefined
+                              }
+                            />
+                          </Line>
                         </td>
                         <td>
-                          {p.id === SUM_PLANET ? (
-                            ''
-                          ) : (
-                            <Line>
-                              <TechnologyC
-                                name="Rob"
-                                technologies={planet.technologies}
-                                techId={Tech.RoboticsFactory}
-                                required={
-                                  account.maxTechnologies.hasOwnProperty(Tech.RoboticsFactory)
-                                    ? account.maxTechnologies[Tech.RoboticsFactory]
-                                    : undefined
-                                }
-                              />
-                              <TechnologyC
-                                name="Spa"
-                                technologies={planet.technologies}
-                                techId={Tech.Shipyard}
-                                required={
-                                  account.maxTechnologies.hasOwnProperty(Tech.Shipyard)
-                                    ? account.maxTechnologies[Tech.Shipyard]
-                                    : undefined
-                                }
-                              />
-                              <TechnologyC
-                                name="Lab"
-                                technologies={planet.technologies}
-                                techId={Tech.ResearchLaboratory}
-                              />
-                              <TechnologyC
-                                name="Nan"
-                                technologies={planet.technologies}
-                                techId={Tech.NaniteFactory}
-                                required={
-                                  account.maxTechnologies.hasOwnProperty(Tech.NaniteFactory)
-                                    ? account.maxTechnologies[Tech.NaniteFactory]
-                                    : undefined
-                                }
-                              />
-                            </Line>
-                          )}
+                          <Line>
+                            <TechnologyC
+                              name="Rob"
+                              technologies={planet.technologies}
+                              techId={Tech.RoboticsFactory}
+                              required={
+                                account.maxTechnologies.hasOwnProperty(Tech.RoboticsFactory)
+                                  ? account.maxTechnologies[Tech.RoboticsFactory]
+                                  : undefined
+                              }
+                            />
+                            <TechnologyC
+                              name="Spa"
+                              technologies={planet.technologies}
+                              techId={Tech.Shipyard}
+                              required={
+                                account.maxTechnologies.hasOwnProperty(Tech.Shipyard)
+                                  ? account.maxTechnologies[Tech.Shipyard]
+                                  : undefined
+                              }
+                            />
+                            <TechnologyC
+                              name="Lab"
+                              technologies={planet.technologies}
+                              techId={Tech.ResearchLaboratory}
+                            />
+                            <TechnologyC
+                              name="Nan"
+                              technologies={planet.technologies}
+                              techId={Tech.NaniteFactory}
+                              required={
+                                account.maxTechnologies.hasOwnProperty(Tech.NaniteFactory)
+                                  ? account.maxTechnologies[Tech.NaniteFactory]
+                                  : undefined
+                              }
+                            />
+                          </Line>
                         </td>
                         <td>
-                          {p.id === SUM_PLANET ? (
-                            ''
-                          ) : (
-                            <Line>
-                              <TechnologyC
-                                name="LM"
-                                technologies={planet.technologies}
-                                techId={Tech.RocketLauncher}
-                                required={Math.ceil(LM_RATIO * totalLoot)}
-                              />
-                              <TechnologyC
-                                name="ALO"
-                                technologies={planet.technologies}
-                                techId={Tech.LaserCannonHeavy}
-                                required={Math.ceil(ALO_RATIO * totalLoot)}
-                              />
-                              <TechnologyC
-                                name="GAU"
-                                technologies={planet.technologies}
-                                techId={Tech.GaussCannon}
-                                required={Math.ceil(GAU_RATIO * totalLoot)}
-                              />{' '}
-                              <TechnologyC
-                                name="PLA"
-                                technologies={planet.technologies}
-                                techId={Tech.PlasmaCannon}
-                                required={Math.ceil(PLA_RATIO * totalLoot)}
-                              />
-                            </Line>
-                          )}
+                          <Line>
+                            <TechnologyC
+                              name="LM"
+                              technologies={planet.technologies}
+                              techId={Tech.RocketLauncher}
+                              required={Math.ceil(LM_RATIO * totalLoot)}
+                            />
+                            <TechnologyC
+                              name="ALO"
+                              technologies={planet.technologies}
+                              techId={Tech.LaserCannonHeavy}
+                              required={Math.ceil(ALO_RATIO * totalLoot)}
+                            />
+                            <TechnologyC
+                              name="GAU"
+                              technologies={planet.technologies}
+                              techId={Tech.GaussCannon}
+                              required={Math.ceil(GAU_RATIO * totalLoot)}
+                            />{' '}
+                            <TechnologyC
+                              name="PLA"
+                              technologies={planet.technologies}
+                              techId={Tech.PlasmaCannon}
+                              required={Math.ceil(PLA_RATIO * totalLoot)}
+                            />
+                          </Line>
                         </td>
                         <td>
-                          {p.id === SUM_PLANET ? (
-                            ''
-                          ) : (
-                            <Line>
-                              <TechnologyC
-                                name="PB"
-                                technologies={planet.technologies}
-                                techId={Tech.ShieldDomeSmall}
-                                required={1}
-                              />
-                              <TechnologyC
-                                name="GB"
-                                technologies={planet.technologies}
-                                techId={Tech.ShieldDomeLarge}
-                                required={1}
-                              />
-                              <TechnologyC
-                                name="MIS"
-                                technologies={planet.technologies}
-                                techId={Tech.MissileInterceptor}
-                                required={
-                                  planet.technologies.hasOwnProperty(Tech.MissileSilo) &&
-                                  planet.technologies[Tech.MissileSilo].value >= 2
-                                    ? planet.technologies[Tech.MissileSilo].value * 10
-                                    : 0
-                                }
-                              />
-                            </Line>
-                          )}
+                          <Line>
+                            <TechnologyC
+                              name="PB"
+                              technologies={planet.technologies}
+                              techId={Tech.ShieldDomeSmall}
+                              required={1}
+                            />
+                            <TechnologyC
+                              name="GB"
+                              technologies={planet.technologies}
+                              techId={Tech.ShieldDomeLarge}
+                              required={1}
+                            />
+                            <TechnologyC
+                              name="MIS"
+                              technologies={planet.technologies}
+                              techId={Tech.MissileInterceptor}
+                              required={
+                                planet.technologies.hasOwnProperty(Tech.MissileSilo) &&
+                                planet.technologies[Tech.MissileSilo].value >= 2
+                                  ? planet.technologies[Tech.MissileSilo].value * 10
+                                  : 0
+                              }
+                            />
+                          </Line>
                         </td>
                         <td>
-                          {p.id === SUM_PLANET ? (
-                            ''
-                          ) : (
-                            <Line>
-                              <TechnologyC
-                                name="PT"
-                                technologies={planet.technologies}
-                                techId={Tech.TransporterSmall}
-                              />
-                              <TechnologyC
-                                name="GT"
-                                technologies={planet.technologies}
-                                techId={Tech.TransporterLarge}
-                                required={requiredTransport}
-                              />
-                              <TechnologyC
-                                name="REC"
-                                technologies={planet.technologies}
-                                techId={Tech.Recycler}
-                              />
-                              <TechnologyC
-                                name="ESP"
-                                technologies={planet.technologies}
-                                techId={Tech.EspionageProbe}
-                              />
-                            </Line>
-                          )}
+                          <Line>
+                            <TechnologyC
+                              name="PT"
+                              technologies={planet.technologies}
+                              techId={Tech.TransporterSmall}
+                            />
+                            <TechnologyC
+                              name="GT"
+                              technologies={planet.technologies}
+                              techId={Tech.TransporterLarge}
+                              required={requiredTransport}
+                            />
+                            <TechnologyC
+                              name="REC"
+                              technologies={planet.technologies}
+                              techId={Tech.Recycler}
+                            />
+                            <TechnologyC
+                              name="ESP"
+                              technologies={planet.technologies}
+                              techId={Tech.EspionageProbe}
+                            />
+                          </Line>
                         </td>
                         <td>
-                          {p.id === SUM_PLANET ? (
-                            ''
-                          ) : (
-                            <Line>
-                              <Loot name="Prod" amount={inactivityLoot} />
-                              <Loot name="Sats" amount={satelliteLoot} />
-                              <Loot name="Total" amount={totalLoot} />
-                            </Line>
-                          )}
+                          <Line>
+                            <Loot name="Prod" amount={inactivityLoot} />
+                            <Loot name="Sats" amount={satelliteLoot} />
+                            <Loot name="Total" amount={totalLoot} />
+                          </Line>
                         </td>
                       </tr>
                     );
@@ -408,27 +375,33 @@ export const App: FC = () => {
               </tbody>
             </Table>
             {(() => {
-              const astroLevel = account.accountTechnologies.hasOwnProperty(
+              const atroTechnology = account.accountTechnologies.hasOwnProperty(
                 Tech.AstrophysicsTechnology
               )
-                ? (account.accountTechnologies[Tech.AstrophysicsTechnology].value as number) + 1
-                : 1;
+                ? account.accountTechnologies[Tech.AstrophysicsTechnology]
+                : undefined;
+              const astroLevel =
+                atroTechnology !== undefined
+                  ? ((atroTechnology.target !== undefined
+                      ? atroTechnology.target
+                      : atroTechnology.value) as number) + 1
+                  : 1;
               const astroCost = AstrophysicsTechnology.cost(astroLevel);
-              let metalSeconds = 0;
-              let crystalSeconds = 0;
-              let deuteriumSeconds = 0;
-              if (account.planetDetails.hasOwnProperty(SUM_PLANET)) {
+              let metalSeconds: number | undefined;
+              let crystalSeconds: number | undefined;
+              let deuteriumSeconds: number | undefined;
+              if (account.planetSum !== undefined) {
                 metalSeconds = Math.ceil(
-                  (astroCost.metal - account.planetDetails[SUM_PLANET].resources.metal) /
-                    account.planetDetails[SUM_PLANET].productions.metal
+                  (astroCost.metal - account.planetSum.resources.metal) /
+                    account.planetSum.productions.metal
                 );
                 crystalSeconds = Math.ceil(
-                  (astroCost.crystal - account.planetDetails[SUM_PLANET].resources.crystal) /
-                    account.planetDetails[SUM_PLANET].productions.crystal
+                  (astroCost.crystal - account.planetSum.resources.crystal) /
+                    account.planetSum.productions.crystal
                 );
                 deuteriumSeconds = Math.ceil(
-                  (astroCost.deuterium - account.planetDetails[SUM_PLANET].resources.deuterium) /
-                    account.planetDetails[SUM_PLANET].productions.deuterium
+                  (astroCost.deuterium - account.planetSum.resources.deuterium) /
+                    account.planetSum.productions.deuterium
                 );
               }
               return (

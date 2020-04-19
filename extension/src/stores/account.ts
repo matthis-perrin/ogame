@@ -1,10 +1,10 @@
 import {useEffect, useState} from 'react';
 
 import {persist} from '@src/controllers/storage';
-import {Account} from '@src/models/account';
-import {ACCOUNT_TECHNOLOGIES, MAX_TECHNOLOGIES, SUM_PLANET} from '@src/models/constants';
+import {Account, AccountPlanet} from '@src/models/account';
+import {ACCOUNT_TECHNOLOGIES, MAX_TECHNOLOGIES} from '@src/models/constants';
 import {Fleet, ReturnFlight} from '@src/models/fleets';
-import {Planet, PlanetCoords, PlanetId, PlanetName} from '@src/models/planets';
+import {Planet, PlanetId} from '@src/models/planets';
 import {ResourceAmount, Resources} from '@src/models/resources';
 import {Tech} from '@src/models/tech';
 import {Technology} from '@src/models/technologies';
@@ -12,6 +12,56 @@ import {sum} from '@src/ui/utils';
 
 let currentAccount: Account | undefined;
 const accountListeners: ((account: Account) => void)[] = [];
+
+function calcPlanetSum(planetDetails: {[planetId: string]: AccountPlanet}): AccountPlanet {
+  let metalResources = 0;
+  let cystalResources = 0;
+  let deuteriumResources = 0;
+  let energyResources = 0;
+  let metalStorages = 0;
+  let cystalStorages = 0;
+  let deuteriumStorages = 0;
+  let metalProductions = 0;
+  let crystalProductions = 0;
+  let deuteriumProductions = 0;
+
+  for (const planetId in planetDetails) {
+    if (planetDetails.hasOwnProperty(planetId)) {
+      const planetDetail = planetDetails[planetId];
+      metalResources += planetDetail.resources.metal;
+      cystalResources += planetDetail.resources.crystal;
+      deuteriumResources += planetDetail.resources.deuterium;
+      energyResources += planetDetail.resources.energy;
+      metalStorages += planetDetail.storages.metal;
+      cystalStorages += planetDetail.storages.crystal;
+      deuteriumStorages += planetDetail.storages.deuterium;
+      metalProductions += planetDetail.productions.metal;
+      crystalProductions += planetDetail.productions.crystal;
+      deuteriumProductions += planetDetail.productions.deuterium;
+    }
+  }
+
+  return {
+    id: 'SUM' as PlanetId,
+    resources: {
+      metal: metalResources as ResourceAmount,
+      crystal: cystalResources as ResourceAmount,
+      deuterium: deuteriumResources as ResourceAmount,
+      energy: energyResources as ResourceAmount,
+    },
+    storages: {
+      metal: metalStorages as ResourceAmount,
+      crystal: cystalStorages as ResourceAmount,
+      deuterium: deuteriumStorages as ResourceAmount,
+    },
+    productions: {
+      metal: metalProductions as ResourceAmount,
+      crystal: crystalProductions as ResourceAmount,
+      deuterium: deuteriumProductions as ResourceAmount,
+    },
+    technologies: {},
+  };
+}
 
 export function setAccount(account: Account, persistent = true): void {
   currentAccount = account;
@@ -36,6 +86,7 @@ export function addPlanet(
     maxTechnologies: currentAccount?.maxTechnologies ?? {},
     accountTechnologies: currentAccount?.accountTechnologies ?? {},
     fleets: currentAccount?.fleets ?? {},
+    planetSum: undefined,
   };
 
   for (const fleet of fleets) {
@@ -102,59 +153,7 @@ export function addPlanet(
     technologies: technologiesObj,
   };
 
-  account.planetList.push({
-    id: SUM_PLANET as PlanetId,
-    name: SUM_PLANET as PlanetName,
-    coords: '[0:0:0]' as PlanetCoords,
-  });
-
-  let metalResources = 0;
-  let cystalResources = 0;
-  let deuteriumResources = 0;
-  let energyResources = 0;
-  let metalStorages = 0;
-  let cystalStorages = 0;
-  let deuteriumStorages = 0;
-  let metalProductions = 0;
-  let crystalProductions = 0;
-  let deuteriumProductions = 0;
-
-  for (const planetId in account.planetDetails) {
-    if (account.planetDetails.hasOwnProperty(planetId) && planetId !== SUM_PLANET) {
-      const planetDetails = account.planetDetails[planetId];
-      metalResources += planetDetails.resources.metal;
-      cystalResources += planetDetails.resources.crystal;
-      deuteriumResources += planetDetails.resources.deuterium;
-      energyResources += planetDetails.resources.energy;
-      metalStorages += planetDetails.storages.metal;
-      cystalStorages += planetDetails.storages.crystal;
-      deuteriumStorages += planetDetails.storages.deuterium;
-      metalProductions += planetDetails.productions.metal;
-      crystalProductions += planetDetails.productions.crystal;
-      deuteriumProductions += planetDetails.productions.deuterium;
-    }
-  }
-
-  account.planetDetails[SUM_PLANET] = {
-    id: SUM_PLANET as PlanetId,
-    resources: {
-      metal: metalResources as ResourceAmount,
-      crystal: cystalResources as ResourceAmount,
-      deuterium: deuteriumResources as ResourceAmount,
-      energy: energyResources as ResourceAmount,
-    },
-    storages: {
-      metal: metalStorages as ResourceAmount,
-      crystal: cystalStorages as ResourceAmount,
-      deuterium: deuteriumStorages as ResourceAmount,
-    },
-    productions: {
-      metal: metalProductions as ResourceAmount,
-      crystal: crystalProductions as ResourceAmount,
-      deuterium: deuteriumProductions as ResourceAmount,
-    },
-    technologies: {},
-  };
+  account.planetSum = calcPlanetSum(account.planetDetails);
 
   setAccount(account);
 }
@@ -184,6 +183,7 @@ function applyProduction(): void {
     maxTechnologies: currentAccount.maxTechnologies,
     accountTechnologies: currentAccount.accountTechnologies,
     fleets: {},
+    planetSum: undefined,
   };
 
   for (const planetId in currentAccount.planetDetails) {
@@ -219,6 +219,8 @@ function applyProduction(): void {
       account.fleets[fleetId] = fleet;
     }
   }
+
+  account.planetSum = calcPlanetSum(account.planetDetails);
 
   setAccount(account);
 }

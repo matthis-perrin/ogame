@@ -18,9 +18,18 @@ export function parseTechnologies(): Technology[] {
           .attr('data-value');
       }
       if (value !== undefined) {
+        let target = $(element)
+          .find('.targetlevel[data-value]')
+          .attr('data-value');
+        if (target === undefined) {
+          target = $(element)
+            .find('.targetamount[data-value]')
+            .attr('data-value');
+        }
         res.push({
           techId: parseFloat(technology) as TechId,
           value: parseFloat(value) as TechnologyValue,
+          target: target !== undefined ? (parseFloat(target) as TechnologyValue) : undefined,
         });
       }
     }
