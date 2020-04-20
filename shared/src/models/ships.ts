@@ -1,11 +1,18 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import {makeResources} from '@shared/models/resource';
+import {
+  CombustionDrive,
+  HyperspaceDrive,
+  ImpulseDrive,
+  Technology,
+} from '@shared/models/technology';
 import {Unit} from '@shared/models/unit';
 
 export interface Ship extends Unit {
   type: 'ship';
   cargoCapacity: number;
   baseSpeed: number;
+  initialDriveTechnology: Technology | undefined;
   fuelConsumption: number;
 }
 
@@ -18,6 +25,7 @@ export const EspionageProbe: Ship = {
   weaponPower: 0,
   cargoCapacity: 1, // TODO - 5 on some universes
   baseSpeed: 100000000,
+  initialDriveTechnology: CombustionDrive,
   fuelConsumption: 1,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
@@ -33,6 +41,7 @@ export const SolarSatellite: Ship = {
   weaponPower: 1,
   cargoCapacity: 0,
   baseSpeed: 0,
+  initialDriveTechnology: undefined,
   fuelConsumption: 0,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
@@ -47,6 +56,7 @@ export const Crawler: Ship = {
   weaponPower: 1,
   cargoCapacity: 0,
   baseSpeed: 0,
+  initialDriveTechnology: undefined,
   fuelConsumption: 0,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
@@ -61,6 +71,7 @@ export const SmallCargo: Ship = {
   weaponPower: 5,
   cargoCapacity: 5000,
   baseSpeed: 5000,
+  initialDriveTechnology: CombustionDrive,
   fuelConsumption: 10,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
@@ -75,6 +86,7 @@ export const LargeCargo: Ship = {
   weaponPower: 5,
   cargoCapacity: 25000,
   baseSpeed: 7500,
+  initialDriveTechnology: CombustionDrive,
   fuelConsumption: 50,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
@@ -90,6 +102,7 @@ export const Recycler: Ship = {
   weaponPower: 1,
   cargoCapacity: 20000,
   baseSpeed: 2000,
+  initialDriveTechnology: CombustionDrive,
   fuelConsumption: 300,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
@@ -104,6 +117,7 @@ export const ColonyShip: Ship = {
   weaponPower: 50,
   cargoCapacity: 7500,
   baseSpeed: 2500,
+  initialDriveTechnology: ImpulseDrive,
   fuelConsumption: 1000,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
@@ -118,6 +132,7 @@ export const LightFighter: Ship = {
   weaponPower: 50,
   cargoCapacity: 50,
   baseSpeed: 12500,
+  initialDriveTechnology: CombustionDrive,
   fuelConsumption: 20,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
@@ -132,6 +147,7 @@ export const Cruiser: Ship = {
   weaponPower: 400,
   cargoCapacity: 800,
   baseSpeed: 15000,
+  initialDriveTechnology: ImpulseDrive,
   fuelConsumption: 300,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
@@ -146,6 +162,7 @@ export const HeavyFighter: Ship = {
   weaponPower: 150,
   cargoCapacity: 100,
   baseSpeed: 10000,
+  initialDriveTechnology: ImpulseDrive,
   fuelConsumption: 75,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
@@ -160,6 +177,7 @@ export const Pathfinder: Ship = {
   weaponPower: 200,
   cargoCapacity: 10000,
   baseSpeed: 12000,
+  initialDriveTechnology: HyperspaceDrive,
   fuelConsumption: 300,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
@@ -174,6 +192,7 @@ export const Battleship: Ship = {
   weaponPower: 1000,
   cargoCapacity: 1500,
   baseSpeed: 10000,
+  initialDriveTechnology: HyperspaceDrive,
   fuelConsumption: 500,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
@@ -188,6 +207,7 @@ export const BattleCruiser: Ship = {
   weaponPower: 700,
   cargoCapacity: 750,
   baseSpeed: 10000,
+  initialDriveTechnology: HyperspaceDrive,
   fuelConsumption: 250,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
@@ -202,6 +222,7 @@ export const Destroyer: Ship = {
   weaponPower: 2000,
   cargoCapacity: 2000,
   baseSpeed: 5000,
+  initialDriveTechnology: HyperspaceDrive,
   fuelConsumption: 1000,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
@@ -216,6 +237,7 @@ export const Bomber: Ship = {
   weaponPower: 1000,
   cargoCapacity: 500,
   baseSpeed: 4000,
+  initialDriveTechnology: ImpulseDrive,
   fuelConsumption: 700,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
@@ -231,6 +253,7 @@ export const Reaper: Ship = {
   weaponPower: 2800,
   cargoCapacity: 10000,
   baseSpeed: 7000,
+  initialDriveTechnology: HyperspaceDrive,
   fuelConsumption: 1100,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
