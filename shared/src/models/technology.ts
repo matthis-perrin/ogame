@@ -133,6 +133,7 @@ export const IntergalacticResearchNetworkTechnology = makeTechnology(
   false // TODO - Multi planets not handled yet
 );
 
+// TODO - Astrophysics cost is rounded to the nearest 100
 export const AstrophysicsTechnology = makeTechnology(
   'Astrophysique',
   makeResources({m: 4000, c: 8000, d: 4000}),

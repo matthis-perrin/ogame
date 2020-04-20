@@ -11,7 +11,6 @@ export type CrystalAmount = Brand<number, 'CrystalAmount'>;
 export type DeuteriumAmount = Brand<number, 'DeuteriumAmount'>;
 export type StandardUnitAmount = Brand<number, 'StandardUnitAmount'>;
 export type EnergyAmount = Brand<number, 'EnergyAmount'>;
-export type Milliseconds = Brand<number, 'Milliseconds'>;
 
 export interface Resources {
   metal: MetalAmount;

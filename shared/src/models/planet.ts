@@ -1,16 +1,19 @@
 import {Building} from '@shared/models/building';
 import {Coordinates} from '@shared/models/coordinates';
 import {Defense} from '@shared/models/defense';
+import {Resources} from '@shared/models/resource';
 import {Ship} from '@shared/models/ships';
+import {Milliseconds} from '@shared/models/time';
 
 export interface Planet {
   metadata: PlanetMetadata;
+  resources: Resources;
   buildingLevels: Map<Building, number>;
-  inProgressBuilding?: {building: Building; level: number};
+  inProgressBuilding?: {building: Building; level: number; startTime: Milliseconds};
   defense: Map<Defense, number>;
-  inProgressDefenses: {defense: Defense; quantity: number}[];
+  inProgressDefenses?: {startTime: Milliseconds; defenses: {defense: Defense; quantity: number}[]};
   ships: Map<Ship, number>;
-  inProgressShips: {ship: Ship; quantity: number}[];
+  inProgressShips?: {startTime: Milliseconds; ships: {ship: Ship; quantity: number}[]};
 }
 
 export interface PlanetMetadata {

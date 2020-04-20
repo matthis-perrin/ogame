@@ -2,6 +2,7 @@
 import {Officers} from '@shared/models/officers';
 import {Planet} from '@shared/models/planet';
 import {Technology} from '@shared/models/technology';
+import {Milliseconds} from '@shared/models/time';
 import {Universe} from '@shared/models/universe';
 
 export enum Class {
@@ -10,10 +11,13 @@ export enum Class {
   Discoverer = 'Discoverer',
 }
 export interface Account {
-  universe: Universe;
+  // Dynamic
   planets: Planet[];
   technologyLevels: Map<Technology, number>;
-  inProgressTechnology?: {technology: Technology; level: number};
+  inProgressTechnology?: {technology: Technology; level: number; startTime: Milliseconds};
+  currentTime: Milliseconds;
+  // Static
+  universe: Universe;
   class: Class;
   officers: Officers;
   preferences: {

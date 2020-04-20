@@ -11,13 +11,15 @@ import {
 } from '@shared/models/building';
 import {Crawler, SolarSatellite} from '@shared/models/ships';
 import {EnergyTechnology, PlasmaTechnology, Technology} from '@shared/models/technology';
+import {ZERO} from '@shared/models/time';
 import {Rosalind, Universe} from '@shared/models/universe';
 
 export function createNewAccount(universe: Universe): Account {
   return {
-    universe,
+    currentTime: ZERO,
     planets: [createRandomMainPlanet(universe)],
     technologyLevels: new Map<Technology, number>(),
+    universe,
     class: Class.Collector,
     officers: {
       commander: false,
@@ -103,12 +105,13 @@ export function createBenjAccount(): Account {
   planet6.ships.set(SolarSatellite, 86);
 
   return {
-    universe,
+    currentTime: ZERO,
     planets: [planet1, planet2, planet3, planet4, planet5, planet6],
     technologyLevels: new Map<Technology, number>([
       [PlasmaTechnology, 7],
       [EnergyTechnology, 8],
     ]),
+    universe,
     officers: {
       commander: true,
       fleetAdmiral: true,

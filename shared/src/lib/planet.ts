@@ -2,6 +2,7 @@ import {Building} from '@shared/models/building';
 import {Coordinates} from '@shared/models/coordinates';
 import {Defense} from '@shared/models/defense';
 import {Planet} from '@shared/models/planet';
+import {makeResources} from '@shared/models/resource';
 import {Ship} from '@shared/models/ships';
 import {Universe} from '@shared/models/universe';
 import {rand} from '@shared/utils/rand';
@@ -12,6 +13,7 @@ export function createPlanet(
   planetTemperature: number
 ): Planet {
   return {
+    resources: makeResources({}),
     metadata: {
       coordinates,
       fields,
@@ -19,9 +21,7 @@ export function createPlanet(
     },
     buildingLevels: new Map<Building, number>(),
     defense: new Map<Defense, number>(),
-    inProgressDefenses: [],
     ships: new Map<Ship, number>(),
-    inProgressShips: [],
   };
 }
 

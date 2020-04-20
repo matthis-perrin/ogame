@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import {Class} from '@shared/models/account';
+import {Building} from '@shared/models/building';
 import {CrystalAmount, DeuteriumAmount, EnergyAmount, MetalAmount} from '@shared/models/resource';
+import {Technology} from '@shared/models/technology';
+import {hoursToMilliseconds, Milliseconds} from '@shared/models/time';
 
 export function getMaxCrawlerCount(
   metalMineLevel: number,
@@ -107,4 +110,31 @@ export function getSatelliteEnergyProductionPerHour(
   planetTemperature: number
 ): EnergyAmount {
   return (solarSatelliteCount * Math.floor((planetTemperature + 160) / 6)) as EnergyAmount;
+}
+
+//
+// BUILD TIME
+//
+
+export function getTechnologyBuildTime(
+  technology: Technology,
+  level: number,
+  researchLabLevel: number
+): Milliseconds {
+  const {metal, crystal} = technology.cost(level);
+  const hours = ((metal as number) + (crystal as number)) / (1000 * (1 + researchLabLevel));
+  return hoursToMilliseconds(hours);
+}
+
+export function getBuildingBuildTime(
+  building: Building,
+  level: number,
+  roboticsFactoryLevel: number,
+  naniteFactoryLevel: number
+): Milliseconds {
+  const {metal, crystal} = building.cost(level);
+  const hours =
+    ((metal as number) + (crystal as number)) /
+    (2500 * (1 + roboticsFactoryLevel) * Math.pow(2, naniteFactoryLevel));
+  return hoursToMilliseconds(hours);
 }
