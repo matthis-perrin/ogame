@@ -21,6 +21,7 @@ export interface Account {
   class: Class;
   officers: Officers;
   preferences: {
+    maxProdHoursOnPlanet: number;
     resourcesRatio: {
       metal: number;
       crystal: number;

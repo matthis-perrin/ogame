@@ -29,6 +29,7 @@ export function createNewAccount(universe: Universe): Account {
       technocrat: false,
     },
     preferences: {
+      maxProdHoursOnPlanet: 6,
       resourcesRatio: {
         metal: 2,
         crystal: 1.5,
@@ -121,6 +122,7 @@ export function createBenjAccount(): Account {
     },
     class: Class.Collector,
     preferences: {
+      maxProdHoursOnPlanet: 6,
       resourcesRatio: {
         metal: 2,
         crystal: 1.5,

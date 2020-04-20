@@ -4,9 +4,11 @@ import {
   getCrystalMineEnergyConsumptionPerHour,
   getCrystalMineProductionPerHour,
   getCrystalProductionBonusFromPlasmaTechnology,
+  getCrystalStorageCapacity,
   getDeuteriumProductionBonusFromPlasmaTechnology,
   getDeuteriumSynthesizerEnergyConsumptionPerHour,
   getDeuteriumSynthesizerProductionPerHour,
+  getDeuteriumTankCapacity,
   getFusionReactorDeuteriumConsumptionPerHour,
   getFusionReactorEnergyProductionPerHour,
   getMaxCrawlerCount,
@@ -14,20 +16,31 @@ import {
   getMetalMineEnergyConsumptionPerHour,
   getMetalMineProductionPerHour,
   getMetalProductionBonusFromPlasmaTechnology,
+  getMetalStorageCapacity,
   getResourceProductionBonusFromCrawlers,
   getSatelliteEnergyProductionPerHour,
   getSolarPlantEnergyProductionPerHour,
 } from '@shared/lib/formula';
+import {toStandardUnits} from '@shared/lib/resources';
 import {Account, Class} from '@shared/models/account';
 import {
   CrystalMine,
+  CrystalStorage,
   DeuteriumSynthesizer,
+  DeuteriumTank,
   FusionReactor,
   MetalMine,
+  MetalStorage,
   SolarPlant,
 } from '@shared/models/building';
 import {Planet} from '@shared/models/planet';
-import {addResources, EnergyAmount, makeResources, Resources} from '@shared/models/resource';
+import {
+  addResources,
+  EnergyAmount,
+  makeResources,
+  Resources,
+  StandardUnitAmount,
+} from '@shared/models/resource';
 import {Crawler, SolarSatellite} from '@shared/models/ships';
 import {EnergyTechnology, PlasmaTechnology} from '@shared/models/technology';
 import {floor, multiply, sum} from '@shared/utils/type_utils';
@@ -239,4 +252,20 @@ export function getAccountProductionPerHour(account: Account): Resources {
     accountProd = addResources(accountProd, prod);
   }
   return accountProd;
+}
+
+export function getMaxAllowedStandardUnitOnPlanet(
+  account: Account,
+  planet: Planet
+): StandardUnitAmount {
+  const {prod} = getPlanetProductionPerHour(account, planet);
+  return multiply(toStandardUnits(account, prod), account.preferences.maxProdHoursOnPlanet);
+}
+
+export function getPlanetStorageCapacity(planet: Planet): Resources {
+  return makeResources({
+    m: getMetalStorageCapacity(planet.buildingLevels.get(MetalStorage) ?? 0),
+    c: getCrystalStorageCapacity(planet.buildingLevels.get(CrystalStorage) ?? 0),
+    d: getDeuteriumTankCapacity(planet.buildingLevels.get(DeuteriumTank) ?? 0),
+  });
 }
