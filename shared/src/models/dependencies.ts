@@ -46,6 +46,7 @@ import {
   ComputerTechnology,
   EnergyTechnology,
   EspionageTechnology,
+  GravitonTechnology,
   HyperspaceDrive,
   HyperspaceTechnology,
   ImpulseDrive,
@@ -125,6 +126,7 @@ export function setupRequirements(): void {
     {entity: EspionageTechnology, level: 4},
     {entity: ImpulseDrive, level: 3}
   );
+  GravitonTechnology.requirements.push({entity: ResearchLab, level: 12});
 
   // Defenses
   RocketLauncher.requirements.push({entity: Shipyard, level: 1});

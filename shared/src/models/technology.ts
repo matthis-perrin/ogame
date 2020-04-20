@@ -39,7 +39,7 @@ function makeTechnology(
 
 export const ComputerTechnology = makeTechnology(
   108,
-  'Ordinateur',
+  'Technologie Ordinateur',
   makeResources({m: 0, c: 400, d: 600}),
   2,
   false // Automatically added after each odd level of Astro
@@ -47,7 +47,7 @@ export const ComputerTechnology = makeTechnology(
 
 export const EnergyTechnology = makeTechnology(
   113,
-  'Energie',
+  'Technologie énergétique',
   makeResources({m: 0, c: 800, d: 400}),
   2,
   false // TODO - Increase fusion reactor energy production, but not implemented yet
@@ -55,7 +55,7 @@ export const EnergyTechnology = makeTechnology(
 
 export const EspionageTechnology = makeTechnology(
   106,
-  'Espionnage',
+  'Technologie Espionnage',
   makeResources({m: 200, c: 1000, d: 200}),
   2,
   false // Automatically added whe the cost is lower than a percentage of the previous build item
@@ -63,7 +63,7 @@ export const EspionageTechnology = makeTechnology(
 
 export const WeaponTechnology = makeTechnology(
   109,
-  'Armes',
+  'Technologie Armes',
   makeResources({m: 800, c: 200, d: 0}),
   2,
   true // Impacts how much defense needs to be built
@@ -71,7 +71,7 @@ export const WeaponTechnology = makeTechnology(
 
 export const ShieldingTechnology = makeTechnology(
   110,
-  'Bouclier',
+  'Technologie Bouclier',
   makeResources({m: 200, c: 600, d: 0}),
   2,
   true // Impacts how much defense needs to be built
@@ -79,7 +79,7 @@ export const ShieldingTechnology = makeTechnology(
 
 export const ArmourTechnology = makeTechnology(
   111,
-  'Protection des vaisseaux',
+  'Technologie Protection des vaisseaux spatiaux',
   makeResources({m: 1000, c: 0, d: 0}),
   2,
   true // Impacts how much defense needs to be built
@@ -87,7 +87,7 @@ export const ArmourTechnology = makeTechnology(
 
 export const HyperspaceTechnology = makeTechnology(
   114,
-  'Hyperspace',
+  'Technologie hyperespace',
   makeResources({m: 0, c: 4000, d: 2000}),
   2,
   false // Negligeable gains. Each level increases cargo capacity by 5%
@@ -119,7 +119,7 @@ export const HyperspaceDrive = makeTechnology(
 
 export const LaserTechnology = makeTechnology(
   120,
-  'Laser',
+  'Technologie Laser',
   makeResources({m: 200, c: 100, d: 0}),
   2,
   false // No bonus
@@ -127,7 +127,7 @@ export const LaserTechnology = makeTechnology(
 
 export const IonTechnology = makeTechnology(
   121,
-  'Ions',
+  'Technologie à ions',
   makeResources({m: 1000, c: 300, d: 100}),
   2,
   false // Reduce deconstruction costs
@@ -135,7 +135,7 @@ export const IonTechnology = makeTechnology(
 
 export const PlasmaTechnology = makeTechnology(
   122,
-  'Plasma',
+  'Technologie Plasma',
   makeResources({m: 2000, c: 4000, d: 1000}),
   2,
   true // Increase crystal and metal production
@@ -158,6 +158,14 @@ export const AstrophysicsTechnology = makeTechnology(
   true // TODO - Multi planets not handled yet
 );
 
+export const GravitonTechnology = makeTechnology(
+  199,
+  'Technologie Graviton',
+  makeResources({m: 0, c: 0, d: 0}),
+  3,
+  false
+);
+
 export const AllTechnologies: Technology[] = [
   EspionageTechnology,
   ComputerTechnology,
@@ -174,4 +182,5 @@ export const AllTechnologies: Technology[] = [
   PlasmaTechnology,
   IntergalacticResearchNetworkTechnology,
   AstrophysicsTechnology,
+  GravitonTechnology,
 ];
