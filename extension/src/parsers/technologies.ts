@@ -1,10 +1,30 @@
 import $ from 'jquery';
 
+import {PlanetName} from '@src/models/planets';
 import {TechId} from '@src/models/resources';
 import {Technology, TechnologyValue} from '@src/models/technologies';
 
+const planetNameRegex = /planète (.*) \[/;
+
 export function parseTechnologies(): Technology[] {
   const res: Technology[] = [];
+  let constructionPlanetName: PlanetName | undefined;
+  if (document.location.search.includes('component=research')) {
+    $('html > body #productionboxresearchcomponent a.tooltip.abortNow[title]').each(
+      (_, element) => {
+        const title = element.getAttribute('title');
+        // eslint-disable-next-line no-null/no-null
+        if (title === null) {
+          return;
+        }
+        const match = planetNameRegex.exec(title);
+        // eslint-disable-next-line no-null/no-null
+        if (match !== null) {
+          constructionPlanetName = match[1] as PlanetName;
+        }
+      }
+    );
+  }
   $('html > body #pageContent #technologies li').each((_, element) => {
     const technology = element.getAttribute('data-technology');
     // eslint-disable-next-line no-null/no-null
@@ -35,6 +55,7 @@ export function parseTechnologies(): Technology[] {
           target: target !== undefined ? (parseFloat(target) as TechnologyValue) : undefined,
           targetEndSeconds:
             targetEndSeconds !== undefined ? parseFloat(targetEndSeconds) : undefined,
+          constructionPlanetName: target !== undefined ? constructionPlanetName : undefined,
         });
       }
     }

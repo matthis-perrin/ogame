@@ -1,7 +1,7 @@
 import React, {FC, Fragment} from 'react';
 import styled from 'styled-components';
 
-import {Account, planetName} from '@src/models/account';
+import {Account, findPlanetName} from '@src/models/account';
 import {Construction, techName} from '@src/models/technologies';
 import {Title} from '@src/ui/common';
 import {time} from '@src/ui/utils';
@@ -29,7 +29,8 @@ export const Constructions: FC<ConstructionsProps> = ({account}) => {
         {constructions.map(construction => (
           <Element key={construction.constructionId}>
             <div>
-              {planetName(account, construction.planetId)} {techName(construction.techId)}
+              {findPlanetName(account.planetList, construction.planetId)}{' '}
+              {techName(construction.techId)}
             </div>
             <div>{time(construction.targetEndSeconds - now)}</div>
           </Element>

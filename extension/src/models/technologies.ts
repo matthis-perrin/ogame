@@ -4,7 +4,7 @@ import {AllDefenses} from '@shared/models/defense';
 import {AllShips} from '@shared/models/ships';
 import {AllTechnologies} from '@shared/models/technology';
 
-import {PlanetId} from '@src/models/planets';
+import {PlanetId, PlanetName} from '@src/models/planets';
 
 export type TechnologyValue = number & {_: 'TechnologyValue'};
 export type ConstructionId = string & {_: 'ConstructionId'};
@@ -14,6 +14,7 @@ export interface Technology {
   value: TechnologyValue;
   target?: TechnologyValue;
   targetEndSeconds?: number;
+  constructionPlanetName?: PlanetName;
 }
 
 export interface Construction {

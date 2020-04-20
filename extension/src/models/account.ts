@@ -41,6 +41,10 @@ export interface AccountPlanet {
   ships: {[techId: number]: Technology};
 }
 
-export function planetName(account: Account, planetId: PlanetId): PlanetName {
-  return account.planetList.find(_ => _.id === planetId)?.name ?? ('' as PlanetName);
+export function findPlanetName(planetList: Planet[], planetId: PlanetId): PlanetName {
+  return planetList.find(_ => _.id === planetId)?.name ?? ('' as PlanetName);
+}
+
+export function findPlanetId(planetList: Planet[], planetName: PlanetName): PlanetId | undefined {
+  return planetList.find(_ => _.name === planetName)?.id;
 }

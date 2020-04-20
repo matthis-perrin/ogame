@@ -4,7 +4,7 @@ import {CrystalMine, DeuteriumSynthesizer, MetalMine, SolarPlant} from '@shared/
 import {SolarSatellite} from '@shared/models/ships';
 
 import {persist} from '@src/controllers/storage';
-import {Account, AccountPlanet} from '@src/models/account';
+import {Account, AccountPlanet, findPlanetId} from '@src/models/account';
 import {ACCOUNT_TECHNOLOGIES, MAX_TECHNOLOGIES, UI_REFRESH_RATE} from '@src/models/constants';
 import {Fleet, ReturnFlight} from '@src/models/fleets';
 import {Planet, PlanetId} from '@src/models/planets';
@@ -134,9 +134,16 @@ export function addPlanet(
     }
     if (technology.target !== undefined && technology.targetEndSeconds !== undefined) {
       const constructionId = generateConstructionId(planetId, technology.techId);
+      let constructionPlanetId = planetId;
+      if (technology.constructionPlanetName !== undefined) {
+        const maybePlanetId = findPlanetId(planetList, technology.constructionPlanetName);
+        if (maybePlanetId !== undefined) {
+          constructionPlanetId = maybePlanetId;
+        }
+      }
       account.constructions[constructionId] = {
         constructionId,
-        planetId,
+        planetId: constructionPlanetId,
         techId: technology.techId,
         value: technology.value,
         target: technology.target,
