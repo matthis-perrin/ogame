@@ -2,6 +2,7 @@
 import {Class} from '@shared/models/account';
 import {Building} from '@shared/models/building';
 import {CrystalAmount, DeuteriumAmount, EnergyAmount, MetalAmount} from '@shared/models/resource';
+import {Ship} from '@shared/models/ships';
 import {Technology} from '@shared/models/technology';
 import {hoursToMilliseconds, Milliseconds} from '@shared/models/time';
 
@@ -154,4 +155,12 @@ export function getBuildingBuildTime(
     (lowLevelSpeedup * ((metal as number) + (crystal as number))) /
     (2500 * (1 + roboticsFactoryLevel) * Math.pow(2, naniteFactoryLevel));
   return hoursToMilliseconds(hours);
+}
+
+//
+// SHIPS FRET
+//
+
+export function getShipCargoCapacity(ship: Ship, hyperspaceTechnologyLevel: number): number {
+  return ship.cargoCapacity * 1 + 0.05 * hyperspaceTechnologyLevel;
 }

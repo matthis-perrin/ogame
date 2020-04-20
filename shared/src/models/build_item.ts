@@ -5,40 +5,35 @@ import {Planet} from '@shared/models/planet';
 import {Ship} from '@shared/models/ships';
 import {Technology} from '@shared/models/technology';
 
-interface BuildTargetBase {
+interface BuildItemBase {
   type: BuildableType;
-  time: number;
 }
 
-export interface ShipBuildTarget extends BuildTargetBase {
+export interface ShipBuildItem extends BuildItemBase {
   type: 'ship';
   ship: Ship;
   quantity: number;
   planet: Planet;
 }
 
-export interface DefenseBuildTarget extends BuildTargetBase {
+export interface DefenseBuildItem extends BuildItemBase {
   type: 'defense';
   defense: Defense;
   quantity: number;
   planet: Planet;
 }
 
-export interface BuildingBuildTarget extends BuildTargetBase {
+export interface BuildingBuildItem extends BuildItemBase {
   type: 'building';
   building: Building;
   level: number;
   planet: Planet;
 }
 
-export interface TechnologyBuildTarget extends BuildTargetBase {
+export interface TechnologyBuildItem extends BuildItemBase {
   type: 'technology';
   technology: Technology;
   level: number;
 }
 
-export type BuildTarget =
-  | ShipBuildTarget
-  | DefenseBuildTarget
-  | BuildingBuildTarget
-  | TechnologyBuildTarget;
+export type BuildItem = ShipBuildItem | DefenseBuildItem | BuildingBuildItem | TechnologyBuildItem;

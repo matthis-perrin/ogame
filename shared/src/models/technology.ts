@@ -95,14 +95,14 @@ export const ImpulseDrive = makeTechnology(
   'Réacteur à impulsion',
   makeResources({m: 2000, c: 4000, d: 600}),
   2,
-  false // Negligeable gains. Increase the speed of some ships
+  false // Negligeable gains. Increase the speed of some ships and sometimes the fuel consumption
 );
 
 export const HyperspaceDrive = makeTechnology(
   'Propulsion hyperespace',
   makeResources({m: 10000, c: 20000, d: 6000}),
   2,
-  false // Negligeable gains. Increase the speed of some ships and reduce fuel consumption
+  false // Negligeable gains. Increase the speed of some ships and sometimes the fuel consumption
 );
 
 export const LaserTechnology = makeTechnology(

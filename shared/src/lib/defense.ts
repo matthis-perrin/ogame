@@ -32,7 +32,7 @@ const DEFENSE_LINES: {
 ];
 /* eslint-enable @typescript-eslint/no-magic-numbers */
 
-export function getRequiredDefenseToStealableResources(
+export function getRequiredDefenseForStealableResources(
   account: Account,
   resources: Resources
 ): {defense: Defense; quantity: number}[] {
