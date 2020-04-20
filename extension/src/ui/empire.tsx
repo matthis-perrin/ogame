@@ -14,11 +14,11 @@ import {
 } from '@src/models/constants';
 import {Tech} from '@src/models/tech';
 import {Table, Title} from '@src/ui/common';
-import {Energy} from '@src/ui/energy';
-import {Loot} from '@src/ui/loot';
-import {Production} from '@src/ui/production';
-import {Resource} from '@src/ui/resource';
-import {TechnologyC} from '@src/ui/technology';
+import {Energy} from '@src/ui/components/energy';
+import {Loot} from '@src/ui/components/loot';
+import {Production} from '@src/ui/components/production';
+import {Resource} from '@src/ui/components/resource';
+import {TechnologyC} from '@src/ui/components/technology';
 import {sum} from '@src/ui/utils';
 
 interface EmpireProps {

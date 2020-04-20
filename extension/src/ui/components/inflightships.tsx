@@ -3,7 +3,7 @@ import React, {FC, Fragment} from 'react';
 import {Fleet} from '@src/models/fleets';
 import {Tech} from '@src/models/tech';
 import {Technology, TechnologyValue} from '@src/models/technologies';
-import {TechnologyC} from '@src/ui/technology';
+import {TechnologyC} from '@src/ui/components/technology';
 
 interface InFlightShipsProps {
   fleets: {[fleetId: string]: Fleet};

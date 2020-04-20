@@ -2,7 +2,7 @@ import React, {FC, Fragment} from 'react';
 
 import {Fleet} from '@src/models/fleets';
 import {ResourceAmount} from '@src/models/resources';
-import {Resource} from '@src/ui/resource';
+import {Resource} from '@src/ui/components/resource';
 import {sum} from '@src/ui/utils';
 
 interface InFlightResourcesProps {

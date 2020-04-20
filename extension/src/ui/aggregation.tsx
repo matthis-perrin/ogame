@@ -2,10 +2,10 @@ import React, {FC, Fragment} from 'react';
 
 import {Account} from '@src/models/account';
 import {Table, Title} from '@src/ui/common';
-import {InFlightResources} from '@src/ui/inflightresources';
-import {InFlightShips} from '@src/ui/inflightships';
-import {PlanetSum} from '@src/ui/planetsum';
-import {PlanetSumProd} from '@src/ui/planetsumprod';
+import {InFlightResources} from '@src/ui/components/inflightresources';
+import {InFlightShips} from '@src/ui/components/inflightships';
+import {PlanetSum} from '@src/ui/components/planetsum';
+import {PlanetSumProd} from '@src/ui/components/planetsumprod';
 
 interface AggregationProps {
   account: Account;

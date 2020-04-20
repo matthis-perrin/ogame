@@ -4,8 +4,8 @@ import {AstrophysicsTechnology} from '@shared/models/technology';
 
 import {Account} from '@src/models/account';
 import {Tech} from '@src/models/tech';
-import {Astrophysics} from '@src/ui/astrophysics';
 import {Title} from '@src/ui/common';
+import {Astrophysics} from '@src/ui/components/astrophysics';
 
 interface ResearchProps {
   account: Account;

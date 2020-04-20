@@ -28,7 +28,7 @@ export const App: FC = () => {
 };
 
 const Top = styled.div`
-  height: 125px;
+  height: 105px;
   padding-top: 20px;
 `;
 

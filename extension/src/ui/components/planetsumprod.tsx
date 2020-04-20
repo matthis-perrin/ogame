@@ -1,7 +1,7 @@
 import React, {FC, Fragment} from 'react';
 
 import {AccountPlanet} from '@src/models/account';
-import {Production} from '@src/ui/production';
+import {Production} from '@src/ui/components/production';
 import {sum} from '@src/ui/utils';
 
 interface PlanetSumProdProps {
