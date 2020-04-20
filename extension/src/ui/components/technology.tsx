@@ -1,13 +1,12 @@
 import React, {FC, Fragment} from 'react';
 import styled from 'styled-components';
 
-import {TechId} from '@src/models/resources';
 import {Technology} from '@src/models/technologies';
 
 interface TechnologyProps {
   name: string;
-  technologies: {[techId: string]: Technology};
-  techId: TechId;
+  technologies: {[techId: number]: Technology};
+  techId: number;
   required?: number;
 }
 

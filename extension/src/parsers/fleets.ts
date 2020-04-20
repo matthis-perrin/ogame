@@ -6,7 +6,7 @@ import {ResourceAmount} from '@src/models/resources';
 
 export function parseFleets(): Fleet[] {
   const res: Fleet[] = [];
-  $('html > body #pageContent #movementcomponent div.fleetDetails').each((_, element) => {
+  $('html > body #pageContent #fleetdispatchcomponent div.fleetDetails').each((_, element) => {
     const fleetId = element.id;
     if (fleetId.length === 0) {
       return;

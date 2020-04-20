@@ -1,19 +1,20 @@
 import {Fleet} from '@src/models/fleets';
-import {Planet, PlanetId} from '@src/models/planets';
+import {Planet, PlanetId, PlanetName} from '@src/models/planets';
 import {ResourceAmount} from '@src/models/resources';
-import {Technology} from '@src/models/technologies';
+import {Construction, Technology} from '@src/models/technologies';
 
 export interface Account {
   planetList: Planet[];
   planetDetails: {[planetId: string]: AccountPlanet};
-  maxTechnologies: {[techId: string]: number};
-  accountTechnologies: {[techId: string]: Technology};
+  maxTechnologies: {[techId: number]: number};
+  accountTechnologies: {[techId: number]: Technology};
   fleets: {[fleetId: string]: Fleet};
   planetSum: AccountPlanet | undefined;
+  constructions: {[constructionId: string]: Construction};
 }
 
 export interface AccountPlanet {
-  id: PlanetId;
+  planetId: PlanetId;
   truth: {
     serverTimeSeconds: number;
     metal: ResourceAmount;
@@ -36,5 +37,9 @@ export interface AccountPlanet {
     crystal: ResourceAmount;
     deuterium: ResourceAmount;
   };
-  technologies: {[techId: string]: Technology};
+  technologies: {[techId: number]: Technology};
+}
+
+export function planetName(account: Account, planetId: PlanetId): PlanetName {
+  return account.planetList.find(_ => _.id === planetId)?.name ?? ('' as PlanetName);
 }

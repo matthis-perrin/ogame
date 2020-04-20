@@ -1,13 +1,15 @@
 import {useEffect, useState} from 'react';
 
+import {CrystalMine, DeuteriumSynthesizer, MetalMine, SolarPlant} from '@shared/models/building';
+import {SolarSatellite} from '@shared/models/ships';
+
 import {persist} from '@src/controllers/storage';
 import {Account, AccountPlanet} from '@src/models/account';
 import {ACCOUNT_TECHNOLOGIES, MAX_TECHNOLOGIES, UI_REFRESH_RATE} from '@src/models/constants';
 import {Fleet, ReturnFlight} from '@src/models/fleets';
 import {Planet, PlanetId} from '@src/models/planets';
 import {ResourceAmount, Resources} from '@src/models/resources';
-import {Tech} from '@src/models/tech';
-import {Technology} from '@src/models/technologies';
+import {generateConstructionId, Technology} from '@src/models/technologies';
 import {sum} from '@src/ui/utils';
 
 let currentAccount: Account | undefined;
@@ -42,7 +44,7 @@ function calcPlanetSum(planetDetails: {[planetId: string]: AccountPlanet}): Acco
   }
 
   return {
-    id: 'SUM' as PlanetId,
+    planetId: 'SUM' as PlanetId,
     truth: {
       serverTimeSeconds: 0,
       metal: 0 as ResourceAmount,
@@ -82,7 +84,7 @@ export function setAccount(account: Account, persistent = true): void {
 export function addPlanet(
   serverTimeSeconds: number,
   planetList: Planet[],
-  id: PlanetId,
+  planetId: PlanetId,
   resources: Resources,
   technologies: Technology[],
   fleets: Fleet[]
@@ -94,13 +96,14 @@ export function addPlanet(
     accountTechnologies: currentAccount?.accountTechnologies ?? {},
     fleets: currentAccount?.fleets ?? {},
     planetSum: undefined,
+    constructions: currentAccount?.constructions ?? {},
   };
 
   for (const fleet of fleets) {
     account.fleets[fleet.fleetId] = fleet;
   }
 
-  const technologiesObj = currentAccount?.planetDetails[id]?.technologies ?? {};
+  const technologiesObj = currentAccount?.planetDetails[planetId]?.technologies ?? {};
   for (const technology of technologies) {
     if (ACCOUNT_TECHNOLOGIES.includes(technology.techId)) {
       account.accountTechnologies[technology.techId] = technology;
@@ -115,23 +118,34 @@ export function addPlanet(
         }
       }
     }
+    if (technology.target !== undefined && technology.targetEndSeconds !== undefined) {
+      const constructionId = generateConstructionId(planetId, technology.techId);
+      account.constructions[constructionId] = {
+        constructionId,
+        planetId,
+        techId: technology.techId,
+        value: technology.value,
+        target: technology.target,
+        targetEndSeconds: technology.targetEndSeconds,
+      };
+    }
   }
 
   const productionCoefficient =
     resources.resources.energy.amount >= 0
       ? 1
       : sum([
-          resources.techs[Tech.SolarPlant].production.energy,
-          resources.techs[Tech.SolarSatellite].production.energy,
+          resources.techs[SolarPlant.id].production.energy,
+          resources.techs[SolarSatellite.id].production.energy,
         ]) /
         sum([
-          resources.techs[Tech.MetalMine].consumption.energy,
-          resources.techs[Tech.CrystalMine].consumption.energy,
-          resources.techs[Tech.DeuteriumSynthesizer].consumption.energy,
+          resources.techs[MetalMine.id].consumption.energy,
+          resources.techs[CrystalMine.id].consumption.energy,
+          resources.techs[DeuteriumSynthesizer.id].consumption.energy,
         ]);
 
-  account.planetDetails[id] = {
-    id,
+  account.planetDetails[planetId] = {
+    planetId,
     truth: {
       serverTimeSeconds,
       metal: resources.resources.metal.amount,
@@ -152,15 +166,15 @@ export function addPlanet(
     productions: {
       metal: sum([
         resources.resources.metal.baseProduction,
-        resources.techs[Tech.MetalMine].production.metal * productionCoefficient,
+        resources.techs[MetalMine.id].production.metal * productionCoefficient,
       ]),
       crystal: sum([
         resources.resources.crystal.baseProduction,
-        resources.techs[Tech.CrystalMine].production.crystal * productionCoefficient,
+        resources.techs[CrystalMine.id].production.crystal * productionCoefficient,
       ]),
       deuterium: sum([
         resources.resources.deuterium.baseProduction,
-        resources.techs[Tech.DeuteriumSynthesizer].production.deuterium * productionCoefficient,
+        resources.techs[DeuteriumSynthesizer.id].production.deuterium * productionCoefficient,
       ]),
     },
     technologies: technologiesObj,
@@ -197,6 +211,7 @@ function applyProduction(): void {
     accountTechnologies: currentAccount.accountTechnologies,
     fleets: {},
     planetSum: undefined,
+    constructions: {},
   };
 
   const nowMillis = new Date().getTime();
@@ -207,7 +222,7 @@ function applyProduction(): void {
       const planet = currentAccount.planetDetails[planetId];
       const elaspedSeconds = (nowMillis - planet.truth.serverTimeSeconds * 1000) / 1000;
       account.planetDetails[planetId] = {
-        id: planet.id,
+        planetId: planet.planetId,
         truth: planet.truth,
         resources: {
           metal: sum([planet.truth.metal, planet.productions.metal * elaspedSeconds]),
@@ -234,6 +249,17 @@ function applyProduction(): void {
         fleet.midTime = fleet.arrivalTime;
       }
       account.fleets[fleetId] = fleet;
+    }
+  }
+
+  for (const constructionId in currentAccount.constructions) {
+    if (currentAccount.constructions.hasOwnProperty(constructionId)) {
+      const construction = currentAccount.constructions[constructionId];
+      if (nowSeconds >= construction.targetEndSeconds) {
+        // TODO: Handle construction end
+        continue;
+      }
+      account.constructions[constructionId] = construction;
     }
   }
 

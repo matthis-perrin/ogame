@@ -11,6 +11,7 @@ export interface BuildableRequirement {
 }
 
 export interface BuildableBase {
+  id: number;
   type: BuildableType;
   name: string;
   requirements: BuildableRequirement[];

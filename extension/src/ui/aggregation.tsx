@@ -20,7 +20,7 @@ export const Aggregation: FC<AggregationProps> = ({account}) => (
             <Title>Flottes ({Object.keys(account.fleets).length})</Title>
           </th>
           <th colSpan={2}>
-            <Title>Total Compte</Title>
+            <Title>Total</Title>
           </th>
         </tr>
       </thead>

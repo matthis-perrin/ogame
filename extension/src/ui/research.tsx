@@ -3,7 +3,6 @@ import React, {FC, Fragment} from 'react';
 import {AstrophysicsTechnology} from '@shared/models/technology';
 
 import {Account} from '@src/models/account';
-import {Tech} from '@src/models/tech';
 import {Title} from '@src/ui/common';
 import {Astrophysics} from '@src/ui/components/astrophysics';
 
@@ -12,8 +11,8 @@ interface ResearchProps {
 }
 
 export const Research: FC<ResearchProps> = ({account}) => {
-  const atroTechnology = account.accountTechnologies.hasOwnProperty(Tech.AstrophysicsTechnology)
-    ? account.accountTechnologies[Tech.AstrophysicsTechnology]
+  const atroTechnology = account.accountTechnologies.hasOwnProperty(AstrophysicsTechnology.id)
+    ? account.accountTechnologies[AstrophysicsTechnology.id]
     : undefined;
   const astroLevel =
     atroTechnology !== undefined

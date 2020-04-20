@@ -3,6 +3,7 @@ import styled from 'styled-components';
 
 import {useAccount} from '@src/stores/account';
 import {Aggregation} from '@src/ui/aggregation';
+import {Constructions} from '@src/ui/constructions';
 import {Empire} from '@src/ui/empire';
 import {Research} from '@src/ui/research';
 
@@ -18,7 +19,10 @@ export const App: FC = () => {
             <Top>
               <Aggregation account={account} />
             </Top>
-            <Empire account={account} />
+            <Middle>
+              <Empire account={account} />
+              <Constructions account={account} />
+            </Middle>
             <Research account={account} />
           </div>
         )}
@@ -30,6 +34,10 @@ export const App: FC = () => {
 const Top = styled.div`
   height: 105px;
   padding-top: 20px;
+`;
+
+const Middle = styled.div`
+  display: flex;
 `;
 
 const Container = styled.div`

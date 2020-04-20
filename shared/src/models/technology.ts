@@ -15,12 +15,14 @@ export interface Technology extends BuildableBase {
 }
 
 function makeTechnology(
+  id: number,
   name: string,
   baseCost: Resources,
   costExponential: number,
   isUseful: boolean
 ): Technology {
   return {
+    id,
     type: 'technology',
     name,
     cost: (level: number) => ({
@@ -36,6 +38,7 @@ function makeTechnology(
 }
 
 export const ComputerTechnology = makeTechnology(
+  108,
   'Ordinateur',
   makeResources({m: 0, c: 400, d: 600}),
   2,
@@ -43,6 +46,7 @@ export const ComputerTechnology = makeTechnology(
 );
 
 export const EnergyTechnology = makeTechnology(
+  113,
   'Energie',
   makeResources({m: 0, c: 800, d: 400}),
   2,
@@ -50,6 +54,7 @@ export const EnergyTechnology = makeTechnology(
 );
 
 export const EspionageTechnology = makeTechnology(
+  106,
   'Espionnage',
   makeResources({m: 200, c: 1000, d: 200}),
   2,
@@ -57,6 +62,7 @@ export const EspionageTechnology = makeTechnology(
 );
 
 export const WeaponTechnology = makeTechnology(
+  109,
   'Armes',
   makeResources({m: 800, c: 200, d: 0}),
   2,
@@ -64,6 +70,7 @@ export const WeaponTechnology = makeTechnology(
 );
 
 export const ShieldingTechnology = makeTechnology(
+  110,
   'Bouclier',
   makeResources({m: 200, c: 600, d: 0}),
   2,
@@ -71,6 +78,7 @@ export const ShieldingTechnology = makeTechnology(
 );
 
 export const ArmourTechnology = makeTechnology(
+  111,
   'Protection des vaisseaux',
   makeResources({m: 1000, c: 0, d: 0}),
   2,
@@ -78,6 +86,7 @@ export const ArmourTechnology = makeTechnology(
 );
 
 export const HyperspaceTechnology = makeTechnology(
+  114,
   'Hyperspace',
   makeResources({m: 0, c: 4000, d: 2000}),
   2,
@@ -85,6 +94,7 @@ export const HyperspaceTechnology = makeTechnology(
 );
 
 export const CombustionDrive = makeTechnology(
+  115,
   'Réacteur à combustion',
   makeResources({m: 400, c: 0, d: 600}),
   2,
@@ -92,6 +102,7 @@ export const CombustionDrive = makeTechnology(
 );
 
 export const ImpulseDrive = makeTechnology(
+  117,
   'Réacteur à impulsion',
   makeResources({m: 2000, c: 4000, d: 600}),
   2,
@@ -99,6 +110,7 @@ export const ImpulseDrive = makeTechnology(
 );
 
 export const HyperspaceDrive = makeTechnology(
+  118,
   'Propulsion hyperespace',
   makeResources({m: 10000, c: 20000, d: 6000}),
   2,
@@ -106,6 +118,7 @@ export const HyperspaceDrive = makeTechnology(
 );
 
 export const LaserTechnology = makeTechnology(
+  120,
   'Laser',
   makeResources({m: 200, c: 100, d: 0}),
   2,
@@ -113,6 +126,7 @@ export const LaserTechnology = makeTechnology(
 );
 
 export const IonTechnology = makeTechnology(
+  121,
   'Ions',
   makeResources({m: 1000, c: 300, d: 100}),
   2,
@@ -120,6 +134,7 @@ export const IonTechnology = makeTechnology(
 );
 
 export const PlasmaTechnology = makeTechnology(
+  122,
   'Plasma',
   makeResources({m: 2000, c: 4000, d: 1000}),
   2,
@@ -127,6 +142,7 @@ export const PlasmaTechnology = makeTechnology(
 );
 
 export const IntergalacticResearchNetworkTechnology = makeTechnology(
+  123,
   'Réseau de recherche intergalactique',
   makeResources({m: 240000, c: 400000, d: 160000}),
   2,
@@ -135,6 +151,7 @@ export const IntergalacticResearchNetworkTechnology = makeTechnology(
 
 // TODO - Astrophysics cost is rounded to the nearest 100
 export const AstrophysicsTechnology = makeTechnology(
+  124,
   'Astrophysique',
   makeResources({m: 4000, c: 8000, d: 4000}),
   1.75,

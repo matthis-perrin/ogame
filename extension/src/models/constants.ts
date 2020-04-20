@@ -1,4 +1,33 @@
-import {Tech} from '@src/models/tech';
+import {
+  CrystalMine,
+  CrystalStorage,
+  DeuteriumSynthesizer,
+  DeuteriumTank,
+  MetalMine,
+  MetalStorage,
+  MissileSilo,
+  NaniteFactory,
+  RoboticsFactory,
+  Shipyard,
+  SolarPlant,
+} from '@shared/models/building';
+import {
+  ArmourTechnology,
+  AstrophysicsTechnology,
+  CombustionDrive,
+  ComputerTechnology,
+  EnergyTechnology,
+  EspionageTechnology,
+  HyperspaceDrive,
+  HyperspaceTechnology,
+  ImpulseDrive,
+  IntergalacticResearchNetworkTechnology,
+  IonTechnology,
+  LaserTechnology,
+  PlasmaTechnology,
+  ShieldingTechnology,
+  WeaponTechnology,
+} from '@shared/models/technology';
 
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 export const INACTIVITY_TIME = 6.5; // 6h30m
@@ -17,17 +46,17 @@ export const SAT_DEBRIS = 2000;
 
 // Required max technologies
 export const MAX_TECHNOLOGIES = [
-  Tech.MetalMine,
-  Tech.CrystalMine,
-  Tech.DeuteriumSynthesizer,
-  Tech.MetalStorage,
-  Tech.CrystalStorage,
-  Tech.DeuteriumStorage,
-  Tech.SolarPlant,
-  Tech.MissileSilo,
-  Tech.RoboticsFactory,
-  Tech.Shipyard,
-  Tech.NaniteFactory,
+  MetalMine.id,
+  CrystalMine.id,
+  DeuteriumSynthesizer.id,
+  MetalStorage.id,
+  CrystalStorage.id,
+  DeuteriumTank.id,
+  SolarPlant.id,
+  MissileSilo.id,
+  RoboticsFactory.id,
+  Shipyard.id,
+  NaniteFactory.id,
 ];
 
 export const TECHNOLOGY_PAGES = [
@@ -40,20 +69,19 @@ export const TECHNOLOGY_PAGES = [
 ];
 
 export const ACCOUNT_TECHNOLOGIES = [
-  Tech.EspionageTechnology,
-  Tech.ComputerTechnology,
-  Tech.WeaponsTechnology,
-  Tech.ShieldingTechnology,
-  Tech.ArmorTechnology,
-  Tech.EnergyTechnology,
-  Tech.HyperspaceTechnology,
-  Tech.CombustionDriveTechnology,
-  Tech.ImpulseDriveTechnology,
-  Tech.HyperspaceDriveTechnology,
-  Tech.LaserTechnology,
-  Tech.IonTechnology,
-  Tech.PlasmaTechnology,
-  Tech.AstrophysicsTechnology,
-  Tech.ResearchNetworkTechnology,
-  Tech.GravitonTechnology,
+  EspionageTechnology.id,
+  ComputerTechnology.id,
+  WeaponTechnology.id,
+  ShieldingTechnology.id,
+  ArmourTechnology.id,
+  EnergyTechnology.id,
+  HyperspaceTechnology.id,
+  CombustionDrive.id,
+  ImpulseDrive.id,
+  HyperspaceDrive.id,
+  LaserTechnology.id,
+  IonTechnology.id,
+  PlasmaTechnology.id,
+  AstrophysicsTechnology.id,
+  IntergalacticResearchNetworkTechnology.id,
 ];

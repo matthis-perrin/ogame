@@ -1,7 +1,8 @@
 import React, {FC, Fragment} from 'react';
 
+import {EspionageProbe, LargeCargo, Recycler, SmallCargo} from '@shared/models/ships';
+
 import {Fleet} from '@src/models/fleets';
-import {Tech} from '@src/models/tech';
 import {Technology, TechnologyValue} from '@src/models/technologies';
 import {TechnologyC} from '@src/ui/components/technology';
 
@@ -10,43 +11,43 @@ interface InFlightShipsProps {
 }
 
 export const InFlightShips: FC<InFlightShipsProps> = ({fleets}) => {
-  const technologies: {[techId: string]: Technology} = {};
-  technologies[Tech.TransporterSmall] = {
-    techId: Tech.TransporterSmall,
+  const technologies: {[techId: number]: Technology} = {};
+  technologies[SmallCargo.id] = {
+    techId: SmallCargo.id,
     value: 0 as TechnologyValue,
   };
-  technologies[Tech.TransporterLarge] = {
-    techId: Tech.TransporterLarge,
+  technologies[LargeCargo.id] = {
+    techId: LargeCargo.id,
     value: 0 as TechnologyValue,
   };
-  technologies[Tech.Recycler] = {
-    techId: Tech.Recycler,
+  technologies[Recycler.id] = {
+    techId: Recycler.id,
     value: 0 as TechnologyValue,
   };
-  technologies[Tech.EspionageProbe] = {
-    techId: Tech.EspionageProbe,
+  technologies[EspionageProbe.id] = {
+    techId: EspionageProbe.id,
     value: 0 as TechnologyValue,
   };
   for (const fleetId in fleets) {
     if (fleets.hasOwnProperty(fleetId)) {
       const fleet = fleets[fleetId];
-      technologies[Tech.TransporterSmall].value = ((technologies[Tech.TransporterSmall]
-        .value as number) + fleet.ships.transporterSmall) as TechnologyValue;
-      technologies[Tech.TransporterLarge].value = ((technologies[Tech.TransporterLarge]
-        .value as number) + fleet.ships.transporterLarge) as TechnologyValue;
-      technologies[Tech.Recycler].value = ((technologies[Tech.Recycler].value as number) +
+      technologies[SmallCargo.id].value = ((technologies[SmallCargo.id].value as number) +
+        fleet.ships.transporterSmall) as TechnologyValue;
+      technologies[LargeCargo.id].value = ((technologies[LargeCargo.id].value as number) +
+        fleet.ships.transporterLarge) as TechnologyValue;
+      technologies[Recycler.id].value = ((technologies[Recycler.id].value as number) +
         fleet.ships.recycler) as TechnologyValue;
-      technologies[Tech.EspionageProbe].value = ((technologies[Tech.EspionageProbe]
-        .value as number) + fleet.ships.espionageProbe) as TechnologyValue;
+      technologies[EspionageProbe.id].value = ((technologies[EspionageProbe.id].value as number) +
+        fleet.ships.espionageProbe) as TechnologyValue;
     }
   }
 
   return (
     <Fragment>
-      <TechnologyC name="PT" technologies={technologies} techId={Tech.TransporterSmall} />
-      <TechnologyC name="GT" technologies={technologies} techId={Tech.TransporterLarge} />
-      <TechnologyC name="REC" technologies={technologies} techId={Tech.Recycler} />
-      <TechnologyC name="ESP" technologies={technologies} techId={Tech.EspionageProbe} />
+      <TechnologyC name="PT" technologies={technologies} techId={SmallCargo.id} />
+      <TechnologyC name="GT" technologies={technologies} techId={LargeCargo.id} />
+      <TechnologyC name="REC" technologies={technologies} techId={Recycler.id} />
+      <TechnologyC name="ESP" technologies={technologies} techId={EspionageProbe.id} />
     </Fragment>
   );
 };

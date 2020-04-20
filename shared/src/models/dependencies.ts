@@ -3,6 +3,7 @@
 import {
   DeuteriumSynthesizer,
   FusionReactor,
+  MissileSilo,
   NaniteFactory,
   ResearchLab,
   RoboticsFactory,
@@ -14,6 +15,8 @@ import {
   IonCannon,
   LargeShieldDome,
   LightLaser,
+  MissileInterceptor,
+  MissileInterplanetary,
   PlasmaTurret,
   RocketLauncher,
   SmallShieldDome,
@@ -67,6 +70,7 @@ export function setupRequirements(): void {
   );
   ResearchLab.requirements.push({entity: DeuteriumSynthesizer, level: 1});
   RoboticsFactory.requirements.push({entity: DeuteriumSynthesizer, level: 1});
+  MissileSilo.requirements.push({entity: Shipyard, level: 1});
 
   // Technologies
   ComputerTechnology.requirements.push({entity: ResearchLab, level: 1});
@@ -152,6 +156,11 @@ export function setupRequirements(): void {
   PlasmaTurret.requirements.push(
     {entity: Shipyard, level: 8},
     {entity: PlasmaTechnology, level: 7}
+  );
+  MissileInterceptor.requirements.push({entity: MissileSilo, level: 2});
+  MissileInterplanetary.requirements.push(
+    {entity: MissileSilo, level: 4},
+    {entity: ImpulseDrive, level: 1}
   );
 
   // Ships
