@@ -1,4 +1,4 @@
-import {Brand, sum} from '@shared/utils/type_utils';
+import {Brand, multiply, substract, sum} from '@shared/utils/type_utils';
 
 export enum ResourceType {
   Metal = 'metal',
@@ -11,6 +11,13 @@ export type CrystalAmount = Brand<number, 'CrystalAmount'>;
 export type DeuteriumAmount = Brand<number, 'DeuteriumAmount'>;
 export type StandardUnitAmount = Brand<number, 'StandardUnitAmount'>;
 export type EnergyAmount = Brand<number, 'EnergyAmount'>;
+export type Milliseconds = Brand<number, 'Milliseconds'>;
+
+export interface Resources {
+  metal: MetalAmount;
+  crystal: CrystalAmount;
+  deuterium: DeuteriumAmount;
+}
 
 export function makeResources(values: {m?: number; c?: number; d?: number}): Resources {
   const {m = 0, c = 0, d = 0} = values;
@@ -21,7 +28,7 @@ export function makeResources(values: {m?: number; c?: number; d?: number}): Res
   };
 }
 
-export function sumResources(r1: Resources, r2: Resources): Resources {
+export function addResources(r1: Resources, r2: Resources): Resources {
   return {
     metal: sum(r1.metal, r2.metal),
     crystal: sum(r1.crystal, r2.crystal),
@@ -29,8 +36,18 @@ export function sumResources(r1: Resources, r2: Resources): Resources {
   };
 }
 
-export interface Resources {
-  metal: MetalAmount;
-  crystal: CrystalAmount;
-  deuterium: DeuteriumAmount;
+export function multiplyResources(r: Resources, times: number): Resources {
+  return {
+    metal: multiply(r.metal, times),
+    crystal: multiply(r.crystal, times),
+    deuterium: multiply(r.deuterium, times),
+  };
+}
+
+export function substractResources(r1: Resources, r2: Resources): Resources {
+  return {
+    metal: substract(r1.metal, r2.metal),
+    crystal: substract(r1.crystal, r2.crystal),
+    deuterium: substract(r1.deuterium, r2.deuterium),
+  };
 }

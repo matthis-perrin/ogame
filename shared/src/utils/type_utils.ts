@@ -153,10 +153,30 @@ export type Untrusted<T> = {
   [P in keyof T]: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 };
 
+// Typed number arithmetic
+
 export function sum<T>(...args: Brand<number, T>[]): Brand<number, T> {
   let total = 0;
   for (const arg of args) {
     total += arg;
   }
   return total as Brand<number, T>;
+}
+export function substract<T>(a: Brand<number, T>, b: Brand<number, T>): Brand<number, T> {
+  return (a - b) as Brand<number, T>;
+}
+export function multiply<T>(value: Brand<number, T>, times: number): Brand<number, T> {
+  return (value * times) as Brand<number, T>;
+}
+export function divide<T>(value: Brand<number, T>, divider: number): Brand<number, T> {
+  return (value / divider) as Brand<number, T>;
+}
+export function floor<T>(value: Brand<number, T>): Brand<number, T> {
+  return Math.floor(value) as Brand<number, T>;
+}
+export function min<T>(...args: Brand<number, T>[]): Brand<number, T> {
+  return Math.min(...args) as Brand<number, T>;
+}
+export function max<T>(...args: Brand<number, T>[]): Brand<number, T> {
+  return Math.max(...args) as Brand<number, T>;
 }

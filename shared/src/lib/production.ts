@@ -1,4 +1,23 @@
-/* eslint-disable @typescript-eslint/no-magic-numbers */
+import {
+  getCrawlerEnergyConsumptionPerHour,
+  getCrystalBaseProdPerHour,
+  getCrystalMineEnergyConsumptionPerHour,
+  getCrystalMineProductionPerHour,
+  getCrystalProductionBonusFromPlasmaTechnology,
+  getDeuteriumProductionBonusFromPlasmaTechnology,
+  getDeuteriumSynthesizerEnergyConsumptionPerHour,
+  getDeuteriumSynthesizerProductionPerHour,
+  getFusionReactorDeuteriumConsumptionPerHour,
+  getFusionReactorEnergyProductionPerHour,
+  getMaxCrawlerCount,
+  getMetalBaseProdPerHour,
+  getMetalMineEnergyConsumptionPerHour,
+  getMetalMineProductionPerHour,
+  getMetalProductionBonusFromPlasmaTechnology,
+  getResourceProductionBonusFromCrawlers,
+  getSatelliteEnergyProductionPerHour,
+  getSolarPlantEnergyProductionPerHour,
+} from '@shared/lib/formula';
 import {Account, Class} from '@shared/models/account';
 import {
   CrystalMine,
@@ -8,116 +27,17 @@ import {
   SolarPlant,
 } from '@shared/models/building';
 import {Planet} from '@shared/models/planet';
-import {
-  CrystalAmount,
-  DeuteriumAmount,
-  EnergyAmount,
-  makeResources,
-  MetalAmount,
-  Resources,
-  sumResources,
-} from '@shared/models/resource';
+import {addResources, EnergyAmount, makeResources, Resources} from '@shared/models/resource';
 import {Crawler, SolarSatellite} from '@shared/models/ships';
 import {EnergyTechnology, PlasmaTechnology} from '@shared/models/technology';
-import {sum} from '@shared/utils/type_utils';
+import {floor, multiply, sum} from '@shared/utils/type_utils';
 
-export function getMaxCrawlerCount(
-  metalMineLevel: number,
-  crystalMineLevel: number,
-  deuteriumSynthesizerLevel: number
-): number {
-  return 8 * (metalMineLevel + crystalMineLevel + deuteriumSynthesizerLevel);
-}
-
-//
-// RESOURCE PRODUCTION/CONSUMPTION
-//
-
-export function getMetalMineProductionPerHour(economySpeed: number, level: number): MetalAmount {
-  return Math.floor(economySpeed * 30 * level * Math.pow(1.1, level)) as MetalAmount;
-}
-
-export function getCrystalMineProductionPerHour(
-  economySpeed: number,
-  level: number
-): CrystalAmount {
-  return Math.floor(economySpeed * 20 * level * Math.pow(1.1, level)) as CrystalAmount;
-}
-
-export function getDeuteriumSynthesizerProductionPerHour(
-  economySpeed: number,
-  level: number,
-  planetTemperature: number
-): DeuteriumAmount {
-  return Math.floor(
-    economySpeed * 20 * level * Math.pow(1.1, level) * (0.68 - 0.002 * planetTemperature)
-  ) as DeuteriumAmount;
-}
-
-export function getFusionReactorDeuteriumConsumptionPerHour(
-  economySpeed: number,
-  level: number
-): DeuteriumAmount {
-  return Math.floor(-economySpeed * 10 * level * Math.pow(1.1, level)) as DeuteriumAmount;
-}
-
-export function getMetalProductionBonusFromPlasmaTechnology(level: number): MetalAmount {
-  return (level * 0.01) as MetalAmount;
-}
-
-export function getCrystalProductionBonusFromPlasmaTechnology(level: number): CrystalAmount {
-  return (level * 0.0066) as CrystalAmount;
-}
-
-export function getDeuteriumProductionBonusFromPlasmaTechnology(level: number): DeuteriumAmount {
-  return (level * 0.0033) as DeuteriumAmount;
-}
-
-export function getResourceProductionBonusFromCrawlers(
-  crawlerCount: number,
-  accountClass: Class
-): number {
-  const accountClassBonus = accountClass === Class.Collector ? 1.5 : 1;
-  return (crawlerCount * accountClassBonus * 0.02) / 100;
-}
-
-//
-// ENERGY PRODUCTION/CONSUMPTION
-//
-
-export function getMetalMineEnergyConsumptionPerHour(level: number): EnergyAmount {
-  return Math.floor(10 * level * Math.pow(1.1, level)) as EnergyAmount;
-}
-
-export function getCrystalMineEnergyConsumptionPerHour(level: number): EnergyAmount {
-  return Math.floor(10 * level * Math.pow(1.1, level)) as EnergyAmount;
-}
-
-export function getDeuteriumSynthesizerEnergyConsumptionPerHour(level: number): EnergyAmount {
-  return Math.floor(20 * level * Math.pow(1.1, level)) as EnergyAmount;
-}
-
-export function getCrawlerEnergyConsumptionPerHour(crawlerCount: number): EnergyAmount {
-  return (50 * crawlerCount) as EnergyAmount;
-}
-
-export function getSolarPlantEnergyProductionPerHour(level: number): EnergyAmount {
-  return Math.floor(20 * level * Math.pow(1.1, level)) as EnergyAmount;
-}
-
-export function getFusionReactorEnergyProductionPerHour(
-  level: number,
-  energyLevel: number
-): EnergyAmount {
-  return Math.floor(30 * level * Math.pow(1.05 + 0.01 * energyLevel, level)) as EnergyAmount;
-}
-
-export function getSatelliteEnergyProductionPerHour(
-  solarSatelliteCount: number,
-  planetTemperature: number
-): EnergyAmount {
-  return (solarSatelliteCount * Math.floor((planetTemperature + 160) / 6)) as EnergyAmount;
-}
+const COLLECTOR_PRODUCTION_BONUS = 0.25;
+const COLLECTOR_ENERGY_BONUS = 0.1;
+const GEOLOG_PRODUCTION_BONUS = 0.1;
+const ENGINEER_ENERGY_BONUS = 0.1;
+const ALL_OFFICERS_ENERGY_BONUS = 0.02;
+const ALL_OFFICERS_PRODUCTION_BONUS = 0.02;
 
 //
 // Aggregation
@@ -147,15 +67,15 @@ export function getPlanetProductionPerHour(
   const energyLevel = account.technologyLevels.get(EnergyTechnology) ?? 0;
 
   const economySpeed = account.universe.economySpeed;
-  const classProductionBonus = account.class === Class.Collector ? 0.25 : 0;
-  const classEnergyBonus = (account.class === Class.Collector ? 0.1 : 0) as EnergyAmount;
+  const classProductionBonus = account.class === Class.Collector ? COLLECTOR_PRODUCTION_BONUS : 0;
+  const classEnergyBonus = account.class === Class.Collector ? COLLECTOR_ENERGY_BONUS : 0;
 
   const {commander, engineer, fleetAdmiral, geologist, technocrat} = account.officers;
   const hasAllOfficers = commander && engineer && fleetAdmiral && geologist && technocrat;
-  const geologProductionBonus = geologist ? 0.1 : 0;
-  const engineerEnergyProductionBonus = (engineer ? 0.1 : 0) as EnergyAmount;
-  const allOfficerProductionBonus = hasAllOfficers ? 0.02 : 0;
-  const allOfficerEnergyBonus = (hasAllOfficers ? 0.02 : 0) as EnergyAmount;
+  const geologProductionBonus = geologist ? GEOLOG_PRODUCTION_BONUS : 0;
+  const engineerEnergyProductionBonus = engineer ? ENGINEER_ENERGY_BONUS : 0;
+  const allOfficerProductionBonus = hasAllOfficers ? ALL_OFFICERS_ENERGY_BONUS : 0;
+  const allOfficerEnergyBonus = hasAllOfficers ? ALL_OFFICERS_PRODUCTION_BONUS : 0;
 
   const resourceProductionBonusFromCrawlers = getResourceProductionBonusFromCrawlers(
     crawlerCount,
@@ -164,42 +84,52 @@ export function getPlanetProductionPerHour(
 
   // Metal
 
-  const metalBaseProdPerHour = 30 * economySpeed;
+  const metalBaseProdPerHour = multiply(getMetalBaseProdPerHour(), economySpeed);
   const metalProdPerHour = getMetalMineProductionPerHour(economySpeed, metalMineLevel);
-  const metalProdBonusFromCrawlers = resourceProductionBonusFromCrawlers * metalProdPerHour;
-  const metalProdBonusFromPlasma =
-    getMetalProductionBonusFromPlasmaTechnology(plasmaLevel) * metalProdPerHour;
-  const metalProdBonusFromGeologist = geologProductionBonus * metalProdPerHour;
-  const metalProdBonusFromAllOfficers = allOfficerProductionBonus * metalProdPerHour;
-  const metalProdBonusFromClass = classProductionBonus * metalProdPerHour;
+  const metalProdBonusFromCrawlers = multiply(
+    metalProdPerHour,
+    resourceProductionBonusFromCrawlers
+  );
+  const metalProdBonusFromPlasma = multiply(
+    metalProdPerHour,
+    getMetalProductionBonusFromPlasmaTechnology(plasmaLevel)
+  );
+  const metalProdBonusFromGeologist = multiply(metalProdPerHour, geologProductionBonus);
+  const metalProdBonusFromAllOfficers = multiply(metalProdPerHour, allOfficerProductionBonus);
+  const metalProdBonusFromClass = multiply(metalProdPerHour, classProductionBonus);
 
   const totalMetalProdPerHour = sum(
     metalProdPerHour,
-    (metalProdBonusFromCrawlers +
-      metalProdBonusFromPlasma +
-      metalProdBonusFromGeologist +
-      metalProdBonusFromAllOfficers +
-      metalProdBonusFromClass) as MetalAmount
+    metalProdBonusFromCrawlers,
+    metalProdBonusFromPlasma,
+    metalProdBonusFromGeologist,
+    metalProdBonusFromAllOfficers,
+    metalProdBonusFromClass
   );
 
   // Crystal
 
-  const crystalBaseProdPerHour = 15 * economySpeed;
+  const crystalBaseProdPerHour = multiply(getCrystalBaseProdPerHour(), economySpeed);
   const crystalProdPerHour = getCrystalMineProductionPerHour(economySpeed, crystalMineLevel);
-  const crystalProdBonusFromCrawlers = resourceProductionBonusFromCrawlers * crystalProdPerHour;
-  const crystalProdBonusFromPlasma =
-    getCrystalProductionBonusFromPlasmaTechnology(plasmaLevel) * crystalProdPerHour;
-  const crystalProdBonusFromGeologist = geologProductionBonus * crystalProdPerHour;
-  const crystalProdBonusFromAllOfficers = allOfficerProductionBonus * crystalProdPerHour;
-  const crystalProdBonusFromClass = classProductionBonus * crystalProdPerHour;
+  const crystalProdBonusFromCrawlers = multiply(
+    crystalProdPerHour,
+    resourceProductionBonusFromCrawlers
+  );
+  const crystalProdBonusFromPlasma = multiply(
+    crystalProdPerHour,
+    getCrystalProductionBonusFromPlasmaTechnology(plasmaLevel)
+  );
+  const crystalProdBonusFromGeologist = multiply(crystalProdPerHour, geologProductionBonus);
+  const crystalProdBonusFromAllOfficers = multiply(crystalProdPerHour, allOfficerProductionBonus);
+  const crystalProdBonusFromClass = multiply(crystalProdPerHour, classProductionBonus);
 
   const totalCrystalProdPerHour = sum(
     crystalProdPerHour,
-    (crystalProdBonusFromCrawlers +
-      crystalProdBonusFromPlasma +
-      crystalProdBonusFromGeologist +
-      crystalProdBonusFromAllOfficers +
-      crystalProdBonusFromClass) as CrystalAmount
+    crystalProdBonusFromCrawlers,
+    crystalProdBonusFromPlasma,
+    crystalProdBonusFromGeologist,
+    crystalProdBonusFromAllOfficers,
+    crystalProdBonusFromClass
   );
 
   // Deuterium
@@ -209,12 +139,20 @@ export function getPlanetProductionPerHour(
     deuteriumSynthesizerLevel,
     planetTemperature
   );
-  const deuteriumProdBonusFromCrawlers = resourceProductionBonusFromCrawlers * deuteriumProdPerHour;
-  const deuteriumProdBonusFromPlasma =
-    getDeuteriumProductionBonusFromPlasmaTechnology(plasmaLevel) * deuteriumProdPerHour;
-  const deuteriumProdBonusFromGeologist = geologProductionBonus * deuteriumProdPerHour;
-  const deuteriumProdBonusFromAllOfficers = allOfficerProductionBonus * deuteriumProdPerHour;
-  const deuteriumProdBonusFromClass = classProductionBonus * deuteriumProdPerHour;
+  const deuteriumProdBonusFromCrawlers = multiply(
+    deuteriumProdPerHour,
+    resourceProductionBonusFromCrawlers
+  );
+  const deuteriumProdBonusFromPlasma = multiply(
+    deuteriumProdPerHour,
+    getDeuteriumProductionBonusFromPlasmaTechnology(plasmaLevel)
+  );
+  const deuteriumProdBonusFromGeologist = multiply(deuteriumProdPerHour, geologProductionBonus);
+  const deuteriumProdBonusFromAllOfficers = multiply(
+    deuteriumProdPerHour,
+    allOfficerProductionBonus
+  );
+  const deuteriumProdBonusFromClass = multiply(deuteriumProdPerHour, classProductionBonus);
   const deuteriumConsumptionPerHour = getFusionReactorDeuteriumConsumptionPerHour(
     economySpeed,
     fusionReactorLevel
@@ -222,11 +160,11 @@ export function getPlanetProductionPerHour(
 
   const totalDeuteriumProdPerHour = sum(
     deuteriumProdPerHour,
-    (deuteriumProdBonusFromCrawlers +
-      deuteriumProdBonusFromPlasma +
-      deuteriumProdBonusFromGeologist +
-      deuteriumProdBonusFromAllOfficers +
-      deuteriumProdBonusFromClass) as DeuteriumAmount,
+    deuteriumProdBonusFromCrawlers,
+    deuteriumProdBonusFromPlasma,
+    deuteriumProdBonusFromGeologist,
+    deuteriumProdBonusFromAllOfficers,
+    deuteriumProdBonusFromClass,
     deuteriumConsumptionPerHour
   );
 
@@ -239,14 +177,14 @@ export function getPlanetProductionPerHour(
   );
   const crawlerEnergyConsumption = getCrawlerEnergyConsumptionPerHour(crawlerCount);
 
-  const totalEnergyConsumption = Math.floor(
+  const totalEnergyConsumption = floor(
     sum(
       metalMineEnergyConsumption,
       crystalMineEnergyConsumption,
       deuteriumSynthesizerEnergyConsumption,
       crawlerEnergyConsumption
     )
-  ) as EnergyAmount;
+  );
 
   // Energy Production
 
@@ -264,13 +202,18 @@ export function getPlanetProductionPerHour(
     fusionReactorEnergyProduction,
     satelliteEnergyProduction
   );
-  const energyBonusFromEngineer = engineerEnergyProductionBonus * energyProductionBeforeBonuses;
-  const energyBonusFromAllOfficer = allOfficerEnergyBonus * energyProductionBeforeBonuses;
-  const energyBonusFromClass = classEnergyBonus * energyProductionBeforeBonuses;
+  const energyBonusFromEngineer = multiply(
+    energyProductionBeforeBonuses,
+    engineerEnergyProductionBonus
+  );
+  const energyBonusFromAllOfficer = multiply(energyProductionBeforeBonuses, allOfficerEnergyBonus);
+  const energyBonusFromClass = multiply(energyProductionBeforeBonuses, classEnergyBonus);
 
   const totalEnergyProduction = sum(
     energyProductionBeforeBonuses,
-    (energyBonusFromEngineer + energyBonusFromAllOfficer + energyBonusFromClass) as EnergyAmount
+    energyBonusFromEngineer,
+    energyBonusFromAllOfficer,
+    energyBonusFromClass
   );
 
   // Aggregation
@@ -280,9 +223,9 @@ export function getPlanetProductionPerHour(
 
   return {
     prod: {
-      metal: (metalBaseProdPerHour + totalMetalProdPerHour * efficiency) as MetalAmount,
-      crystal: (crystalBaseProdPerHour + totalCrystalProdPerHour * efficiency) as CrystalAmount,
-      deuterium: (totalDeuteriumProdPerHour * efficiency) as DeuteriumAmount,
+      metal: sum(metalBaseProdPerHour, multiply(totalMetalProdPerHour, efficiency)),
+      crystal: sum(crystalBaseProdPerHour, multiply(totalCrystalProdPerHour, efficiency)),
+      deuterium: multiply(totalDeuteriumProdPerHour, efficiency),
     },
     energyProduction: totalEnergyProduction,
     energyConsumption: totalEnergyConsumption,
@@ -293,7 +236,7 @@ export function getAccountProductionPerHour(account: Account): Resources {
   let accountProd: Resources = makeResources({});
   for (const planet of account.planets) {
     const {prod} = getPlanetProductionPerHour(account, planet);
-    accountProd = sumResources(accountProd, prod);
+    accountProd = addResources(accountProd, prod);
   }
   return accountProd;
 }
