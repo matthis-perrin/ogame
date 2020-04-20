@@ -38,6 +38,7 @@ export interface AccountPlanet {
     deuterium: ResourceAmount;
   };
   technologies: {[techId: number]: Technology};
+  ships: {[techId: number]: Technology};
 }
 
 export function planetName(account: Account, planetId: PlanetId): PlanetName {

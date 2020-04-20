@@ -68,6 +68,7 @@ function calcPlanetSum(planetDetails: {[planetId: string]: AccountPlanet}): Acco
       deuterium: deuteriumProductions as ResourceAmount,
     },
     technologies: {},
+    ships: {},
   };
 }
 
@@ -87,6 +88,7 @@ export function addPlanet(
   planetId: PlanetId,
   resources: Resources,
   technologies: Technology[],
+  ships: Technology[] | undefined,
   fleets: Fleet[]
 ): void {
   const account: Account = {
@@ -101,6 +103,18 @@ export function addPlanet(
 
   for (const fleet of fleets) {
     account.fleets[fleet.fleetId] = fleet;
+  }
+
+  let shipsObj = currentAccount?.planetDetails[planetId]?.ships ?? {};
+  if (ships !== undefined) {
+    shipsObj = {};
+    for (const ship of ships) {
+      if (ship.techId === SolarSatellite.id) {
+        technologies.push(ship);
+      } else {
+        shipsObj[ship.techId] = ship;
+      }
+    }
   }
 
   const technologiesObj = currentAccount?.planetDetails[planetId]?.technologies ?? {};
@@ -178,6 +192,7 @@ export function addPlanet(
       ]),
     },
     technologies: technologiesObj,
+    ships: shipsObj,
   };
 
   account.planetSum = calcPlanetSum(account.planetDetails);
@@ -233,6 +248,7 @@ function applyProduction(): void {
         productions: planet.productions,
         storages: planet.storages,
         technologies: planet.technologies,
+        ships: planet.ships,
       };
     }
   }

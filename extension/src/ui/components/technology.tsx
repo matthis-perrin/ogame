@@ -37,7 +37,7 @@ export const TechnologyC: FC<TechnologyProps> = ({name, technologies, techId, re
           ? `${technology.value}${
               technology.target !== undefined ? `+${technology.target - technology.value}` : ''
             }${missingAmount === undefined || missingAmount <= 0 ? '' : ` (${missingAmount})`}`
-          : '-'}
+          : '0'}
       </TechnologyContainer>
     </Fragment>
   );

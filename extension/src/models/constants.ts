@@ -29,6 +29,12 @@ import {
   WeaponTechnology,
 } from '@shared/models/technology';
 
+export const SESSION_ID = Math.random()
+  .toString()
+  .substr(2);
+export const SESSION_ID_LOCAL_STORAGE_KEY = 'titanraccoonid';
+localStorage.setItem(SESSION_ID_LOCAL_STORAGE_KEY, SESSION_ID);
+
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 export const INACTIVITY_TIME = 6.5; // 6h30m
 export const DEBRIS_PERCENTAGE = 0.3;
@@ -59,14 +65,14 @@ export const MAX_TECHNOLOGIES = [
   NaniteFactory.id,
 ];
 
-export const TECHNOLOGY_PAGES = [
+export const PAGES_TECHNOLOGIES = [
   'component=supplies',
   'component=facilities',
   'component=defenses',
-  'component=shipyard',
   'component=research',
-  'component=fleetdispatch',
 ];
+
+export const PAGES_SHIPS = ['component=shipyard', 'component=fleetdispatch'];
 
 export const ACCOUNT_TECHNOLOGIES = [
   EspionageTechnology.id,

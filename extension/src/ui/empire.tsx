@@ -354,25 +354,17 @@ export const Empire: FC<EmpireProps> = ({account}) => (
                 </td>
                 <td>
                   <Line>
-                    <TechnologyC
-                      name="PT"
-                      technologies={planet.technologies}
-                      techId={SmallCargo.id}
-                    />
+                    <TechnologyC name="PT" technologies={planet.ships} techId={SmallCargo.id} />
                     <TechnologyC
                       name="GT"
-                      technologies={planet.technologies}
+                      technologies={planet.ships}
                       techId={LargeCargo.id}
                       required={requiredTransport}
                     />
-                    <TechnologyC
-                      name="REC"
-                      technologies={planet.technologies}
-                      techId={Recycler.id}
-                    />
+                    <TechnologyC name="REC" technologies={planet.ships} techId={Recycler.id} />
                     <TechnologyC
                       name="ESP"
-                      technologies={planet.technologies}
+                      technologies={planet.ships}
                       techId={EspionageProbe.id}
                     />
                   </Line>

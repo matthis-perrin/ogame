@@ -1,4 +1,4 @@
-import {TECHNOLOGY_PAGES} from '@src/models/constants';
+import {PAGES_SHIPS, PAGES_TECHNOLOGIES} from '@src/models/constants';
 import {Fleet} from '@src/models/fleets';
 import {PlanetId} from '@src/models/planets';
 import {Technology} from '@src/models/technologies';
@@ -34,17 +34,28 @@ export function parseUI(): void {
   console.log(`Planets parsed ${planets.length}`);
 
   let technologies: Technology[] = [];
+  let ships: Technology[] | undefined;
   let shouldParseTechnologies = false;
-  for (const page of TECHNOLOGY_PAGES) {
+  let shouldParseShips = false;
+  for (const page of PAGES_TECHNOLOGIES) {
     if (document.location.search.includes(page)) {
       shouldParseTechnologies = true;
       break;
     }
   }
+  for (const page of PAGES_SHIPS) {
+    if (document.location.search.includes(page)) {
+      shouldParseShips = true;
+      break;
+    }
+  }
   if (shouldParseTechnologies) {
     technologies = parseTechnologies();
+    console.log(`Technologies parsed ${technologies.length}`);
+  } else if (shouldParseShips) {
+    ships = parseTechnologies();
+    console.log(`Ships parsed ${ships.length}`);
   }
-  console.log(`Technologies parsed ${technologies.length}`);
 
   let fleets: Fleet[] = [];
   if (document.location.search.includes('component=movement')) {
@@ -54,5 +65,5 @@ export function parseUI(): void {
 
   console.log('OK');
 
-  addPlanet(serverTimeSeconds, planets, planetId, resources, technologies, fleets);
+  addPlanet(serverTimeSeconds, planets, planetId, resources, technologies, ships, fleets);
 }
