@@ -1,8 +1,10 @@
 import React, {FC, Fragment} from 'react';
 import styled from 'styled-components';
 
+import {COLOR_WHITE} from '@src/models/constants';
 import {useAccount} from '@src/stores/account';
 import {Aggregation} from '@src/ui/aggregation';
+import {Separator} from '@src/ui/components/separator';
 import {Constructions} from '@src/ui/constructions';
 import {Empire} from '@src/ui/empire';
 import {Research} from '@src/ui/research';
@@ -21,6 +23,7 @@ export const App: FC = () => {
             </Top>
             <Middle>
               <Empire account={account} />
+              <Separator />
               <Constructions account={account} />
             </Middle>
             <Research account={account} />
@@ -41,7 +44,7 @@ const Middle = styled.div`
 `;
 
 const Container = styled.div`
-  color: #aaa;
+  color: ${COLOR_WHITE};
   text-align: left;
   font-size: 10px;
   margin-left: 5px;

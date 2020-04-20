@@ -11,5 +11,8 @@ export const Table = styled.table`
   th,
   td {
     padding-right: 10px;
+    &:last-child {
+      padding-right: 0;
+    }
   }
 `;

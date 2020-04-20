@@ -2,7 +2,7 @@ import React, {FC, Fragment} from 'react';
 import styled from 'styled-components';
 
 import {Account, planetName} from '@src/models/account';
-import {Construction} from '@src/models/technologies';
+import {Construction, techName} from '@src/models/technologies';
 import {Title} from '@src/ui/common';
 import {time} from '@src/ui/utils';
 
@@ -29,7 +29,7 @@ export const Constructions: FC<ConstructionsProps> = ({account}) => {
         {constructions.map(construction => (
           <Element key={construction.constructionId}>
             <div>
-              {planetName(account, construction.planetId)} {construction.techId}
+              {planetName(account, construction.planetId)} {techName(construction.techId)}
             </div>
             <div>{time(construction.targetEndSeconds - now)}</div>
           </Element>
@@ -42,7 +42,6 @@ export const Constructions: FC<ConstructionsProps> = ({account}) => {
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  padding-left: 60px;
 `;
 
 const Element = styled.div`

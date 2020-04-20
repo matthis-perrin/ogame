@@ -34,14 +34,14 @@ import {
 
 import {Account} from '@src/models/account';
 import {
-  ALO_RATIO,
   DEBRIS_PERCENTAGE,
-  GAU_RATIO,
-  GT_FRET,
+  DEBRIS_SAT,
+  FRET_GT,
   INACTIVITY_TIME,
-  LM_RATIO,
-  PLA_RATIO,
-  SAT_DEBRIS,
+  RATIO_ALO,
+  RATIO_GAU,
+  RATIO_LM,
+  RATIO_PLA,
 } from '@src/models/constants';
 import {Table, Title} from '@src/ui/common';
 import {Energy} from '@src/ui/components/energy';
@@ -103,7 +103,7 @@ export const Empire: FC<EmpireProps> = ({account}) => (
               INACTIVITY_TIME;
             const inactivityLoot = inactivityProduction / 2;
             const satelliteLoot = planet.technologies.hasOwnProperty(SolarSatellite.id)
-              ? planet.technologies[SolarSatellite.id].value * SAT_DEBRIS * DEBRIS_PERCENTAGE
+              ? planet.technologies[SolarSatellite.id].value * DEBRIS_SAT * DEBRIS_PERCENTAGE
               : 0;
             const totalLoot = inactivityLoot + satelliteLoot;
             const resourcesSum = sum([
@@ -121,7 +121,7 @@ export const Empire: FC<EmpireProps> = ({account}) => (
               planet.productions.crystal,
               planet.productions.deuterium,
             ]);
-            const requiredTransport = Math.ceil(resourcesSum / GT_FRET);
+            const requiredTransport = Math.ceil(resourcesSum / FRET_GT);
             return (
               <tr key={p.id}>
                 <td>
@@ -303,25 +303,25 @@ export const Empire: FC<EmpireProps> = ({account}) => (
                       name="LM"
                       technologies={planet.technologies}
                       techId={RocketLauncher.id}
-                      required={Math.ceil(LM_RATIO * totalLoot)}
+                      required={Math.ceil(RATIO_LM * totalLoot)}
                     />
                     <TechnologyC
                       name="ALO"
                       technologies={planet.technologies}
                       techId={HeavyLaser.id}
-                      required={Math.ceil(ALO_RATIO * totalLoot)}
+                      required={Math.ceil(RATIO_ALO * totalLoot)}
                     />
                     <TechnologyC
                       name="GAU"
                       technologies={planet.technologies}
                       techId={GaussCannon.id}
-                      required={Math.ceil(GAU_RATIO * totalLoot)}
+                      required={Math.ceil(RATIO_GAU * totalLoot)}
                     />{' '}
                     <TechnologyC
                       name="PLA"
                       technologies={planet.technologies}
                       techId={PlasmaTurret.id}
-                      required={Math.ceil(PLA_RATIO * totalLoot)}
+                      required={Math.ceil(RATIO_PLA * totalLoot)}
                     />
                   </Line>
                 </td>
