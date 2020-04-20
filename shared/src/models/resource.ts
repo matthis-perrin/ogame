@@ -27,6 +27,13 @@ export function makeResources(values: {m?: number; c?: number; d?: number}): Res
   };
 }
 
+export function incrementResources(r1: Resources, increment: Resources): void {
+  const {metal, crystal, deuterium} = increment;
+  r1.metal = sum(r1.metal, metal);
+  r1.crystal = sum(r1.crystal, crystal);
+  r1.deuterium = sum(r1.deuterium, deuterium);
+}
+
 export function addResources(r1: Resources, r2: Resources): Resources {
   return {
     metal: sum(r1.metal, r2.metal),

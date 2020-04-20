@@ -1,6 +1,9 @@
+import {Account} from '@shared/models/account';
 import {Buildable, BuildableRequirement} from '@shared/models/buildable';
 import {Building} from '@shared/models/building';
+import {Planet} from '@shared/models/planet';
 import {Technology} from '@shared/models/technology';
+import {neverHappens} from '@shared/utils/type_utils';
 
 interface RequirementTree {
   target: Buildable;
@@ -95,4 +98,25 @@ export function removeRequirementFromTree(
   requirement: BuildableRequirement
 ): void {
   removeRequirementFromTreeNode(buildTree, requirement);
+}
+
+export function isBuildableAvailableOnPlanet(
+  account: Account,
+  planet: Planet,
+  buildable: Buildable
+): boolean {
+  for (const requirement of buildable.requirements) {
+    if (requirement.entity.type === 'building') {
+      if ((planet.buildingLevels.get(requirement.entity) ?? 0) < requirement.level) {
+        return false;
+      }
+    } else if (requirement.entity.type === 'technology') {
+      if ((account.technologyLevels.get(requirement.entity) ?? 0) < requirement.level) {
+        return false;
+      }
+    } else {
+      neverHappens(requirement.entity, `Invalid requirement type "${requirement.entity['type']}"`);
+    }
+  }
+  return true;
 }
