@@ -1,7 +1,7 @@
 import React, {FC, Fragment} from 'react';
 import styled from 'styled-components';
 
-import {getShipCargoCapacity} from '@shared/lib/formula';
+import {getSatelliteEnergyProductionPerHour, getShipCargoCapacity} from '@shared/lib/formula';
 import {
   CrystalMine,
   CrystalStorage,
@@ -39,13 +39,13 @@ import {
   goToDefenses,
   goToFactories,
   goToMines,
-  goToOverview,
   goToResources,
   goToShips,
 } from '@src/controllers/navigator';
 import {Account} from '@src/models/account';
 import {
-  COLLECTOR_FRET_BONUS,
+  COLLECTOR_BONUS_ENERGY,
+  COLLECTOR_BONUS_FRET,
   DEBRIS_PERCENTAGE,
   DEBRIS_SAT,
   INACTIVITY_TIME,
@@ -75,9 +75,6 @@ export const Empire: FC<EmpireProps> = ({account}) => (
             <Title>Ressources</Title>
           </th>
           <th>
-            <Title>Prod</Title>
-          </th>
-          <th>
             <Title>Mines</Title>
           </th>
           <th>
@@ -94,6 +91,9 @@ export const Empire: FC<EmpireProps> = ({account}) => (
           </th>
           <th>
             <Title>Flotte</Title>
+          </th>
+          <th>
+            <Title>Prod</Title>
           </th>
           <th>
             <Title>Loot</Title>
@@ -138,12 +138,24 @@ export const Empire: FC<EmpireProps> = ({account}) => (
             const ptAmount = planet.ships.hasOwnProperty(SmallCargo.id)
               ? planet.ships[SmallCargo.id].value
               : 0;
-            const fretPt = getShipCargoCapacity(SmallCargo, hyperLevel, COLLECTOR_FRET_BONUS);
-            const fretGt = getShipCargoCapacity(LargeCargo, hyperLevel, COLLECTOR_FRET_BONUS);
+            const fretPt = getShipCargoCapacity(SmallCargo, hyperLevel, COLLECTOR_BONUS_FRET);
+            const fretGt = getShipCargoCapacity(LargeCargo, hyperLevel, COLLECTOR_BONUS_FRET);
             const requiredGt = Math.ceil((resourcesSum - ptAmount * fretPt) / fretGt);
+            let requiredSat = 0;
+            if (planet.resources.energy < 0) {
+              const satEnergy = getSatelliteEnergyProductionPerHour(
+                1,
+                (p.tempHigh + p.tempLow) / 2,
+                COLLECTOR_BONUS_ENERGY
+              );
+              const satNumber = planet.technologies.hasOwnProperty(SolarSatellite.id)
+                ? planet.technologies[SolarSatellite.id].value
+                : 0;
+              requiredSat = (satNumber as number) + Math.ceil(-planet.resources.energy / satEnergy);
+            }
             return (
               <tr key={p.id}>
-                <td onClick={() => goToOverview(planet.planetId)} style={{cursor: 'pointer'}}>
+                <td>
                   <Line>
                     <Resource
                       name="M"
@@ -169,14 +181,6 @@ export const Empire: FC<EmpireProps> = ({account}) => (
                       storage={storagesSum}
                       production={productionsSum}
                     />
-                  </Line>
-                </td>
-                <td onClick={() => goToResources(planet.planetId)} style={{cursor: 'pointer'}}>
-                  <Line>
-                    <Production name="M" production={planet.productions.metal} unit="h" />
-                    <Production name="C" production={planet.productions.crystal} unit="h" />
-                    <Production name="D" production={planet.productions.deuterium} unit="h" />
-                    <Production name="Σ" production={productionsSum} unit="h" />
                   </Line>
                 </td>
                 <td onClick={() => goToMines(planet.planetId)} style={{cursor: 'pointer'}}>
@@ -229,6 +233,7 @@ export const Empire: FC<EmpireProps> = ({account}) => (
                       name="Sat"
                       technologies={planet.technologies}
                       techId={SolarSatellite.id}
+                      required={requiredSat}
                     />
                     <Energy name="E" amount={planet.resources.energy} />
                   </Line>
@@ -387,6 +392,14 @@ export const Empire: FC<EmpireProps> = ({account}) => (
                       technologies={planet.ships}
                       techId={EspionageProbe.id}
                     />
+                  </Line>
+                </td>
+                <td onClick={() => goToResources(planet.planetId)} style={{cursor: 'pointer'}}>
+                  <Line>
+                    <Production name="M" production={planet.productions.metal} unit="h" />
+                    <Production name="C" production={planet.productions.crystal} unit="h" />
+                    <Production name="D" production={planet.productions.deuterium} unit="h" />
+                    <Production name="Σ" production={productionsSum} unit="h" />
                   </Line>
                 </td>
                 <td>

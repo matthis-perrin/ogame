@@ -1,11 +1,12 @@
 import React, {FC, Fragment} from 'react';
 import styled from 'styled-components';
 
-import {goToFleets, goToGalaxy} from '@src/controllers/navigator';
-import {Account} from '@src/models/account';
+import {goToFleets, goToShips} from '@src/controllers/navigator';
+import {Account, findPlanetId} from '@src/models/account';
 import {COLOR_GREEN} from '@src/models/constants';
-import {Fleet, missionTypeString} from '@src/models/fleets';
+import {Fleet, MissionTypeEnum, missionTypeString} from '@src/models/fleets';
 import {Title} from '@src/ui/common';
+import {PlanetCoordsC} from '@src/ui/components/planetcoords';
 import {time} from '@src/ui/utils';
 
 interface FleetsProps {
@@ -33,16 +34,28 @@ export const Fleets: FC<FleetsProps> = ({account}) => {
         {fleets.map(fleet => {
           const seconds = fleet.midTime - now;
           return (
-            <Element key={fleet.fleetId}>
-              <div>{missionTypeString(fleet)}</div>
+            <Element
+              key={fleet.fleetId}
+              onClick={() => {
+                let planetName = fleet.destinationName;
+                if (fleet.missionType === MissionTypeEnum.Transport) {
+                  planetName = fleet.originName;
+                }
+                const planetId = findPlanetId(account.planetList, planetName);
+                if (planetId === undefined) {
+                  return;
+                }
+                goToShips(planetId);
+              }}
+              style={{cursor: 'pointer'}}
+            >
               <div>
-                <span onClick={() => goToGalaxy(fleet.originCoords)} style={{cursor: 'pointer'}}>
-                  {fleet.originName}
-                </span>{' '}
-                =>{' '}
-                <span onClick={() => goToGalaxy(fleet.originCoords)} style={{cursor: 'pointer'}}>
-                  {fleet.destinationName}
-                </span>
+                {missionTypeString(fleet)}
+                {fleet.returnFlight ? ' (R)' : ''}
+              </div>
+              <div>
+                <PlanetCoordsC coords={fleet.originCoords} name={fleet.originName} /> =>{' '}
+                <PlanetCoordsC coords={fleet.destinationCoords} name={fleet.destinationName} />
               </div>
               <div>
                 {seconds > 0 ? time(seconds) : <span style={{color: COLOR_GREEN}}>Arrivée</span>}

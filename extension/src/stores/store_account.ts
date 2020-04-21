@@ -6,7 +6,7 @@ import {SolarSatellite} from '@shared/models/ships';
 import {persist} from '@src/controllers/storage';
 import {Account, AccountPlanet, findPlanetId} from '@src/models/account';
 import {ACCOUNT_TECHNOLOGIES, MAX_TECHNOLOGIES, UI_REFRESH_RATE} from '@src/models/constants';
-import {Fleet, ReturnFlight} from '@src/models/fleets';
+import {Fleet, MissionTypeEnum, ReturnFlight} from '@src/models/fleets';
 import {Planet, PlanetId} from '@src/models/planets';
 import {ResourceAmount, Resources} from '@src/models/resources';
 import {generateConstructionId, Technology} from '@src/models/technologies';
@@ -299,7 +299,7 @@ function applyProduction(): void {
     if (currentAccount.fleets.hasOwnProperty(fleetId)) {
       const fleet = currentAccount.fleets[fleetId];
       if (nowSeconds >= fleet.midTime) {
-        if (fleet.returnFlight) {
+        if (fleet.returnFlight || fleet.missionType === MissionTypeEnum.Deployment) {
           // TODO: Handle resource drop
         } else {
           fleet.returnFlight = true as ReturnFlight;

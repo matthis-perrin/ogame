@@ -6,6 +6,11 @@ export type MissionType = number & {_: 'MissionType'};
 export type ReturnFlight = boolean & {_: 'ReturnFlight'};
 export type FleetTime = number & {_: 'FleetTime'};
 
+export enum MissionTypeEnum {
+  Transport = 3,
+  Deployment = 4,
+}
+
 export interface Fleet {
   fleetId: FleetId;
   missionType: MissionType;
@@ -32,9 +37,10 @@ export interface Fleet {
 
 export function missionTypeString(fleet: Fleet): string {
   switch (fleet.missionType) {
-    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-    case 4:
+    case MissionTypeEnum.Deployment:
       return 'Stationner';
+    case MissionTypeEnum.Transport:
+      return 'Transporter';
     default:
       return `MISSION_${fleet.missionType}`;
   }

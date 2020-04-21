@@ -1,7 +1,8 @@
 import React, {FC, Fragment} from 'react';
 
-import {AccountPlanet} from '@src/models/account';
-import {Fleet} from '@src/models/fleets';
+import {AccountPlanet, findPlanetId} from '@src/models/account';
+import {Fleet, MissionTypeEnum} from '@src/models/fleets';
+import {Planet} from '@src/models/planets';
 import {ResourceAmount} from '@src/models/resources';
 import {Resource} from '@src/ui/components/resource';
 import {sum} from '@src/ui/utils';
@@ -9,15 +10,24 @@ import {sum} from '@src/ui/utils';
 interface PlanetSumProps {
   planetSum: AccountPlanet;
   fleets: {[fleetId: string]: Fleet};
+  planetList: Planet[];
 }
 
-export const PlanetSum: FC<PlanetSumProps> = ({planetSum, fleets}) => {
+export const PlanetSum: FC<PlanetSumProps> = ({planetSum, fleets, planetList}) => {
   let fleetMetal = 0 as ResourceAmount;
   let fleetCrystal = 0 as ResourceAmount;
   let fleetDeuterium = 0 as ResourceAmount;
   for (const fleetId in fleets) {
     if (fleets.hasOwnProperty(fleetId)) {
       const fleet = fleets[fleetId];
+      // Resource transport to external planet
+      if (
+        fleet.missionType === MissionTypeEnum.Transport &&
+        fleet.returnFlight === false &&
+        findPlanetId(planetList, fleet.destinationName) === undefined
+      ) {
+        continue;
+      }
       fleetMetal = sum([fleetMetal, fleet.resources.metal]);
       fleetCrystal = sum([fleetCrystal, fleet.resources.crystal]);
       fleetDeuterium = sum([fleetDeuterium, fleet.resources.deuterium]);

@@ -37,7 +37,11 @@ export const Aggregation: FC<AggregationProps> = ({account}) => (
             {account.planetSum === undefined ? (
               ''
             ) : (
-              <PlanetSum planetSum={account.planetSum} fleets={account.fleets} />
+              <PlanetSum
+                planetSum={account.planetSum}
+                fleets={account.fleets}
+                planetList={account.planetList}
+              />
             )}
           </td>
           <td>

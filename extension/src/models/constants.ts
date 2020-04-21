@@ -41,7 +41,8 @@ export const DEBRIS_PERCENTAGE = 0.3;
 export const UI_REFRESH_RATE = 1000;
 
 // Class bonus
-export const COLLECTOR_FRET_BONUS = 0.25;
+export const COLLECTOR_BONUS_FRET = 0.25;
+export const COLLECTOR_BONUS_ENERGY = 0.1;
 
 // Defense ratio for 1M lootable resource
 export const RATIO_LM = 2000 / 1000000;

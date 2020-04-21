@@ -124,9 +124,12 @@ export function getFusionReactorEnergyProductionPerHour(
 
 export function getSatelliteEnergyProductionPerHour(
   solarSatelliteCount: number,
-  planetTemperature: number
+  planetTemperature: number,
+  classBonus: number
 ): EnergyAmount {
-  return (solarSatelliteCount * Math.floor((planetTemperature + 160) / 6)) as EnergyAmount;
+  return ((1 + classBonus) *
+    solarSatelliteCount *
+    Math.floor((planetTemperature + 160) / 6)) as EnergyAmount;
 }
 
 //

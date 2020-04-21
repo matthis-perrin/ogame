@@ -6,6 +6,8 @@ export interface Planet {
   id: PlanetId;
   name: PlanetName;
   coords: PlanetCoords;
+  tempLow: number;
+  tempHigh: number;
 }
 
 export interface Coords {
