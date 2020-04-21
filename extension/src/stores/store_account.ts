@@ -89,7 +89,7 @@ export function addPlanet(
   resources: Resources,
   technologies: Technology[],
   ships: Technology[] | undefined,
-  fleets: Fleet[]
+  fleets: Fleet[] | undefined
 ): void {
   const account: Account = {
     planetList,
@@ -102,8 +102,12 @@ export function addPlanet(
   };
 
   // Add all fleets
-  for (const fleet of fleets) {
-    account.fleets[fleet.fleetId] = fleet;
+  // fleets === undefined => not parsed
+  if (fleets !== undefined) {
+    account.fleets = {};
+    for (const fleet of fleets) {
+      account.fleets[fleet.fleetId] = fleet;
+    }
   }
 
   // Handle new constructions

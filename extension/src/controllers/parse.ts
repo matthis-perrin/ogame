@@ -57,11 +57,11 @@ export function parseUI(): void {
     console.log(`Ships parsed ${ships.length}`);
   }
 
-  let fleets: Fleet[] = [];
+  let fleets: Fleet[] | undefined;
   if (document.location.search.includes('component=movement')) {
     fleets = parseFleets();
+    console.log(`Fleets parsed ${fleets.length}`);
   }
-  console.log(`Fleets parsed ${fleets.length}`);
 
   console.log('OK');
 
