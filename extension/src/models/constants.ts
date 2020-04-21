@@ -38,8 +38,10 @@ localStorage.setItem(SESSION_ID_LOCAL_STORAGE_KEY, SESSION_ID);
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 export const INACTIVITY_TIME = 6.5; // 6h30m
 export const DEBRIS_PERCENTAGE = 0.3;
-export const FRET_GT = 31250;
-export const UI_REFRESH_RATE = 500;
+export const UI_REFRESH_RATE = 1000;
+
+// Class bonus
+export const COLLECTOR_FRET_BONUS = 0.25;
 
 // Defense ratio for 1M lootable resource
 export const RATIO_LM = 2000 / 1000000;
@@ -96,3 +98,7 @@ export const COLOR_WHITE = '#aaa';
 export const COLOR_GREEN = '#9c0';
 export const COLOR_RED = '#d43635';
 export const COLOR_ORANGE = '#d29d00';
+
+export const NAME_METAL = 'Métal';
+export const NAME_CRYSTAL = 'Cristal';
+export const NAME_DEUTERIUM = 'Deutérium';

@@ -1,6 +1,7 @@
 import React, {FC, Fragment} from 'react';
 import styled from 'styled-components';
 
+import {getShipCargoCapacity} from '@shared/lib/formula';
 import {
   CrystalMine,
   CrystalStorage,
@@ -25,12 +26,14 @@ import {
   SmallShieldDome,
 } from '@shared/models/defense';
 import {
+  ColonyShip,
   EspionageProbe,
   LargeCargo,
   Recycler,
   SmallCargo,
   SolarSatellite,
 } from '@shared/models/ships';
+import {HyperspaceTechnology} from '@shared/models/technology';
 
 import {
   goToDefenses,
@@ -42,9 +45,9 @@ import {
 } from '@src/controllers/navigator';
 import {Account} from '@src/models/account';
 import {
+  COLLECTOR_FRET_BONUS,
   DEBRIS_PERCENTAGE,
   DEBRIS_SAT,
-  FRET_GT,
   INACTIVITY_TIME,
   RATIO_ALO,
   RATIO_GAU,
@@ -129,7 +132,15 @@ export const Empire: FC<EmpireProps> = ({account}) => (
               planet.productions.crystal,
               planet.productions.deuterium,
             ]);
-            const requiredTransport = Math.ceil(resourcesSum / FRET_GT);
+            const hyperLevel = account.accountTechnologies.hasOwnProperty(HyperspaceTechnology.id)
+              ? account.accountTechnologies[HyperspaceTechnology.id].value
+              : 0;
+            const ptAmount = planet.ships.hasOwnProperty(SmallCargo.id)
+              ? planet.ships[SmallCargo.id].value
+              : 0;
+            const fretPt = getShipCargoCapacity(SmallCargo, hyperLevel, COLLECTOR_FRET_BONUS);
+            const fretGt = getShipCargoCapacity(LargeCargo, hyperLevel, COLLECTOR_FRET_BONUS);
+            const requiredGt = Math.ceil((resourcesSum - ptAmount * fretPt) / fretGt);
             return (
               <tr key={p.id}>
                 <td onClick={() => goToOverview(planet.planetId)} style={{cursor: 'pointer'}}>
@@ -162,10 +173,10 @@ export const Empire: FC<EmpireProps> = ({account}) => (
                 </td>
                 <td onClick={() => goToResources(planet.planetId)} style={{cursor: 'pointer'}}>
                   <Line>
-                    <Production name="M" production={planet.productions.metal} />
-                    <Production name="C" production={planet.productions.crystal} />
-                    <Production name="D" production={planet.productions.deuterium} />
-                    <Production name="Σ" production={productionsSum} />
+                    <Production name="M" production={planet.productions.metal} unit="h" />
+                    <Production name="C" production={planet.productions.crystal} unit="h" />
+                    <Production name="D" production={planet.productions.deuterium} unit="h" />
+                    <Production name="Σ" production={productionsSum} unit="h" />
                   </Line>
                 </td>
                 <td onClick={() => goToMines(planet.planetId)} style={{cursor: 'pointer'}}>
@@ -367,9 +378,10 @@ export const Empire: FC<EmpireProps> = ({account}) => (
                       name="GT"
                       technologies={planet.ships}
                       techId={LargeCargo.id}
-                      required={requiredTransport}
+                      required={requiredGt}
                     />
                     <TechnologyC name="REC" technologies={planet.ships} techId={Recycler.id} />
+                    <TechnologyC name="COLO" technologies={planet.ships} techId={ColonyShip.id} />
                     <TechnologyC
                       name="ESP"
                       technologies={planet.ships}
@@ -401,5 +413,5 @@ export const Empire: FC<EmpireProps> = ({account}) => (
 );
 
 const Line = styled.div`
-  height: 60px;
+  height: 70px;
 `;

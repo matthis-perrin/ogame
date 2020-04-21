@@ -161,6 +161,10 @@ export function getBuildingBuildTime(
 // SHIPS FRET
 //
 
-export function getShipCargoCapacity(ship: Ship, hyperspaceTechnologyLevel: number): number {
-  return ship.cargoCapacity * 1 + 0.05 * hyperspaceTechnologyLevel;
+export function getShipCargoCapacity(
+  ship: Ship,
+  hyperspaceTechnologyLevel: number,
+  classBonus: number
+): number {
+  return Math.floor(ship.cargoCapacity * (1 + 0.05 * hyperspaceTechnologyLevel + classBonus));
 }

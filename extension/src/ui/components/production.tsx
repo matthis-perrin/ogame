@@ -6,12 +6,13 @@ import {snum} from '@src/ui/utils';
 interface ResourceProps {
   name: string;
   production: ResourceAmount;
+  unit: string;
 }
 
-export const Production: FC<ResourceProps> = ({name, production}) => (
+export const Production: FC<ResourceProps> = ({name, production, unit}) => (
   <Fragment>
     <div>
-      {name}: +{snum(production * 3600)}/h
+      {name}: +{snum(production * 3600)}/{unit}
     </div>
   </Fragment>
 );

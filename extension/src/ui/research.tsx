@@ -3,6 +3,7 @@ import styled from 'styled-components';
 
 import {AstrophysicsTechnology} from '@shared/models/technology';
 
+import {goToResearch} from '@src/controllers/navigator';
 import {Account} from '@src/models/account';
 import {Title} from '@src/ui/common';
 import {Astrophysics} from '@src/ui/components/astrophysics';
@@ -40,7 +41,7 @@ export const Research: FC<ResearchProps> = ({account}) => {
   }
   return (
     <Fragment>
-      <Container>
+      <Container onClick={() => goToResearch()} style={{cursor: 'pointer'}}>
         <Title>Astrophysique {astroLevel}</Title>
         <Astrophysics name="M" cost={astroCost.metal} seconds={metalSeconds} />
         <Astrophysics name="C" cost={astroCost.crystal} seconds={crystalSeconds} />

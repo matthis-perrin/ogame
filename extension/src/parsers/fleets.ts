@@ -1,7 +1,10 @@
 import $ from 'jquery';
 
+import {ColonyShip, EspionageProbe, LargeCargo, Recycler, SmallCargo} from '@shared/models/ships';
+
+import {NAME_CRYSTAL, NAME_DEUTERIUM, NAME_METAL} from '@src/models/constants';
 import {Fleet, FleetId, FleetTime, MissionType, ReturnFlight} from '@src/models/fleets';
-import {PlanetCoords} from '@src/models/planets';
+import {PlanetCoords, PlanetName} from '@src/models/planets';
 import {ResourceAmount} from '@src/models/resources';
 
 export function parseFleets(): Fleet[] {
@@ -32,28 +35,45 @@ export function parseFleets(): Fleet[] {
     if (midTime === undefined) {
       return;
     }
-    const origin = $(element)
+    const originCoords = $(element)
       .find('.originCoords')
       .text()
       .trim();
-    if (origin.length === 0) {
+    if (originCoords.length === 0) {
       return;
     }
-    const destination = $(element)
+    const destinationCoords = $(element)
       .find('.destinationCoords')
       .text()
       .trim();
-    if (destination.length === 0) {
+    if (destinationCoords.length === 0) {
+      return;
+    }
+    const originName = $(element)
+      .find('.originPlanet')
+      .text()
+      .trim();
+    if (originName.length === 0) {
+      return;
+    }
+    const destinationName = $(element)
+      .find('.destinationPlanet')
+      .text()
+      .trim();
+    if (destinationName.length === 0) {
       return;
     }
     const fleet: Fleet = {
-      fleetId: fleetId as FleetId,
+      // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+      fleetId: fleetId.substr(5) as FleetId,
       missionType: parseFloat(missionType) as MissionType,
       returnFlight: (returnFlight === '1') as ReturnFlight,
       arrivalTime: parseFloat(arrivalTime) as FleetTime,
       midTime: parseFloat(midTime) as FleetTime,
-      origin: origin as PlanetCoords,
-      destination: destination as PlanetCoords,
+      originCoords: originCoords as PlanetCoords,
+      destinationCoords: destinationCoords as PlanetCoords,
+      originName: originName as PlanetName,
+      destinationName: destinationName as PlanetName,
       resources: {
         metal: 0 as ResourceAmount,
         crystal: 0 as ResourceAmount,
@@ -63,6 +83,7 @@ export function parseFleets(): Fleet[] {
         transporterLarge: 0,
         transporterSmall: 0,
         recycler: 0,
+        colonyShip: 0,
         espionageProbe: 0,
       },
     };
@@ -75,31 +96,35 @@ export function parseFleets(): Fleet[] {
             .text()
             .replace(/\./g, '')
         );
-        if (tr.innerText.includes('Grand transporteur')) {
+        if (tr.innerText.includes(LargeCargo.name)) {
           fleet.ships.transporterLarge = value;
           return;
         }
-        if (tr.innerText.includes('Petit transporteur')) {
+        if (tr.innerText.includes(SmallCargo.name)) {
           fleet.ships.transporterSmall = value;
           return;
         }
-        if (tr.innerText.includes('Recycleur')) {
+        if (tr.innerText.includes(Recycler.name)) {
           fleet.ships.recycler = value;
           return;
         }
-        if (tr.innerText.includes('Sonde d`espionnage')) {
+        if (tr.innerText.includes(ColonyShip.name)) {
+          fleet.ships.colonyShip = value;
+          return;
+        }
+        if (tr.innerText.includes(EspionageProbe.name)) {
           fleet.ships.espionageProbe = value;
           return;
         }
-        if (tr.innerText.includes('Métal')) {
+        if (tr.innerText.includes(NAME_METAL)) {
           fleet.resources.metal = value as ResourceAmount;
           return;
         }
-        if (tr.innerText.includes('Cristal')) {
+        if (tr.innerText.includes(NAME_CRYSTAL)) {
           fleet.resources.crystal = value as ResourceAmount;
           return;
         }
-        if (tr.innerText.includes('Deutérium')) {
+        if (tr.innerText.includes(NAME_DEUTERIUM)) {
           fleet.resources.deuterium = value as ResourceAmount;
           return;
         }

@@ -1,4 +1,4 @@
-import {PlanetId} from '@src/models/planets';
+import {getCoords, PlanetCoords, PlanetId} from '@src/models/planets';
 import {TechnologyIndex} from '@src/models/technologies';
 
 export function goToTechnology(techId: number, planetId: PlanetId): void {
@@ -21,6 +21,10 @@ export function goToFleets(): void {
   window.location.href = `${document.location.origin}${document.location.pathname}?page=ingame&component=movement`;
 }
 
+export function goToResearch(): void {
+  window.location.href = `${document.location.origin}${document.location.pathname}?page=ingame&component=research`;
+}
+
 export function goToMines(planetId: PlanetId): void {
   window.location.href = `${document.location.origin}${document.location.pathname}?page=ingame&component=supplies&cp=${planetId}`;
 }
@@ -35,4 +39,9 @@ export function goToDefenses(planetId: PlanetId): void {
 
 export function goToShips(planetId: PlanetId): void {
   window.location.href = `${document.location.origin}${document.location.pathname}?page=ingame&component=shipyard&cp=${planetId}`;
+}
+
+export function goToGalaxy(planetCoords: PlanetCoords): void {
+  const coords = getCoords(planetCoords);
+  window.location.href = `${document.location.origin}${document.location.pathname}?page=ingame&component=galaxy&galaxy=${coords.galaxy}&system=${coords.system}&position=${coords.position}`;
 }

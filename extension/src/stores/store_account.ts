@@ -301,10 +301,10 @@ function applyProduction(): void {
       if (nowSeconds >= fleet.midTime) {
         if (fleet.returnFlight) {
           // TODO: Handle resource drop
-          continue;
+        } else {
+          fleet.returnFlight = true as ReturnFlight;
+          fleet.midTime = fleet.arrivalTime;
         }
-        fleet.returnFlight = true as ReturnFlight;
-        fleet.midTime = fleet.arrivalTime;
       }
       account.fleets[fleetId] = fleet;
     }

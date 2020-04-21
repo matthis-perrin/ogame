@@ -7,6 +7,7 @@ import {Aggregation} from '@src/ui/aggregation';
 import {Separator} from '@src/ui/components/separator';
 import {Constructions} from '@src/ui/constructions';
 import {Empire} from '@src/ui/empire';
+import {Fleets} from '@src/ui/fleets';
 import {Research} from '@src/ui/research';
 
 export const App: FC = () => {
@@ -23,11 +24,13 @@ export const App: FC = () => {
             </Top>
             <Middle>
               <Empire account={account} />
-              <Separator />
-              <Constructions account={account} />
             </Middle>
             <Bottom>
               <Research account={account} />
+              <Separator />
+              <Constructions account={account} />
+              <Separator />
+              <Fleets account={account} />
             </Bottom>
           </div>
         )}

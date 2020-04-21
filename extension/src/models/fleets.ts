@@ -1,4 +1,4 @@
-import {PlanetCoords} from '@src/models/planets';
+import {PlanetCoords, PlanetName} from '@src/models/planets';
 import {ResourceAmount} from '@src/models/resources';
 
 export type FleetId = string & {_: 'FleetId'};
@@ -12,8 +12,10 @@ export interface Fleet {
   returnFlight: ReturnFlight;
   arrivalTime: FleetTime;
   midTime: FleetTime;
-  origin: PlanetCoords;
-  destination: PlanetCoords;
+  originCoords: PlanetCoords;
+  destinationCoords: PlanetCoords;
+  originName: PlanetName;
+  destinationName: PlanetName;
   resources: {
     metal: ResourceAmount;
     crystal: ResourceAmount;
@@ -23,6 +25,17 @@ export interface Fleet {
     transporterLarge: number;
     transporterSmall: number;
     recycler: number;
+    colonyShip: number;
     espionageProbe: number;
   };
+}
+
+export function missionTypeString(fleet: Fleet): string {
+  switch (fleet.missionType) {
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+    case 4:
+      return 'Stationner';
+    default:
+      return `MISSION_${fleet.missionType}`;
+  }
 }
