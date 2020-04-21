@@ -9,11 +9,24 @@ export interface Planet {
   metadata: PlanetMetadata;
   resources: Resources;
   buildingLevels: Map<Building, number>;
-  inProgressBuilding?: {building: Building; level: number; startTime: Milliseconds};
+  inProgressBuilding?: {
+    startTime: Milliseconds;
+    endTime: Milliseconds;
+    building: Building;
+    level: number;
+  };
   defense: Map<Defense, number>;
-  inProgressDefenses?: {startTime: Milliseconds; defenses: {defense: Defense; quantity: number}[]};
+  inProgressDefenses?: {
+    startTime: Milliseconds;
+    endTime: Milliseconds;
+    defenses: {defense: Defense; quantity: number}[];
+  };
   ships: Map<Ship, number>;
-  inProgressShips?: {startTime: Milliseconds; ships: {ship: Ship; quantity: number}[]};
+  inProgressShips?: {
+    startTime: Milliseconds;
+    endTime: Milliseconds;
+    ships: {ship: Ship; quantity: number}[];
+  };
 }
 
 export interface PlanetMetadata {

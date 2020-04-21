@@ -72,7 +72,8 @@ export function getTimeBeforeBuildItemQueueable(
         getTechnologyBuildTime(
           account.inProgressTechnology.technology,
           account.inProgressTechnology.level,
-          planet.buildingLevels.get(ResearchLab) ?? 0
+          planet.buildingLevels.get(ResearchLab) ?? 0,
+          account.universe.researchSpeed
         ),
         account.inProgressTechnology.startTime
       );
@@ -88,7 +89,8 @@ export function getTimeBeforeBuildItemQueueable(
           planet.inProgressBuilding.building,
           planet.inProgressBuilding.level,
           planet.buildingLevels.get(RoboticsFactory) ?? 0,
-          planet.buildingLevels.get(NaniteFactory) ?? 0
+          planet.buildingLevels.get(NaniteFactory) ?? 0,
+          account.universe.economySpeed
         ),
         planet.inProgressBuilding.startTime
       );

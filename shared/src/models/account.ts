@@ -14,7 +14,12 @@ export interface Account {
   // Dynamic
   planets: Planet[];
   technologyLevels: Map<Technology, number>;
-  inProgressTechnology?: {technology: Technology; level: number; startTime: Milliseconds};
+  inProgressTechnology?: {
+    technology: Technology;
+    level: number;
+    startTime: Milliseconds;
+    endTime: Milliseconds;
+  };
   currentTime: Milliseconds;
   // Static
   universe: Universe;

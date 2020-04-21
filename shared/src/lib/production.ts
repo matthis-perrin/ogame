@@ -43,6 +43,7 @@ import {
 } from '@shared/models/resource';
 import {Crawler, SolarSatellite} from '@shared/models/ships';
 import {EnergyTechnology, PlasmaTechnology} from '@shared/models/technology';
+import {hoursToMilliseconds, Milliseconds} from '@shared/models/time';
 import {floor, multiply, sum} from '@shared/utils/type_utils';
 
 const COLLECTOR_PRODUCTION_BONUS = 0.25;
@@ -268,4 +269,13 @@ export function getPlanetStorageCapacity(planet: Planet): Resources {
     c: getCrystalStorageCapacity(planet.buildingLevels.get(CrystalStorage) ?? 0),
     d: getDeuteriumTankCapacity(planet.buildingLevels.get(DeuteriumTank) ?? 0),
   });
+}
+
+export function timeToProduceAtLeast(toProduce: Resources, prodPerHour: Resources): Milliseconds {
+  const hoursToProduceMetal = toProduce.metal / prodPerHour.metal;
+  const hoursToProduceCrystal = toProduce.crystal / prodPerHour.crystal;
+  const hoursToProduceDeuterium = toProduce.deuterium / prodPerHour.deuterium;
+  return hoursToMilliseconds(
+    Math.max(0, hoursToProduceMetal, hoursToProduceCrystal, hoursToProduceDeuterium)
+  );
 }
