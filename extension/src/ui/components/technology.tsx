@@ -1,6 +1,7 @@
 import React, {FC, Fragment} from 'react';
 import styled from 'styled-components';
 
+import {COLOR_ORANGE, COLOR_RED} from '@src/models/constants';
 import {Technology} from '@src/models/technologies';
 
 interface TechnologyProps {
@@ -45,9 +46,9 @@ export const TechnologyC: FC<TechnologyProps> = ({name, technologies, techId, re
 
 const TechnologyContainer = styled.div`
   &.red {
-    color: #d43635;
+    color: ${COLOR_RED};
   }
   &.orange {
-    color: #d29d00;
+    color: ${COLOR_ORANGE};
   }
 `;

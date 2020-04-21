@@ -16,6 +16,7 @@ export const RocketLauncher: Defense = {
   weaponPower: 80,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
+  component: 'defenses',
 };
 
 export const LightLaser: Defense = {
@@ -28,6 +29,7 @@ export const LightLaser: Defense = {
   weaponPower: 100,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
+  component: 'defenses',
 };
 
 export const HeavyLaser: Defense = {
@@ -40,6 +42,7 @@ export const HeavyLaser: Defense = {
   weaponPower: 250,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
+  component: 'defenses',
 };
 
 export const IonCannon: Defense = {
@@ -52,6 +55,7 @@ export const IonCannon: Defense = {
   weaponPower: 150,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
+  component: 'defenses',
 };
 
 // TODO - Max 1 by planet
@@ -65,6 +69,7 @@ export const SmallShieldDome: Defense = {
   weaponPower: 1,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
+  component: 'defenses',
 };
 
 // TODO - Max 1 by planet
@@ -78,6 +83,7 @@ export const LargeShieldDome: Defense = {
   weaponPower: 1,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
+  component: 'defenses',
 };
 
 export const GaussCannon: Defense = {
@@ -90,6 +96,7 @@ export const GaussCannon: Defense = {
   weaponPower: 1100,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
+  component: 'defenses',
 };
 
 export const PlasmaTurret: Defense = {
@@ -102,6 +109,7 @@ export const PlasmaTurret: Defense = {
   weaponPower: 3000,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
+  component: 'defenses',
 };
 
 export const MissileInterceptor: Defense = {
@@ -114,6 +122,7 @@ export const MissileInterceptor: Defense = {
   weaponPower: 1,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
+  component: 'defenses',
 };
 
 export const MissileInterplanetary: Defense = {
@@ -126,6 +135,7 @@ export const MissileInterplanetary: Defense = {
   weaponPower: 12000,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
+  component: 'defenses',
 };
 
 export const AllDefenses: Defense[] = [

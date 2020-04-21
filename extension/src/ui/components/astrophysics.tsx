@@ -1,6 +1,7 @@
 import React, {FC, Fragment} from 'react';
 import styled from 'styled-components';
 
+import {COLOR_GREEN, COLOR_RED} from '@src/models/constants';
 import {snum, time} from '@src/ui/utils';
 
 interface AstrophysicsProps {
@@ -30,9 +31,9 @@ export const Astrophysics: FC<AstrophysicsProps> = ({name, cost, seconds}) => {
 
 const AstrophysicsContainer = styled.div`
   &.red {
-    color: #d43635;
+    color: ${COLOR_RED};
   }
   &.green {
-    color: #9c0;
+    color: ${COLOR_GREEN};
   }
 `;

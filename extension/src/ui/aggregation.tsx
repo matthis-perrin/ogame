@@ -1,5 +1,6 @@
 import React, {FC, Fragment} from 'react';
 
+import {goToFleets} from '@src/controllers/navigator';
 import {Account} from '@src/models/account';
 import {Table, Title} from '@src/ui/common';
 import {InFlightResources} from '@src/ui/components/inflightresources';
@@ -16,7 +17,7 @@ export const Aggregation: FC<AggregationProps> = ({account}) => (
     <Table>
       <thead>
         <tr>
-          <th colSpan={2}>
+          <th colSpan={2} onClick={() => goToFleets()} style={{cursor: 'pointer'}}>
             <Title>Flottes ({Object.keys(account.fleets).length})</Title>
           </th>
           <th colSpan={2}>
@@ -26,10 +27,10 @@ export const Aggregation: FC<AggregationProps> = ({account}) => (
       </thead>
       <tbody>
         <tr>
-          <td>
+          <td onClick={() => goToFleets()} style={{cursor: 'pointer'}}>
             <InFlightResources fleets={account.fleets} />
           </td>
-          <td>
+          <td onClick={() => goToFleets()} style={{cursor: 'pointer'}}>
             <InFlightShips fleets={account.fleets} />
           </td>
           <td>

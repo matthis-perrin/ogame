@@ -30,7 +30,7 @@ export function generateConstructionId(planetId: PlanetId, techId: number): Cons
   return `${planetId}_${techId}` as ConstructionId;
 }
 
-const TechnologyIndex: Map<number, BuildableBase> = new Map();
+export const TechnologyIndex: Map<number, BuildableBase> = new Map();
 function buildIndex(buildable: BuildableBase): void {
   TechnologyIndex.set(buildable.id, buildable);
 }

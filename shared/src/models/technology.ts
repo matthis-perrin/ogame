@@ -34,6 +34,7 @@ function makeTechnology(
     }),
     requirements: [],
     isUseful,
+    component: 'research',
   };
 }
 

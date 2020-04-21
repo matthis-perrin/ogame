@@ -7,7 +7,7 @@ import {parseMeta} from '@src/parsers/meta';
 import {parsePlanets} from '@src/parsers/planets';
 import {parseResources} from '@src/parsers/resources';
 import {parseTechnologies} from '@src/parsers/technologies';
-import {addPlanet} from '@src/stores/account';
+import {addPlanet} from '@src/stores/store_account';
 
 /* eslint-disable no-console */
 export function parseUI(): void {
@@ -23,7 +23,7 @@ export function parseUI(): void {
   if (id === undefined || timestamp === undefined) {
     return;
   }
-  const planetId = `planet-${id}` as PlanetId;
+  const planetId = id.toString() as PlanetId;
   const serverTimeSeconds = parseFloat(timestamp);
   console.log(`Meta parsed ${metas.length}`);
 

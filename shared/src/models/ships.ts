@@ -30,6 +30,7 @@ export const EspionageProbe: Ship = {
   fuelConsumption: 1,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
+  component: 'shipyard',
 };
 
 // TODO - Produce energy
@@ -47,6 +48,7 @@ export const SolarSatellite: Ship = {
   fuelConsumption: 0,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
+  component: 'supplies',
 };
 
 export const Crawler: Ship = {
@@ -63,6 +65,7 @@ export const Crawler: Ship = {
   fuelConsumption: 0,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
+  component: 'shipyard',
 };
 
 export const SmallCargo: Ship = {
@@ -79,6 +82,7 @@ export const SmallCargo: Ship = {
   fuelConsumption: 10,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
+  component: 'shipyard',
 };
 
 export const LargeCargo: Ship = {
@@ -95,6 +99,7 @@ export const LargeCargo: Ship = {
   fuelConsumption: 50,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
+  component: 'shipyard',
 };
 
 // TODO - Can recycle 100% of debris fields
@@ -112,6 +117,7 @@ export const Recycler: Ship = {
   fuelConsumption: 300,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
+  component: 'shipyard',
 };
 
 export const ColonyShip: Ship = {
@@ -128,6 +134,7 @@ export const ColonyShip: Ship = {
   fuelConsumption: 1000,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
+  component: 'shipyard',
 };
 
 export const LightFighter: Ship = {
@@ -144,6 +151,7 @@ export const LightFighter: Ship = {
   fuelConsumption: 20,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
+  component: 'shipyard',
 };
 
 export const Cruiser: Ship = {
@@ -160,6 +168,7 @@ export const Cruiser: Ship = {
   fuelConsumption: 300,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
+  component: 'shipyard',
 };
 
 export const HeavyFighter: Ship = {
@@ -176,6 +185,7 @@ export const HeavyFighter: Ship = {
   fuelConsumption: 75,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
+  component: 'shipyard',
 };
 
 export const Pathfinder: Ship = {
@@ -192,6 +202,7 @@ export const Pathfinder: Ship = {
   fuelConsumption: 300,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
+  component: 'shipyard',
 };
 
 export const Battleship: Ship = {
@@ -208,6 +219,7 @@ export const Battleship: Ship = {
   fuelConsumption: 500,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
+  component: 'shipyard',
 };
 
 export const BattleCruiser: Ship = {
@@ -224,6 +236,7 @@ export const BattleCruiser: Ship = {
   fuelConsumption: 250,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
+  component: 'shipyard',
 };
 
 export const Destroyer: Ship = {
@@ -240,6 +253,7 @@ export const Destroyer: Ship = {
   fuelConsumption: 1000,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
+  component: 'shipyard',
 };
 
 export const Bomber: Ship = {
@@ -256,6 +270,7 @@ export const Bomber: Ship = {
   fuelConsumption: 700,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
+  component: 'shipyard',
 };
 
 // TODO - Can recycle 25% of debris fields
@@ -273,6 +288,7 @@ export const Reaper: Ship = {
   fuelConsumption: 1100,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
+  component: 'shipyard',
 };
 
 export const AllShips: Ship[] = [

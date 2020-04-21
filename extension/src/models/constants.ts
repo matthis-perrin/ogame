@@ -72,7 +72,7 @@ export const PAGES_TECHNOLOGIES = [
   'component=research',
 ];
 
-export const PAGES_SHIPS = ['component=shipyard', 'component=fleetdispatch'];
+export const PAGES_SHIPS = ['component=shipyard'];
 
 export const ACCOUNT_TECHNOLOGIES = [
   EspionageTechnology.id,
@@ -93,3 +93,6 @@ export const ACCOUNT_TECHNOLOGIES = [
 ];
 
 export const COLOR_WHITE = '#aaa';
+export const COLOR_GREEN = '#9c0';
+export const COLOR_RED = '#d43635';
+export const COLOR_ORANGE = '#d29d00';

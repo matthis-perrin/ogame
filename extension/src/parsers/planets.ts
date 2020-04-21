@@ -6,7 +6,7 @@ export function parsePlanets(): Planet[] {
   const res: Planet[] = [];
   $('html > body #planetList > div').each((_, element) => {
     res.push({
-      id: element.id as PlanetId,
+      id: element.id.substr(7) as PlanetId,
       name: $(element)
         .find('.planet-name')
         .text() as PlanetName,

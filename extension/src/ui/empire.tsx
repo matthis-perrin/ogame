@@ -32,6 +32,14 @@ import {
   SolarSatellite,
 } from '@shared/models/ships';
 
+import {
+  goToDefenses,
+  goToFactories,
+  goToMines,
+  goToOverview,
+  goToResources,
+  goToShips,
+} from '@src/controllers/navigator';
 import {Account} from '@src/models/account';
 import {
   DEBRIS_PERCENTAGE,
@@ -124,7 +132,7 @@ export const Empire: FC<EmpireProps> = ({account}) => (
             const requiredTransport = Math.ceil(resourcesSum / FRET_GT);
             return (
               <tr key={p.id}>
-                <td>
+                <td onClick={() => goToOverview(planet.planetId)} style={{cursor: 'pointer'}}>
                   <Line>
                     <Resource
                       name="M"
@@ -152,7 +160,7 @@ export const Empire: FC<EmpireProps> = ({account}) => (
                     />
                   </Line>
                 </td>
-                <td>
+                <td onClick={() => goToResources(planet.planetId)} style={{cursor: 'pointer'}}>
                   <Line>
                     <Production name="M" production={planet.productions.metal} />
                     <Production name="C" production={planet.productions.crystal} />
@@ -160,7 +168,7 @@ export const Empire: FC<EmpireProps> = ({account}) => (
                     <Production name="Σ" production={productionsSum} />
                   </Line>
                 </td>
-                <td>
+                <td onClick={() => goToMines(planet.planetId)} style={{cursor: 'pointer'}}>
                   <Line>
                     <TechnologyC
                       name="M"
@@ -194,7 +202,7 @@ export const Empire: FC<EmpireProps> = ({account}) => (
                     />
                   </Line>
                 </td>
-                <td>
+                <td onClick={() => goToResources(planet.planetId)} style={{cursor: 'pointer'}}>
                   <Line>
                     <TechnologyC
                       name="Sol"
@@ -214,7 +222,7 @@ export const Empire: FC<EmpireProps> = ({account}) => (
                     <Energy name="E" amount={planet.resources.energy} />
                   </Line>
                 </td>
-                <td>
+                <td onClick={() => goToMines(planet.planetId)} style={{cursor: 'pointer'}}>
                   <Line>
                     <TechnologyC
                       name="M"
@@ -258,7 +266,7 @@ export const Empire: FC<EmpireProps> = ({account}) => (
                     />
                   </Line>
                 </td>
-                <td>
+                <td onClick={() => goToFactories(planet.planetId)} style={{cursor: 'pointer'}}>
                   <Line>
                     <TechnologyC
                       name="Rob"
@@ -297,7 +305,7 @@ export const Empire: FC<EmpireProps> = ({account}) => (
                     />
                   </Line>
                 </td>
-                <td>
+                <td onClick={() => goToDefenses(planet.planetId)} style={{cursor: 'pointer'}}>
                   <Line>
                     <TechnologyC
                       name="LM"
@@ -325,7 +333,7 @@ export const Empire: FC<EmpireProps> = ({account}) => (
                     />
                   </Line>
                 </td>
-                <td>
+                <td onClick={() => goToShips(planet.planetId)} style={{cursor: 'pointer'}}>
                   <Line>
                     <TechnologyC
                       name="PB"
@@ -352,7 +360,7 @@ export const Empire: FC<EmpireProps> = ({account}) => (
                     />
                   </Line>
                 </td>
-                <td>
+                <td onClick={() => goToShips(planet.planetId)} style={{cursor: 'pointer'}}>
                   <Line>
                     <TechnologyC name="PT" technologies={planet.ships} techId={SmallCargo.id} />
                     <TechnologyC

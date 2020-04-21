@@ -1,6 +1,7 @@
 import React, {FC, Fragment} from 'react';
 import styled from 'styled-components';
 
+import {COLOR_RED} from '@src/models/constants';
 import {ResourceAmount} from '@src/models/resources';
 
 interface EnergyProps {
@@ -26,6 +27,6 @@ export const Energy: FC<EnergyProps> = ({name, amount}) => {
 
 const EnergyContainer = styled.div`
   &.red {
-    color: #d43635;
+    color: ${COLOR_RED};
   }
 `;

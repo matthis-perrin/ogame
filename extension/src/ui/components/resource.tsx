@@ -1,7 +1,7 @@
 import React, {FC, Fragment} from 'react';
 import styled from 'styled-components';
 
-import {INACTIVITY_TIME} from '@src/models/constants';
+import {COLOR_ORANGE, COLOR_RED, INACTIVITY_TIME} from '@src/models/constants';
 import {ResourceAmount} from '@src/models/resources';
 import {snum, sum} from '@src/ui/utils';
 
@@ -37,9 +37,9 @@ export const Resource: FC<ResourceProps> = ({name, amount, storage, production})
 
 const ResourceContainer = styled.div`
   &.red {
-    color: #d43635;
+    color: ${COLOR_RED};
   }
   &.orange {
-    color: #d29d00;
+    color: ${COLOR_ORANGE};
   }
 `;

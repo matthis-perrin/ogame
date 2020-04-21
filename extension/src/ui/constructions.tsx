@@ -1,7 +1,9 @@
 import React, {FC, Fragment} from 'react';
 import styled from 'styled-components';
 
+import {goToTechnology} from '@src/controllers/navigator';
 import {Account, findPlanetName} from '@src/models/account';
+import {COLOR_GREEN} from '@src/models/constants';
 import {Construction, techName} from '@src/models/technologies';
 import {Title} from '@src/ui/common';
 import {time} from '@src/ui/utils';
@@ -26,15 +28,23 @@ export const Constructions: FC<ConstructionsProps> = ({account}) => {
     <Fragment>
       <Container>
         <Title>Constructions</Title>
-        {constructions.map(construction => (
-          <Element key={construction.constructionId}>
-            <div>
-              {findPlanetName(account.planetList, construction.planetId)}{' '}
-              {techName(construction.techId)}
-            </div>
-            <div>{time(construction.targetEndSeconds - now)}</div>
-          </Element>
-        ))}
+        {constructions.map(construction => {
+          const seconds = construction.targetEndSeconds - now;
+          return (
+            <Element
+              key={construction.constructionId}
+              onClick={() => goToTechnology(construction.techId, construction.planetId)}
+            >
+              <div>
+                {findPlanetName(account.planetList, construction.planetId)}{' '}
+                {techName(construction.techId)}
+              </div>
+              <div>
+                {seconds > 0 ? time(seconds) : <span style={{color: COLOR_GREEN}}>Terminé</span>}
+              </div>
+            </Element>
+          );
+        })}
       </Container>
     </Fragment>
   );
@@ -47,4 +57,5 @@ const Container = styled.div`
 
 const Element = styled.div`
   margin-bottom: 10px;
+  cursor: pointer;
 `;

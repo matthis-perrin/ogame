@@ -15,6 +15,7 @@ export interface BuildableBase {
   type: BuildableType;
   name: string;
   requirements: BuildableRequirement[];
+  component: string; // In URL
 }
 
 export type Buildable = Technology | Building | Ship | Defense;

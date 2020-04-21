@@ -101,28 +101,68 @@ export function addPlanet(
     constructions: currentAccount?.constructions ?? {},
   };
 
+  // Add all fleets
   for (const fleet of fleets) {
     account.fleets[fleet.fleetId] = fleet;
   }
 
+  // Handle new constructions
+  const handleConstruction = (t: Technology): void => {
+    if (t.target !== undefined && t.targetEndSeconds !== undefined) {
+      // Override planetId for researches
+      let constructionPlanetId = planetId;
+      if (t.constructionPlanetName !== undefined) {
+        const maybePlanetId = findPlanetId(planetList, t.constructionPlanetName);
+        if (maybePlanetId !== undefined) {
+          constructionPlanetId = maybePlanetId;
+        }
+      }
+      // Generate unique ID
+      const constructionId = generateConstructionId(constructionPlanetId, t.techId);
+      // Overriding existing constructions
+      // Info: this doesn't remove finished constructions
+      account.constructions[constructionId] = {
+        constructionId,
+        planetId: constructionPlanetId,
+        techId: t.techId,
+        value: t.value,
+        target: t.target,
+        targetEndSeconds: t.targetEndSeconds,
+      };
+    } else {
+      // Removing finished constructions because it is getting updating with new technology info
+      const constructionId = generateConstructionId(planetId, t.techId);
+      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+      delete account.constructions[constructionId];
+    }
+  };
+
+  // Retrieve ships or replace with new ones
   let shipsObj = currentAccount?.planetDetails[planetId]?.ships ?? {};
+  // ships === undefined => no ships parsed
+  // ships === [] => no more ships (destroyed or inflight)
   if (ships !== undefined) {
     shipsObj = {};
     for (const ship of ships) {
+      // Exception: solar satellites cannot move, adding them to all other technologies
       if (ship.techId === SolarSatellite.id) {
         technologies.push(ship);
       } else {
         shipsObj[ship.techId] = ship;
+        handleConstruction(ship);
       }
     }
   }
 
+  // Retrieve technologies and add new ones
   const technologiesObj = currentAccount?.planetDetails[planetId]?.technologies ?? {};
   for (const technology of technologies) {
+    // Account level technologies => researches
     if (ACCOUNT_TECHNOLOGIES.includes(technology.techId)) {
       account.accountTechnologies[technology.techId] = technology;
     } else {
       technologiesObj[technology.techId] = technology;
+      // MAX_TECHNOLOGIES => list of technologies to match on all planets (mines, storages, factories...)
       if (MAX_TECHNOLOGIES.includes(technology.techId)) {
         if (
           !account.maxTechnologies.hasOwnProperty(technology.techId) ||
@@ -132,26 +172,10 @@ export function addPlanet(
         }
       }
     }
-    if (technology.target !== undefined && technology.targetEndSeconds !== undefined) {
-      const constructionId = generateConstructionId(planetId, technology.techId);
-      let constructionPlanetId = planetId;
-      if (technology.constructionPlanetName !== undefined) {
-        const maybePlanetId = findPlanetId(planetList, technology.constructionPlanetName);
-        if (maybePlanetId !== undefined) {
-          constructionPlanetId = maybePlanetId;
-        }
-      }
-      account.constructions[constructionId] = {
-        constructionId,
-        planetId: constructionPlanetId,
-        techId: technology.techId,
-        value: technology.value,
-        target: technology.target,
-        targetEndSeconds: technology.targetEndSeconds,
-      };
-    }
+    handleConstruction(technology);
   }
 
+  // Calculating production coefficient to handle missing energy
   const productionCoefficient =
     resources.resources.energy.amount >= 0
       ? 1
@@ -165,6 +189,7 @@ export function addPlanet(
           resources.techs[DeuteriumSynthesizer.id].consumption.energy,
         ]);
 
+  // Saving planet data
   account.planetDetails[planetId] = {
     planetId,
     truth: {
@@ -202,8 +227,10 @@ export function addPlanet(
     ships: shipsObj,
   };
 
+  // Calculating planet sum of everything (resources, storages, productions...)
   account.planetSum = calcPlanetSum(account.planetDetails);
 
+  // Saving to local storage + refreshing UI
   setAccount(account);
 }
 
@@ -226,6 +253,7 @@ function applyProduction(): void {
     return;
   }
 
+  // Building next tick account
   const account: Account = {
     planetList: currentAccount.planetList,
     planetDetails: {},
@@ -236,9 +264,11 @@ function applyProduction(): void {
     constructions: {},
   };
 
+  // Using milliseconds to have below second UI refresh
   const nowMillis = new Date().getTime();
   const nowSeconds = Math.floor(nowMillis / 1000);
 
+  // Calculating next tick resources
   for (const planetId in currentAccount.planetDetails) {
     if (currentAccount.planetDetails.hasOwnProperty(planetId)) {
       const planet = currentAccount.planetDetails[planetId];
@@ -260,6 +290,7 @@ function applyProduction(): void {
     }
   }
 
+  // Calculating fleets status (inflight, return, finished)
   for (const fleetId in currentAccount.fleets) {
     if (currentAccount.fleets.hasOwnProperty(fleetId)) {
       const fleet = currentAccount.fleets[fleetId];
@@ -275,17 +306,18 @@ function applyProduction(): void {
     }
   }
 
+  // Calculating constructions
   for (const constructionId in currentAccount.constructions) {
     if (currentAccount.constructions.hasOwnProperty(constructionId)) {
       const construction = currentAccount.constructions[constructionId];
       if (nowSeconds >= construction.targetEndSeconds) {
         // TODO: Handle construction end
-        continue;
       }
       account.constructions[constructionId] = construction;
     }
   }
 
+  // Calculating new planet sum
   account.planetSum = calcPlanetSum(account.planetDetails);
 
   setAccount(account);
