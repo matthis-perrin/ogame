@@ -1,5 +1,3 @@
-import {toStandardUnits} from '@shared/lib/resources';
-import {Account} from '@shared/models/account';
 import {
   Defense,
   GaussCannon,
@@ -7,7 +5,8 @@ import {
   PlasmaTurret,
   RocketLauncher,
 } from '@shared/models/defense';
-import {Resources, StandardUnitAmount} from '@shared/models/resource';
+import {Planet} from '@shared/models/planet';
+import {StandardUnitAmount} from '@shared/models/resource';
 
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 const baseDefenseLineForOneMillion = new Map<Defense, number>([
@@ -33,21 +32,37 @@ const DEFENSE_LINES: {
 /* eslint-enable @typescript-eslint/no-magic-numbers */
 
 export function getRequiredDefenseForStealableResources(
-  account: Account,
-  resources: Resources
+  standardUnit: StandardUnitAmount
 ): {defense: Defense; quantity: number}[] {
-  const standardUnitToProtect = toStandardUnits(account, resources);
   for (const defenseLine of DEFENSE_LINES) {
-    if (defenseLine.minResources > standardUnitToProtect) {
+    if (defenseLine.minResources > standardUnit) {
       continue;
     }
-    const millionsToProtect = standardUnitToProtect / (1000 * 1000);
+    const millionsToProtect = standardUnit / (1000 * 1000);
     return defenseLine.defenses.map(defense => ({
       defense,
       quantity: Math.round(millionsToProtect * (baseDefenseLineForOneMillion.get(defense) ?? 0)),
     }));
   }
-  throw new Error(
-    `Could not find a defense line to protect ${standardUnitToProtect} standard units`
-  );
+  throw new Error(`Could not find a defense line to protect ${standardUnit} standard units`);
+}
+
+export function getExtraDefensesToBuildOnPlanet(
+  planet: Planet,
+  targetDefenses: {defense: Defense; quantity: number}[]
+): {defense: Defense; quantity: number}[] {
+  const defensesToBuild: {defense: Defense; quantity: number}[] = [];
+  for (const {defense, quantity} of targetDefenses) {
+    const currentQuantity = planet.defense.get(defense) ?? 0;
+    let inProgressQuantity = 0;
+    planet.inProgressDefenses?.defenses.forEach(d => {
+      if (d.defense === defense) {
+        inProgressQuantity += d.quantity;
+      }
+    });
+    if (currentQuantity + inProgressQuantity < quantity) {
+      defensesToBuild.push({defense, quantity: quantity - currentQuantity - inProgressQuantity});
+    }
+  }
+  return defensesToBuild;
 }

@@ -31,7 +31,7 @@ export function createNewAccount(universe: Universe): Account {
     preferences: {
       maxProdHoursOnPlanet: 6,
       resourcesRatio: {
-        metal: 2,
+        metal: 2.5,
         crystal: 1.5,
         deuterium: 1,
       },
@@ -124,7 +124,7 @@ export function createBenjAccount(): Account {
     preferences: {
       maxProdHoursOnPlanet: 6,
       resourcesRatio: {
-        metal: 2,
+        metal: 2.5,
         crystal: 1.5,
         deuterium: 1,
       },

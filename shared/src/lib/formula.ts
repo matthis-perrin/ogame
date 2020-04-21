@@ -136,25 +136,41 @@ export function getSatelliteEnergyProductionPerHour(
 export function getTechnologyBuildTime(
   technology: Technology,
   level: number,
-  researchLabLevel: number
+  researchLabLevel: number,
+  universeResearchSpeed: number
 ): Milliseconds {
   const {metal, crystal} = technology.cost(level);
   const hours = ((metal as number) + (crystal as number)) / (1000 * (1 + researchLabLevel));
-  return hoursToMilliseconds(hours);
+  return hoursToMilliseconds(hours / universeResearchSpeed);
 }
 
 export function getBuildingBuildTime(
   building: Building,
   level: number,
   roboticsFactoryLevel: number,
-  naniteFactoryLevel: number
+  naniteFactoryLevel: number,
+  universeEconomySpeed: number
 ): Milliseconds {
   const {metal, crystal} = building.cost(level);
   const lowLevelSpeedup = level > 5 ? 1 : 2 / (7 - level - 1);
   const hours =
     (lowLevelSpeedup * ((metal as number) + (crystal as number))) /
     (2500 * (1 + roboticsFactoryLevel) * Math.pow(2, naniteFactoryLevel));
-  return hoursToMilliseconds(hours);
+  return hoursToMilliseconds(hours / universeEconomySpeed);
+}
+
+export function getShipsBuildTime(
+  ship: Ship,
+  quantity: number,
+  shipyardLevel: number,
+  naniteFactoryLevel: number,
+  universeEconomySpeed: number
+): Milliseconds {
+  const {metal, crystal} = ship.cost;
+  const hours =
+    ((metal as number) + (crystal as number)) /
+    (2500 * (1 + shipyardLevel) * Math.pow(2, naniteFactoryLevel));
+  return hoursToMilliseconds((hours * quantity) / universeEconomySpeed);
 }
 
 //
@@ -162,5 +178,5 @@ export function getBuildingBuildTime(
 //
 
 export function getShipCargoCapacity(ship: Ship, hyperspaceTechnologyLevel: number): number {
-  return ship.cargoCapacity * 1 + 0.05 * hyperspaceTechnologyLevel;
+  return ship.cargoCapacity * (1 + 0.05 * hyperspaceTechnologyLevel);
 }
