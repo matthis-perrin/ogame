@@ -11,6 +11,12 @@ export interface Account {
   fleets: {[fleetId: string]: Fleet};
   planetSum: AccountPlanet | undefined;
   constructions: {[constructionId: string]: Construction};
+  inFlightResources: {
+    metal: ResourceAmount;
+    crystal: ResourceAmount;
+    deuterium: ResourceAmount;
+    sum: ResourceAmount;
+  };
 }
 
 export interface AccountPlanet {

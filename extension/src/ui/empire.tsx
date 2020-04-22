@@ -268,7 +268,7 @@ export const Empire: FC<EmpireProps> = ({account}) => {
                       />
                     </Line>
                   </td>
-                  <td onClick={() => goToResources(planet.planetId)} style={{cursor: 'pointer'}}>
+                  <td onClick={() => goToMines(planet.planetId)} style={{cursor: 'pointer'}}>
                     <Line>
                       <TechnologyC
                         name="Sol"
@@ -400,7 +400,7 @@ export const Empire: FC<EmpireProps> = ({account}) => {
                       />
                     </Line>
                   </td>
-                  <td onClick={() => goToShips(planet.planetId)} style={{cursor: 'pointer'}}>
+                  <td onClick={() => goToDefenses(planet.planetId)} style={{cursor: 'pointer'}}>
                     <Line>
                       <TechnologyC
                         name="PB"

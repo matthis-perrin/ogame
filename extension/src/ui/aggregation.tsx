@@ -27,20 +27,13 @@ export const Aggregation: FC<AggregationProps> = ({account}) => (
       <tbody>
         <tr>
           <td onClick={() => goToFleets()} style={{cursor: 'pointer'}}>
-            <InFlightResources fleets={account.fleets} planetList={account.planetList} />
+            <InFlightResources account={account} />
           </td>
-          {/* <td onClick={() => goToFleets()} style={{cursor: 'pointer'}}>
-            <InFlightShips fleets={account.fleets} />
-          </td> */}
           <td>
             {account.planetSum === undefined ? (
               ''
             ) : (
-              <PlanetSum
-                planetSum={account.planetSum}
-                fleets={account.fleets}
-                planetList={account.planetList}
-              />
+              <PlanetSum planetSum={account.planetSum} account={account} />
             )}
           </td>
           <td>

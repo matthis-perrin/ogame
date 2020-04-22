@@ -72,6 +72,38 @@ function calcPlanetSum(planetDetails: {[planetId: string]: AccountPlanet}): Acco
   };
 }
 
+function calcInFlightResources(
+  planetList: Planet[],
+  fleets: {[fleetId: string]: Fleet}
+): {
+  metal: ResourceAmount;
+  crystal: ResourceAmount;
+  deuterium: ResourceAmount;
+  sum: ResourceAmount;
+} {
+  let metal = 0 as ResourceAmount;
+  let crystal = 0 as ResourceAmount;
+  let deuterium = 0 as ResourceAmount;
+  for (const fleetId in fleets) {
+    if (fleets.hasOwnProperty(fleetId)) {
+      const fleet = fleets[fleetId];
+      const destinationIsMyPlanet = findPlanetId(planetList, fleet.destinationName) !== undefined;
+      const returnFromAttacking =
+        fleet.missionType === MissionTypeEnum.Attacking && fleet.returnFlight;
+      const deploying = fleet.missionType === MissionTypeEnum.Deployment;
+      const transportingToMyPlanet =
+        fleet.missionType === MissionTypeEnum.Transport && destinationIsMyPlanet;
+      if (returnFromAttacking || deploying || transportingToMyPlanet) {
+        metal = sum([metal, fleet.resources.metal]);
+        crystal = sum([crystal, fleet.resources.crystal]);
+        deuterium = sum([deuterium, fleet.resources.deuterium]);
+      }
+    }
+  }
+  const resourcesSum = sum([metal, crystal, deuterium]);
+  return {metal, crystal, deuterium, sum: resourcesSum};
+}
+
 export function setAccount(account: Account, persistent = true): void {
   currentAccount = account;
   if (persistent) {
@@ -99,6 +131,12 @@ export function addPlanet(
     fleets: {},
     constructions: currentAccount?.constructions ?? {},
     planetSum: undefined,
+    inFlightResources: currentAccount?.inFlightResources ?? {
+      metal: 0 as ResourceAmount,
+      crystal: 0 as ResourceAmount,
+      deuterium: 0 as ResourceAmount,
+      sum: 0 as ResourceAmount,
+    },
   };
 
   // Clean old fleets
@@ -157,6 +195,9 @@ export function addPlanet(
   for (const fleet of fleets) {
     account.fleets[fleet.fleetId] = fleet;
   }
+
+  // Calculate inflight resourses
+  account.inFlightResources = calcInFlightResources(planetList, account.fleets);
 
   // Handle new constructions
   const handleConstruction = (t: Technology): void => {
@@ -315,6 +356,7 @@ function applyProduction(): void {
     fleets: {},
     planetSum: undefined,
     constructions: {},
+    inFlightResources: currentAccount.inFlightResources,
   };
 
   // Using milliseconds to have below second UI refresh
