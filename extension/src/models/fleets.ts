@@ -1,5 +1,5 @@
 import {PlanetCoords, PlanetName} from '@src/models/planets';
-import {ResourceAmount} from '@src/models/resources';
+import {ResourcesWithSum} from '@src/models/resources';
 
 export type FleetId = string & {_: 'FleetId'};
 export type MissionType = number & {_: 'MissionType'};
@@ -34,11 +34,7 @@ export interface Fleet {
   destinationCoords: PlanetCoords;
   originName: PlanetName;
   destinationName: PlanetName;
-  resources: {
-    metal: ResourceAmount;
-    crystal: ResourceAmount;
-    deuterium: ResourceAmount;
-  };
+  resources: ResourcesWithSum;
   ships: {
     transporterLarge: number;
     transporterSmall: number;

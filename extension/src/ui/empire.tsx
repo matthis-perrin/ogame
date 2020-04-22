@@ -54,7 +54,7 @@ import {
   RATIO_LM,
   RATIO_PLA,
 } from '@src/models/constants';
-import {ResourceAmount} from '@src/models/resources';
+import {ResourceAmount, ResourcesWithSum} from '@src/models/resources';
 import {Table, Title} from '@src/ui/common';
 import {Energy} from '@src/ui/components/energy';
 import {Loot} from '@src/ui/components/loot';
@@ -68,15 +68,7 @@ interface EmpireProps {
 }
 
 export const Empire: FC<EmpireProps> = ({account}) => {
-  const inFlightResources: Map<
-    string,
-    {
-      metal: ResourceAmount;
-      crystal: ResourceAmount;
-      deuterium: ResourceAmount;
-      sum: ResourceAmount;
-    }
-  > = new Map();
+  const inFlightResources: Map<string, ResourcesWithSum> = new Map();
 
   for (const fleetId in account.fleets) {
     if (account.fleets.hasOwnProperty(fleetId)) {
@@ -289,7 +281,7 @@ export const Empire: FC<EmpireProps> = ({account}) => {
                       <Energy name="E" amount={planet.resources.energy} />
                     </Line>
                   </td>
-                  <td onClick={() => goToMines(planet.planetId)} style={{cursor: 'pointer'}}>
+                  <td onClick={() => goToFactories(planet.planetId)} style={{cursor: 'pointer'}}>
                     <Line>
                       <TechnologyC
                         name="M"

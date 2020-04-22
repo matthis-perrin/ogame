@@ -7,8 +7,9 @@ import {persist} from '@src/controllers/storage';
 import {Account, AccountPlanet, findPlanetId} from '@src/models/account';
 import {ACCOUNT_TECHNOLOGIES, MAX_TECHNOLOGIES, UI_REFRESH_RATE} from '@src/models/constants';
 import {Fleet, MissionTypeEnum} from '@src/models/fleets';
+import {Message} from '@src/models/messages';
 import {Planet, PlanetId} from '@src/models/planets';
-import {ResourceAmount, Resources} from '@src/models/resources';
+import {ResourceAmount, Resources, ResourcesWithSum} from '@src/models/resources';
 import {generateConstructionId, Technology} from '@src/models/technologies';
 import {sum} from '@src/ui/utils';
 
@@ -75,12 +76,7 @@ function calcPlanetSum(planetDetails: {[planetId: string]: AccountPlanet}): Acco
 function calcInFlightResources(
   planetList: Planet[],
   fleets: {[fleetId: string]: Fleet}
-): {
-  metal: ResourceAmount;
-  crystal: ResourceAmount;
-  deuterium: ResourceAmount;
-  sum: ResourceAmount;
-} {
+): ResourcesWithSum {
   let metal = 0 as ResourceAmount;
   let crystal = 0 as ResourceAmount;
   let deuterium = 0 as ResourceAmount;
@@ -121,7 +117,8 @@ export function addPlanet(
   resources: Resources,
   technologies: Technology[],
   ships: Technology[] | undefined,
-  fleets: Fleet[]
+  fleets: Fleet[],
+  messages: Message[] | undefined
 ): void {
   const account: Account = {
     planetList,
@@ -137,7 +134,18 @@ export function addPlanet(
       deuterium: 0 as ResourceAmount,
       sum: 0 as ResourceAmount,
     },
+    messages: {},
   };
+
+  // Retrieve messages or replace with new ones
+  let messagesObj = currentAccount?.messages ?? {};
+  if (messages !== undefined) {
+    messagesObj = {};
+    for (const message of messages) {
+      messagesObj[message.messageId] = message;
+    }
+  }
+  account.messages = messagesObj;
 
   // Clean old fleets
   const oldFleets = currentAccount?.fleets ?? {};
@@ -171,6 +179,16 @@ export function addPlanet(
           fleet.missionType === MissionTypeEnum.Transport &&
           !fleet.returnFlight &&
           destPlanetId === planetId
+        ) {
+          continue;
+        }
+        // Auto-removing non-returning attacking/expedition/espionage fleets when on messages page
+        if (
+          (fleet.missionType === MissionTypeEnum.Attacking ||
+            fleet.missionType === MissionTypeEnum.Expedition ||
+            fleet.missionType === MissionTypeEnum.Espionage) &&
+          !fleet.returnFlight &&
+          document.location.search.includes('page=messages')
         ) {
           continue;
         }
@@ -357,6 +375,7 @@ function applyProduction(): void {
     planetSum: undefined,
     constructions: {},
     inFlightResources: currentAccount.inFlightResources,
+    messages: currentAccount.messages,
   };
 
   // Using milliseconds to have below second UI refresh
@@ -408,16 +427,8 @@ function applyProduction(): void {
         }
       }
       if (nowSeconds >= fleet.arrivalTime) {
-        // Auto-removing attacking/expedition fleets that don't return
-        if (
-          (fleet.missionType === MissionTypeEnum.Attacking ||
-            fleet.missionType === MissionTypeEnum.Expedition) &&
-          !fleet.returnFlight
-        ) {
-          continue;
-        }
-        // Auto-removing espionage fleets
-        if (fleet.missionType === MissionTypeEnum.Espionage) {
+        // Auto-removing returning espionage fleets
+        if (fleet.missionType === MissionTypeEnum.Espionage && fleet.returnFlight) {
           continue;
         }
       }

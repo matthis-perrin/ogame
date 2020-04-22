@@ -39,6 +39,7 @@ localStorage.setItem(SESSION_ID_LOCAL_STORAGE_KEY, SESSION_ID);
 export const INACTIVITY_TIME = 6.5; // 6h30m
 export const DEBRIS_PERCENTAGE = 0.3;
 export const UI_REFRESH_RATE = 1000;
+export const PROBES_AMOUNT = 10;
 
 // Class bonus
 export const COLLECTOR_BONUS_FRET = 0.25;

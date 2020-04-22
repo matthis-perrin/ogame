@@ -45,3 +45,12 @@ export function goToGalaxy(planetCoords: PlanetCoords): void {
   const coords = getCoords(planetCoords);
   window.location.href = `${document.location.origin}${document.location.pathname}?page=ingame&component=galaxy&galaxy=${coords.galaxy}&system=${coords.system}&position=${coords.position}`;
 }
+
+export function goToMessages(): void {
+  window.location.href = `${document.location.origin}${document.location.pathname}?page=messages`;
+}
+
+export function sendLargeCargos(planetCoords: PlanetCoords, amount: number): void {
+  const coords = getCoords(planetCoords);
+  window.location.href = `${document.location.origin}${document.location.pathname}?page=ingame&component=fleetdispatch&galaxy=${coords.galaxy}&system=${coords.system}&position=${coords.position}&type=1&mission=1&am203=${amount}`;
+}

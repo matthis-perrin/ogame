@@ -8,6 +8,7 @@ import {Separator} from '@src/ui/components/separator';
 import {Constructions} from '@src/ui/constructions';
 import {Empire} from '@src/ui/empire';
 import {Fleets} from '@src/ui/fleets';
+import {Messages} from '@src/ui/messages';
 import {Research} from '@src/ui/research';
 
 export const App: FC = () => {
@@ -21,16 +22,17 @@ export const App: FC = () => {
           <div>
             <Top>
               <Aggregation account={account} />
+              <Research account={account} />
             </Top>
             <Middle>
               <Empire account={account} />
             </Middle>
             <Bottom>
-              <Research account={account} />
-              <Separator />
               <Constructions account={account} />
               <Separator />
               <Fleets account={account} />
+              <Separator />
+              <Messages account={account} />
             </Bottom>
           </div>
         )}
@@ -42,6 +44,7 @@ export const App: FC = () => {
 const Top = styled.div`
   height: 105px;
   padding-top: 20px;
+  display: flex;
 `;
 
 const Middle = styled.div`

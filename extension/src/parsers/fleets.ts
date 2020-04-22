@@ -6,6 +6,7 @@ import {NAME_CRYSTAL, NAME_DEUTERIUM, NAME_METAL} from '@src/models/constants';
 import {Fleet, FleetId, FleetTime, MissionType, ReturnFlight} from '@src/models/fleets';
 import {PlanetCoords, PlanetName} from '@src/models/planets';
 import {ResourceAmount} from '@src/models/resources';
+import {sum} from '@src/ui/utils';
 
 export function parseFleets(): Fleet[] {
   const res: Fleet[] = [];
@@ -77,6 +78,7 @@ export function parseFleets(): Fleet[] {
         metal: 0 as ResourceAmount,
         crystal: 0 as ResourceAmount,
         deuterium: 0 as ResourceAmount,
+        sum: 0 as ResourceAmount,
       },
       ships: {
         transporterLarge: 0,
@@ -134,6 +136,11 @@ export function parseFleets(): Fleet[] {
           return;
         }
       });
+    fleet.resources.sum = sum([
+      fleet.resources.metal,
+      fleet.resources.crystal,
+      fleet.resources.deuterium,
+    ]);
     res.push(fleet);
   });
   return res;

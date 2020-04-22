@@ -2,6 +2,7 @@ import {PAGES_SHIPS, PAGES_TECHNOLOGIES} from '@src/models/constants';
 import {PlanetId} from '@src/models/planets';
 import {Technology} from '@src/models/technologies';
 import {parseFleets} from '@src/parsers/fleets';
+import {parseMessages} from '@src/parsers/messages';
 import {parseMeta} from '@src/parsers/meta';
 import {parsePlanets} from '@src/parsers/planets';
 import {parseResources} from '@src/parsers/resources';
@@ -59,7 +60,26 @@ export function parseUI(): void {
   const fleets = parseFleets();
   console.log(`Fleets parsed ${fleets.length}`);
 
-  console.log('OK');
+  parseMessages()
+    .then(messages => {
+      if (messages !== undefined) {
+        console.log(`Messages parsed ${messages.length}`);
+      }
 
-  addPlanet(serverTimeSeconds, planets, planetId, resources, technologies, ships, fleets);
+      console.log('OK');
+
+      addPlanet(
+        serverTimeSeconds,
+        planets,
+        planetId,
+        resources,
+        technologies,
+        ships,
+        fleets,
+        messages
+      );
+    })
+    .catch(err => {
+      console.error(err);
+    });
 }

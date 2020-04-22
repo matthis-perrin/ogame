@@ -1,14 +1,14 @@
 import React, {FC, Fragment} from 'react';
 import styled from 'styled-components';
 
-import {goToFleets, goToShips} from '@src/controllers/navigator';
+import {goToFleets, goToMessages, goToShips} from '@src/controllers/navigator';
 import {Account, findPlanetId} from '@src/models/account';
 import {COLOR_GREEN} from '@src/models/constants';
-import {Fleet, missionTypeString} from '@src/models/fleets';
+import {Fleet, MissionTypeEnum, missionTypeString} from '@src/models/fleets';
 import {Table, Title} from '@src/ui/common';
 import {PlanetCoordsC} from '@src/ui/components/planetcoords';
 import {Resource} from '@src/ui/components/resource';
-import {sum, time} from '@src/ui/utils';
+import {time} from '@src/ui/utils';
 
 interface FleetsProps {
   account: Account;
@@ -42,11 +42,6 @@ export const Fleets: FC<FleetsProps> = ({account}) => {
           <tbody>
             {fleets.map(fleet => {
               const seconds = fleet.arrivalTime - now;
-              const resourcesSum = sum([
-                fleet.resources.metal,
-                fleet.resources.crystal,
-                fleet.resources.deuterium,
-              ]);
               return (
                 <tr key={fleet.fleetId}>
                   <td>
@@ -58,10 +53,14 @@ export const Fleets: FC<FleetsProps> = ({account}) => {
                     <PlanetCoordsC coords={fleet.destinationCoords} name={fleet.destinationName} />
                   </td>
                   <td>
-                    <Resource name="Σ" amount={resourcesSum} />
+                    <Resource name="Σ" amount={fleet.resources.sum} />
                   </td>
                   <Hover
                     onClick={() => {
+                      if (fleet.missionType === MissionTypeEnum.Espionage) {
+                        goToMessages();
+                        return;
+                      }
                       const planetId = findPlanetId(account.planetList, fleet.destinationName);
                       if (planetId === undefined) {
                         return;

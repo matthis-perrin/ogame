@@ -1,6 +1,7 @@
 import {Fleet} from '@src/models/fleets';
+import {Message} from '@src/models/messages';
 import {Planet, PlanetId, PlanetName} from '@src/models/planets';
-import {ResourceAmount} from '@src/models/resources';
+import {BaseResources, ResourcesWithEnergy, ResourcesWithSum} from '@src/models/resources';
 import {Construction, Technology} from '@src/models/technologies';
 
 export interface Account {
@@ -11,38 +12,20 @@ export interface Account {
   fleets: {[fleetId: string]: Fleet};
   planetSum: AccountPlanet | undefined;
   constructions: {[constructionId: string]: Construction};
-  inFlightResources: {
-    metal: ResourceAmount;
-    crystal: ResourceAmount;
-    deuterium: ResourceAmount;
-    sum: ResourceAmount;
-  };
+  inFlightResources: ResourcesWithSum;
+  messages: {[messageId: string]: Message};
+}
+
+export interface ResourcesWithServerTime extends BaseResources {
+  serverTimeSeconds: number;
 }
 
 export interface AccountPlanet {
   planetId: PlanetId;
-  truth: {
-    serverTimeSeconds: number;
-    metal: ResourceAmount;
-    crystal: ResourceAmount;
-    deuterium: ResourceAmount;
-  };
-  resources: {
-    metal: ResourceAmount;
-    crystal: ResourceAmount;
-    deuterium: ResourceAmount;
-    energy: ResourceAmount;
-  };
-  storages: {
-    metal: ResourceAmount;
-    crystal: ResourceAmount;
-    deuterium: ResourceAmount;
-  };
-  productions: {
-    metal: ResourceAmount;
-    crystal: ResourceAmount;
-    deuterium: ResourceAmount;
-  };
+  truth: ResourcesWithServerTime;
+  resources: ResourcesWithEnergy;
+  storages: BaseResources;
+  productions: BaseResources;
   technologies: {[techId: number]: Technology};
   ships: {[techId: number]: Technology};
 }

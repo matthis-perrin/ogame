@@ -22,13 +22,20 @@ export interface ResourceInfo {
 
 export interface TechInfo {
   techId: TechId;
-  production: ResourceValues;
-  consumption: ResourceValues;
+  production: ResourcesWithEnergy;
+  consumption: ResourcesWithEnergy;
 }
 
-export interface ResourceValues {
+export interface ResourcesWithEnergy extends BaseResources {
+  energy: ResourceAmount;
+}
+
+export interface ResourcesWithSum extends BaseResources {
+  sum: ResourceAmount;
+}
+
+export interface BaseResources {
   metal: ResourceAmount;
   crystal: ResourceAmount;
   deuterium: ResourceAmount;
-  energy: ResourceAmount;
 }
