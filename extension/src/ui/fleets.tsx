@@ -57,7 +57,10 @@ export const Fleets: FC<FleetsProps> = ({account}) => {
                   </td>
                   <Hover
                     onClick={() => {
-                      if (fleet.missionType === MissionTypeEnum.Espionage) {
+                      if (
+                        fleet.missionType === MissionTypeEnum.Espionage ||
+                        (fleet.missionType === MissionTypeEnum.Attacking && !fleet.returnFlight)
+                      ) {
                         goToMessages();
                         return;
                       }

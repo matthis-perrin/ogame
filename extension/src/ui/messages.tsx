@@ -22,16 +22,33 @@ interface MessagesProps {
 
 export const Messages: FC<MessagesProps> = ({account}) => {
   const messages: Message[] = [];
-  const duplicates: Map<PlanetCoords, number> = new Map();
+  const duplicatesByCoords: Map<PlanetCoords, Message[]> = new Map();
+
   for (const messageId in account.messages) {
     if (account.messages.hasOwnProperty(messageId)) {
       const message = account.messages[messageId];
       messages.push(message);
-      let dup = duplicates.get(message.planetCoords) ?? 0;
-      dup += 1;
-      duplicates.set(message.planetCoords, dup);
+      const dups = duplicatesByCoords.get(message.planetCoords) ?? [];
+      dups.push(message);
+      duplicatesByCoords.set(message.planetCoords, dups);
     }
   }
+
+  const duplicatesList: Set<string> = new Set();
+  duplicatesByCoords.forEach(messageList => {
+    if (messageList.length < 2) {
+      return;
+    }
+    let oldest: Message | undefined;
+    for (const message of messageList) {
+      if (oldest === undefined || message.timeSeconds < oldest.timeSeconds) {
+        oldest = message;
+      }
+    }
+    if (oldest !== undefined) {
+      duplicatesList.add(oldest.messageId);
+    }
+  });
 
   messages.sort((a, b) => b.resources.sum - a.resources.sum);
   const now = Math.floor(new Date().getTime() / 1000);
@@ -42,6 +59,8 @@ export const Messages: FC<MessagesProps> = ({account}) => {
       const fleet = account.fleets[fleetId];
       if (fleet.missionType === MissionTypeEnum.Attacking && !fleet.returnFlight) {
         attackingFleets.add(fleet.destinationCoords);
+      } else if (fleet.missionType === MissionTypeEnum.Attacking && fleet.returnFlight) {
+        attackingFleets.add(fleet.originCoords);
       }
     }
   }
@@ -60,54 +79,55 @@ export const Messages: FC<MessagesProps> = ({account}) => {
             </tr>
           </thead>
           <tbody>
-            {messages.map(message => (
-              <Line
-                key={message.messageId}
-                className={
-                  !message.noUnits || (duplicates.get(message.planetCoords) ?? 0) > 1 ? 'red' : ''
-                }
-              >
-                <td>{message.planetCoords}</td>
-                <td>
-                  <Resource name="Σ" amount={message.resources.sum} />
-                </td>
-                <td>{time(now - message.timeSeconds)}</td>
-                <td>{message.noUnits ? 'OK' : 'KO'}</td>
-                <td>
-                  <Hover onClick={() => sendProbes(message.planetCoords)}>Esp</Hover>{' '}
-                  <Hover
-                    onClick={() => {
-                      deleteMessage(message.messageId);
-                      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-                      delete account.messages[message.messageId];
-                    }}
-                  >
-                    Sup
-                  </Hover>{' '}
-                  <Hover
-                    onClick={() => {
-                      const hyperLevel = account.accountTechnologies.hasOwnProperty(
-                        HyperspaceTechnology.id
-                      )
-                        ? account.accountTechnologies[HyperspaceTechnology.id].value
-                        : 0;
-                      const fretGt = getShipCargoCapacity(
-                        LargeCargo,
-                        hyperLevel,
-                        COLLECTOR_BONUS_FRET
-                      );
-                      sendLargeCargos(
-                        message.planetCoords,
-                        Math.ceil(message.resources.sum / fretGt)
-                      );
-                    }}
-                    className={attackingFleets.has(message.planetCoords) ? 'orange' : ''}
-                  >
-                    Att
-                  </Hover>
-                </td>
-              </Line>
-            ))}
+            {messages.map(message => {
+              const isDuplicate = duplicatesList.has(message.messageId);
+              return (
+                <Line
+                  key={message.messageId}
+                  className={!message.noUnits || isDuplicate ? 'red' : ''}
+                >
+                  <td>{message.planetCoords}</td>
+                  <td>
+                    <Resource name="Σ" amount={message.resources.sum} />
+                  </td>
+                  <td>{time(now - message.timeSeconds)}</td>
+                  <td>{!message.noUnits ? 'KO' : isDuplicate ? 'DUP' : 'OK'}</td>
+                  <td>
+                    <Hover onClick={() => sendProbes(message.planetCoords)}>Esp</Hover>{' '}
+                    <Hover
+                      onClick={() => {
+                        deleteMessage(message.messageId);
+                        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+                        delete account.messages[message.messageId];
+                      }}
+                    >
+                      Sup
+                    </Hover>{' '}
+                    <Hover
+                      onClick={() => {
+                        const hyperLevel = account.accountTechnologies.hasOwnProperty(
+                          HyperspaceTechnology.id
+                        )
+                          ? account.accountTechnologies[HyperspaceTechnology.id].value
+                          : 0;
+                        const fretGt = getShipCargoCapacity(
+                          LargeCargo,
+                          hyperLevel,
+                          COLLECTOR_BONUS_FRET
+                        );
+                        sendLargeCargos(
+                          message.planetCoords,
+                          Math.ceil(message.resources.sum / fretGt)
+                        );
+                      }}
+                      className={attackingFleets.has(message.planetCoords) ? 'orange' : ''}
+                    >
+                      Att
+                    </Hover>
+                  </td>
+                </Line>
+              );
+            })}
           </tbody>
         </Table>
       </Container>
