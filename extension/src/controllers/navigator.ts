@@ -38,7 +38,7 @@ export function goToDefenses(planetId: PlanetId): void {
 }
 
 export function goToShips(planetId: PlanetId): void {
-  window.location.href = `${document.location.origin}${document.location.pathname}?page=ingame&component=shipyard&cp=${planetId}`;
+  window.location.href = `${document.location.origin}${document.location.pathname}?page=ingame&component=fleetdispatch&cp=${planetId}`;
 }
 
 export function goToGalaxy(planetCoords: PlanetCoords): void {

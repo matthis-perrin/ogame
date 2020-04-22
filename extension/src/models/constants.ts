@@ -75,7 +75,7 @@ export const PAGES_TECHNOLOGIES = [
   'component=research',
 ];
 
-export const PAGES_SHIPS = ['component=shipyard'];
+export const PAGES_SHIPS = ['component=shipyard', 'component=fleetdispatch'];
 
 export const ACCOUNT_TECHNOLOGIES = [
   EspionageTechnology.id,

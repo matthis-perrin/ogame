@@ -9,7 +9,7 @@ import {ResourceAmount} from '@src/models/resources';
 
 export function parseFleets(): Fleet[] {
   const res: Fleet[] = [];
-  $('html > body #pageContent #movementcomponent div.fleetDetails').each((_, element) => {
+  $('#eventboxContent #eventContent tr.eventFleet').each((_, element) => {
     const fleetId = element.id;
     if (fleetId.length === 0) {
       return;
@@ -19,9 +19,9 @@ export function parseFleets(): Fleet[] {
     if (missionType === null) {
       return;
     }
-    const returnFlight = element.getAttribute('data-return-flight');
+    const returnFlightRaw = element.getAttribute('data-return-flight');
     // eslint-disable-next-line no-null/no-null
-    if (returnFlight === null) {
+    if (returnFlightRaw === null) {
       return;
     }
     const arrivalTime = element.getAttribute('data-arrival-time');
@@ -29,51 +29,50 @@ export function parseFleets(): Fleet[] {
     if (arrivalTime === null) {
       return;
     }
-    const midTime = $(element)
-      .find('.openDetails [data-end-time]')
-      .attr('data-end-time');
-    if (midTime === undefined) {
-      return;
-    }
     const originCoords = $(element)
-      .find('.originCoords')
+      .find('.coordsOrigin')
       .text()
       .trim();
     if (originCoords.length === 0) {
       return;
     }
     const destinationCoords = $(element)
-      .find('.destinationCoords')
+      .find('.destCoords')
       .text()
       .trim();
     if (destinationCoords.length === 0) {
       return;
     }
     const originName = $(element)
-      .find('.originPlanet')
+      .find('.originFleet')
       .text()
       .trim();
     if (originName.length === 0) {
       return;
     }
-    const destinationName = $(element)
-      .find('.destinationPlanet')
-      .text()
-      .trim();
-    if (destinationName.length === 0) {
-      return;
+    let destinationName = $(element)
+      .find('.destFleet > span.tooltip[title]')
+      .attr('title');
+    if (destinationName === undefined) {
+      destinationName = $(element)
+        .find('.destFleet')
+        .text()
+        .trim();
+      if (originName.length === 0) {
+        return;
+      }
     }
+    const returnFlight = (returnFlightRaw !== 'false') as ReturnFlight;
     const fleet: Fleet = {
       // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-      fleetId: fleetId.substr(5) as FleetId,
+      fleetId: fleetId.substr(9) as FleetId,
       missionType: parseFloat(missionType) as MissionType,
-      returnFlight: (returnFlight === '1') as ReturnFlight,
+      returnFlight,
       arrivalTime: parseFloat(arrivalTime) as FleetTime,
-      midTime: parseFloat(midTime) as FleetTime,
-      originCoords: originCoords as PlanetCoords,
-      destinationCoords: destinationCoords as PlanetCoords,
-      originName: originName as PlanetName,
-      destinationName: destinationName as PlanetName,
+      originCoords: (returnFlight ? destinationCoords : originCoords) as PlanetCoords,
+      destinationCoords: (returnFlight ? originCoords : destinationCoords) as PlanetCoords,
+      originName: (returnFlight ? destinationName : originName) as PlanetName,
+      destinationName: (returnFlight ? originName : destinationName) as PlanetName,
       resources: {
         metal: 0 as ResourceAmount,
         crystal: 0 as ResourceAmount,
@@ -87,9 +86,15 @@ export function parseFleets(): Fleet[] {
         espionageProbe: 0,
       },
     };
-    $(element)
-      .find('.route .fleetinfo tr')
-      .each((i, tr) => {
+    const title = $(element)
+      .find('.icon_movement > span[title], .icon_movement_reserve > span[title]')
+      .attr('title');
+    if (title === undefined) {
+      return;
+    }
+    $($.parseHTML(title.trim()))
+      .find('.fleetinfo tr')
+      .each((j, tr) => {
         const value = parseFloat(
           $(tr)
             .find('td.value')

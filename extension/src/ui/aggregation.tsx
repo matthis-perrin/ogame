@@ -4,7 +4,6 @@ import {goToFleets} from '@src/controllers/navigator';
 import {Account} from '@src/models/account';
 import {Table, Title} from '@src/ui/common';
 import {InFlightResources} from '@src/ui/components/inflightresources';
-import {InFlightShips} from '@src/ui/components/inflightships';
 import {PlanetSum} from '@src/ui/components/planetsum';
 import {PlanetSumProd} from '@src/ui/components/planetsumprod';
 
@@ -17,8 +16,8 @@ export const Aggregation: FC<AggregationProps> = ({account}) => (
     <Table>
       <thead>
         <tr>
-          <th colSpan={2} onClick={() => goToFleets()} style={{cursor: 'pointer'}}>
-            <Title>Flottes ({Object.keys(account.fleets).length})</Title>
+          <th>
+            <Title>Flottes</Title>
           </th>
           <th colSpan={2}>
             <Title>Total</Title>
@@ -28,11 +27,11 @@ export const Aggregation: FC<AggregationProps> = ({account}) => (
       <tbody>
         <tr>
           <td onClick={() => goToFleets()} style={{cursor: 'pointer'}}>
-            <InFlightResources fleets={account.fleets} />
+            <InFlightResources fleets={account.fleets} planetList={account.planetList} />
           </td>
-          <td onClick={() => goToFleets()} style={{cursor: 'pointer'}}>
+          {/* <td onClick={() => goToFleets()} style={{cursor: 'pointer'}}>
             <InFlightShips fleets={account.fleets} />
-          </td>
+          </td> */}
           <td>
             {account.planetSum === undefined ? (
               ''

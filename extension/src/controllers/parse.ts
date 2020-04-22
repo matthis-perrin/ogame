@@ -1,5 +1,4 @@
 import {PAGES_SHIPS, PAGES_TECHNOLOGIES} from '@src/models/constants';
-import {Fleet} from '@src/models/fleets';
 import {PlanetId} from '@src/models/planets';
 import {Technology} from '@src/models/technologies';
 import {parseFleets} from '@src/parsers/fleets';
@@ -57,11 +56,8 @@ export function parseUI(): void {
     console.log(`Ships parsed ${ships.length}`);
   }
 
-  let fleets: Fleet[] | undefined;
-  if (document.location.search.includes('component=movement')) {
-    fleets = parseFleets();
-    console.log(`Fleets parsed ${fleets.length}`);
-  }
+  const fleets = parseFleets();
+  console.log(`Fleets parsed ${fleets.length}`);
 
   console.log('OK');
 

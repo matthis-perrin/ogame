@@ -6,7 +6,7 @@ import {SolarSatellite} from '@shared/models/ships';
 import {persist} from '@src/controllers/storage';
 import {Account, AccountPlanet, findPlanetId} from '@src/models/account';
 import {ACCOUNT_TECHNOLOGIES, MAX_TECHNOLOGIES, UI_REFRESH_RATE} from '@src/models/constants';
-import {Fleet, MissionTypeEnum, ReturnFlight} from '@src/models/fleets';
+import {Fleet, MissionTypeEnum} from '@src/models/fleets';
 import {Planet, PlanetId} from '@src/models/planets';
 import {ResourceAmount, Resources} from '@src/models/resources';
 import {generateConstructionId, Technology} from '@src/models/technologies';
@@ -89,25 +89,73 @@ export function addPlanet(
   resources: Resources,
   technologies: Technology[],
   ships: Technology[] | undefined,
-  fleets: Fleet[] | undefined
+  fleets: Fleet[]
 ): void {
   const account: Account = {
     planetList,
     planetDetails: currentAccount?.planetDetails ?? {},
     maxTechnologies: currentAccount?.maxTechnologies ?? {},
     accountTechnologies: currentAccount?.accountTechnologies ?? {},
-    fleets: currentAccount?.fleets ?? {},
-    planetSum: undefined,
+    fleets: {},
     constructions: currentAccount?.constructions ?? {},
+    planetSum: undefined,
   };
 
-  // Add all fleets
-  // fleets === undefined => not parsed
-  if (fleets !== undefined) {
-    account.fleets = {};
-    for (const fleet of fleets) {
-      account.fleets[fleet.fleetId] = fleet;
+  // Clean old fleets
+  const oldFleets = currentAccount?.fleets ?? {};
+  const nowSeconds = Math.floor(new Date().getTime() / 1000);
+  for (const fleetId in oldFleets) {
+    if (oldFleets.hasOwnProperty(fleetId)) {
+      const fleet = oldFleets[fleetId];
+      if (nowSeconds >= fleet.arrivalTime) {
+        const destPlanetId = findPlanetId(planetList, fleet.destinationName);
+        // Auto-removing returning attacking/transporting fleets when on fleet page of destination planet
+        if (
+          (fleet.missionType === MissionTypeEnum.Attacking ||
+            fleet.missionType === MissionTypeEnum.Transport ||
+            fleet.missionType === MissionTypeEnum.Expedition) &&
+          fleet.returnFlight &&
+          document.location.search.includes('component=fleetdispatch') &&
+          destPlanetId === planetId
+        ) {
+          continue;
+        }
+        // Auto-removing deploying fleets when on fleet page of destination planet
+        if (
+          fleet.missionType === MissionTypeEnum.Deployment &&
+          document.location.search.includes('component=fleetdispatch') &&
+          destPlanetId === planetId
+        ) {
+          continue;
+        }
+        // Auto-removing non-returning transport fleets when on any page of destination planet
+        if (
+          fleet.missionType === MissionTypeEnum.Transport &&
+          !fleet.returnFlight &&
+          destPlanetId === planetId
+        ) {
+          continue;
+        }
+      } else {
+        // Check fleet cancellation and removing if needed
+        let fleetStillAvailable = false;
+        for (const newFleet of fleets) {
+          if (newFleet.fleetId === fleetId) {
+            fleetStillAvailable = true;
+            break;
+          }
+        }
+        if (!fleetStillAvailable) {
+          continue;
+        }
+      }
+      account.fleets[fleetId] = fleet;
     }
+  }
+
+  // Add all fleets
+  for (const fleet of fleets) {
+    account.fleets[fleet.fleetId] = fleet;
   }
 
   // Handle new constructions
@@ -133,7 +181,8 @@ export function addPlanet(
         target: t.target,
         targetEndSeconds: t.targetEndSeconds,
       };
-    } else {
+      // Exception: don't update constructions on fleet page
+    } else if (!document.location.search.includes('component=fleetdispatch')) {
       // Removing finished constructions because it is getting updating with new technology info
       const constructionId = generateConstructionId(planetId, t.techId);
       // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
@@ -298,12 +347,36 @@ function applyProduction(): void {
   for (const fleetId in currentAccount.fleets) {
     if (currentAccount.fleets.hasOwnProperty(fleetId)) {
       const fleet = currentAccount.fleets[fleetId];
-      if (nowSeconds >= fleet.midTime) {
-        if (fleet.returnFlight || fleet.missionType === MissionTypeEnum.Deployment) {
-          // TODO: Handle resource drop
-        } else {
-          fleet.returnFlight = true as ReturnFlight;
-          fleet.midTime = fleet.arrivalTime;
+      // Handling resources for transport return
+      if (fleet.missionType === MissionTypeEnum.Transport && fleet.returnFlight) {
+        // IDs are incremental
+        const notReturningFleetId = parseFloat(fleetId) - 1;
+        if (currentAccount.fleets.hasOwnProperty(notReturningFleetId)) {
+          const notReturningFleet = currentAccount.fleets[notReturningFleetId];
+          if (
+            notReturningFleet.missionType === MissionTypeEnum.Transport &&
+            !notReturningFleet.returnFlight &&
+            notReturningFleet.destinationCoords === fleet.originCoords &&
+            notReturningFleet.originCoords === fleet.destinationCoords
+          ) {
+            fleet.resources.metal = 0 as ResourceAmount;
+            fleet.resources.crystal = 0 as ResourceAmount;
+            fleet.resources.deuterium = 0 as ResourceAmount;
+          }
+        }
+      }
+      if (nowSeconds >= fleet.arrivalTime) {
+        // Auto-removing attacking/expedition fleets that don't return
+        if (
+          (fleet.missionType === MissionTypeEnum.Attacking ||
+            fleet.missionType === MissionTypeEnum.Expedition) &&
+          !fleet.returnFlight
+        ) {
+          continue;
+        }
+        // Auto-removing espionage fleets
+        if (fleet.missionType === MissionTypeEnum.Espionage) {
+          continue;
         }
       }
       account.fleets[fleetId] = fleet;
