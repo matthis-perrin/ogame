@@ -9,7 +9,8 @@ import {
 } from '@shared/models/resource';
 
 export interface Building extends BuildableBase {
-  type: 'building';
+  readonly type: 'building';
+  cost(level: number): Resources;
 }
 
 function makeBuilding(

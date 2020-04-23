@@ -1,38 +1,37 @@
-import {BuildableType} from '@shared/models/buildable';
+import {Buildable, BuildableType} from '@shared/models/buildable';
 import {Building} from '@shared/models/building';
 import {Defense} from '@shared/models/defense';
-import {Planet} from '@shared/models/planet';
+import {PlanetId} from '@shared/models/planet';
 import {Ship} from '@shared/models/ships';
 import {Technology} from '@shared/models/technology';
 
 interface BuildItemBase {
   type: BuildableType;
+  planetId: PlanetId;
+  buildable: Buildable;
 }
 
 export interface ShipBuildItem extends BuildItemBase {
   type: 'ship';
-  ship: Ship;
+  buildable: Ship;
   quantity: number;
-  planet: Planet;
 }
 
 export interface DefenseBuildItem extends BuildItemBase {
   type: 'defense';
-  defense: Defense;
+  buildable: Defense;
   quantity: number;
-  planet: Planet;
 }
 
 export interface BuildingBuildItem extends BuildItemBase {
   type: 'building';
-  building: Building;
+  buildable: Building;
   level: number;
-  planet: Planet;
 }
 
 export interface TechnologyBuildItem extends BuildItemBase {
   type: 'technology';
-  technology: Technology;
+  buildable: Technology;
   level: number;
 }
 

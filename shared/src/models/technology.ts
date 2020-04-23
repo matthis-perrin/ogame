@@ -9,8 +9,9 @@ import {
 } from '@shared/models/resource';
 
 export interface Technology extends BuildableBase {
-  type: 'technology';
-  isUseful: boolean;
+  readonly type: 'technology';
+  cost(level: number): Resources;
+  readonly isUseful: boolean;
 }
 
 function makeTechnology(

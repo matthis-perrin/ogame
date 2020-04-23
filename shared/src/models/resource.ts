@@ -15,10 +15,11 @@ export type EnergyAmount = Brand<number, 'EnergyAmount'>;
 export const ZERO_METAL = 0 as MetalAmount;
 export const ZERO_CRYSTAL = 0 as CrystalAmount;
 export const ZERO_DEUTERIUM = 0 as DeuteriumAmount;
+export const ZERO_ENERGY = 0 as EnergyAmount;
 export interface Resources {
-  metal: MetalAmount;
-  crystal: CrystalAmount;
-  deuterium: DeuteriumAmount;
+  readonly metal: MetalAmount;
+  readonly crystal: CrystalAmount;
+  readonly deuterium: DeuteriumAmount;
 }
 
 export function makeResources(values: {m?: number; c?: number; d?: number}): Resources {
@@ -28,13 +29,6 @@ export function makeResources(values: {m?: number; c?: number; d?: number}): Res
     crystal: c as CrystalAmount,
     deuterium: d as DeuteriumAmount,
   };
-}
-
-export function incrementResources(r1: Resources, increment: Resources): void {
-  const {metal, crystal, deuterium} = increment;
-  r1.metal = sum(r1.metal, metal);
-  r1.crystal = sum(r1.crystal, crystal);
-  r1.deuterium = sum(r1.deuterium, deuterium);
 }
 
 export function addResources(r1: Resources, r2: Resources): Resources {
@@ -59,4 +53,8 @@ export function substractResources(r1: Resources, r2: Resources): Resources {
     crystal: substract(r1.crystal, r2.crystal),
     deuterium: substract(r1.deuterium, r2.deuterium),
   };
+}
+
+export function hasNegativeAmount({metal, crystal, deuterium}: Resources): boolean {
+  return metal < 0 || crystal < 0 || deuterium < 0;
 }

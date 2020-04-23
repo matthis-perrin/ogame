@@ -2,100 +2,162 @@ import {uniqBy} from 'lodash-es';
 import React, {FC} from 'react';
 import styled from 'styled-components';
 
-import {applyBuildItem, createBenjAccount, createNewAccount} from '@shared/lib/account';
+import {createNewAccount, updateAccountPlanet, updateAccountTechnology} from '@shared/lib/account';
 import {
-  BuildOrderItem,
-  buildOrderItemAreEqual,
-  buildOrderItemToString,
+  buildableRequirementToString,
+  buildItemCost,
+  buildItemToString,
+} from '@shared/lib/build_items';
+import {
   getAvailableBuildingsForPlanet,
   getAvailableTechnologiesForAccount,
 } from '@shared/lib/build_order';
-import {getAccountProductionPerHour, getPlanetProductionPerHour} from '@shared/lib/production';
+import {updatePlanetBuilding} from '@shared/lib/planet';
 import {
+  buildableRequirementAreEqual,
   computeRequirementTree,
   getRequirementTreeLeaves,
   removeRequirementFromTree,
 } from '@shared/lib/requirement_tree';
 import {toStandardUnits} from '@shared/lib/resources';
+import {createAccountTimeline} from '@shared/lib/timeline';
+import {BuildItem} from '@shared/models/build_item';
+import {BuildableRequirement} from '@shared/models/buildable';
 import {PlasmaTurret} from '@shared/models/defense';
 import {setupRapidFire, setupRequirements} from '@shared/models/dependencies';
+import {Planet, PlanetId} from '@shared/models/planet';
 import {Destroyer} from '@shared/models/ships';
+import {AstrophysicsTechnology} from '@shared/models/technology';
+import {timeToString} from '@shared/models/time';
 import {Rosalind} from '@shared/models/universe';
-import {arrayJoin} from '@shared/utils/array_utils';
 
-import {BuildOrderItemView} from '@src/components/build_order_item_view';
+import {BuildItemView} from '@src/components/build_item_view';
 
 setupRapidFire();
 setupRequirements();
 
-const account = createNewAccount(Rosalind);
-// console.log(getAccountProductionPerHour(account));
+const target = Destroyer;
+let account = createNewAccount(Rosalind);
+function getMainPlanet(): Planet {
+  return Array.from(account.planets.values())[0];
+}
+const startPoint = {...account};
 
-const benjAccount = createBenjAccount();
-console.log(getAccountProductionPerHour(benjAccount));
-for (const p of benjAccount.planets) {
-  console.log(getPlanetProductionPerHour(benjAccount, p));
+function buildRequirementToBuildItem(
+  requirement: BuildableRequirement,
+  planetId: PlanetId
+): BuildItem {
+  if (requirement.entity.type === 'building') {
+    return {
+      type: 'building',
+      buildable: requirement.entity,
+      level: requirement.level,
+      planetId,
+    };
+  }
+  return {
+    type: 'technology',
+    buildable: requirement.entity,
+    level: requirement.level,
+    planetId,
+  };
 }
 
-const mainPlanet = account.planets[0];
-// mainPlanet.buildingLevels.set(ResearchLab, 2);
-function nextBuildOrderItem(nextEssentialBuilds: BuildOrderItem[]): BuildOrderItem {
-  const availableBuildings: BuildOrderItem[] = getAvailableBuildingsForPlanet(account, mainPlanet);
-  const availableTechonologies: BuildOrderItem[] = getAvailableTechnologiesForAccount(
+function nextBuildableRequirement(
+  nextEssentialBuilds: BuildableRequirement[]
+): BuildableRequirement {
+  const availableBuildings: BuildableRequirement[] = getAvailableBuildingsForPlanet(
     account,
-    mainPlanet
+    getMainPlanet().id
+  );
+  const availableTechonologies: BuildableRequirement[] = getAvailableTechnologiesForAccount(
+    account,
+    getMainPlanet().id
   );
   const availableItems = uniqBy(
     [...availableBuildings, ...availableTechonologies, ...nextEssentialBuilds],
-    buildOrderItemToString
+    buildableRequirementToString
   );
   let totalScore = 0;
-  const availableItemsAndScore: [BuildOrderItem, number][] = availableItems.map(item => {
-    const score = 1 / toStandardUnits(account, item.entity.cost(item.level));
+  const availableItemsAndScore: [BuildableRequirement, number][] = availableItems.map(item => {
+    const score =
+      1 /
+      toStandardUnits(
+        account,
+        buildItemCost(buildRequirementToBuildItem(item, getMainPlanet().id))
+      );
     totalScore += score;
     return [item, score];
   });
 
-  const r = Math.random() * totalScore;
-  let current = 0;
-  for (const [item, score] of availableItemsAndScore) {
-    current += score;
-    if (r < current) {
-      return item;
-    }
-  }
+  // Cheapest first
+  return availableItemsAndScore.sort((a, b) => b[1] - a[1])[0][0];
+
+  // // Weighted Random
+  // const r = Math.random() * totalScore;
+  // let current = 0;
+  // for (const [item, score] of availableItemsAndScore) {
+  //   current += score;
+  //   if (r < current) {
+  //     return item;
+  //   }
+  // }
 
   throw new Error(`Failure to pick a build order item`);
 }
 
-const buildOrder: BuildOrderItem[] = [];
-const buildTree = computeRequirementTree(PlasmaTurret);
+const buildOrder: BuildItem[] = [];
+const buildTree = computeRequirementTree(target);
 
 while (buildTree.children.length > 0) {
-  let leaves = getRequirementTreeLeaves(buildTree).map(leaf => ({...leaf, planet: mainPlanet}));
+  let leaves = getRequirementTreeLeaves(buildTree);
   while (leaves.length > 0) {
-    const next = nextBuildOrderItem(leaves);
-    const newLeaves = leaves.filter(leaf => !buildOrderItemAreEqual(leaf, next));
-    applyBuildItem(account, next);
-    // console.log(getAccountProductionPerHour(account));
+    const next = nextBuildableRequirement(leaves);
+    if (next.entity.type === 'building') {
+      account = updateAccountPlanet(
+        account,
+        updatePlanetBuilding(getMainPlanet(), next.entity, next.level)
+      );
+    } else {
+      account = updateAccountTechnology(account, next.entity, next.level);
+    }
+    const nextAsBuildItem = buildRequirementToBuildItem(next, getMainPlanet().id);
+    const newLeaves = leaves.filter(leaf => !buildableRequirementAreEqual(leaf, next));
     if (newLeaves.length !== leaves.length) {
       removeRequirementFromTree(buildTree, next);
-      leaves = getRequirementTreeLeaves(buildTree).map(leaf => ({...leaf, planet: mainPlanet}));
+      leaves = getRequirementTreeLeaves(buildTree).map(leaf => ({
+        ...leaf,
+        planetId: getMainPlanet().id,
+      }));
     }
-    buildOrder.push(next);
+    buildOrder.push(nextAsBuildItem);
   }
 }
 
 if (buildTree.target.type === 'building' || buildTree.target.type === 'technology') {
-  const lastEssential = {entity: buildTree.target, level: 1, planet: mainPlanet};
+  const lastEssential = {entity: buildTree.target, level: 1, planetId: getMainPlanet().id};
   while (true) {
-    const next = nextBuildOrderItem([lastEssential]);
-    buildOrder.push(next);
-    if (buildOrderItemAreEqual(next, lastEssential)) {
+    const next = nextBuildableRequirement([lastEssential]);
+    const nextAsBuildItem = buildRequirementToBuildItem(next, getMainPlanet().id);
+    buildOrder.push(nextAsBuildItem);
+    if (buildableRequirementAreEqual(next, lastEssential)) {
       break;
     }
   }
 }
+
+console.log('BUILD ORDER');
+console.log(JSON.stringify(buildOrder.map(buildItemToString), undefined, 2));
+const tStart = performance.now();
+const timeline = createAccountTimeline(startPoint, buildOrder);
+const tEnd = performance.now();
+console.log(timeline);
+console.log(
+  timeToString(
+    timeline.transitions[timeline.transitions.length - 1].transitionnedAccount.currentTime
+  )
+);
+console.log(`Computed in ${tEnd - tStart} ms`);
 
 // while (buildTree.children.length > 0) {
 //   const leaves = getRequirementTreeLeaves(buildTree);
@@ -106,24 +168,22 @@ if (buildTree.target.type === 'building' || buildTree.target.type === 'technolog
 
 export const App: FC = () => (
   <Wrapper>
-    <Column>
+    {/* <Column>
       <ColumnTitle>Build Order</ColumnTitle>
       <Separator />
       {arrayJoin(
-        buildOrder.map(item => (
-          <BuildOrderItemView key={`${item.entity.name}-${item.level}`} item={item} />
-        )),
+        buildOrder.map(item => <BuildItemView key={buildItemToString(item)} item={item} />),
         i => (
           <Separator key={i} />
         )
       )}
-    </Column>
+    </Column> */}
     {/* <Column>
       <ColumnTitle>Available buildings on main planet</ColumnTitle>
       <Separator />
       {arrayJoin(
         availableBuildings.map(item => (
-          <BuildOrderItemView key={`${item.entity.name}-${item.level}`} item={item} />
+          <BuildItemView key={`${item.entity.name}-${item.level}`} item={item} />
         )),
         i => (
           <Separator key={i} />
@@ -135,7 +195,7 @@ export const App: FC = () => (
       <Separator />
       {arrayJoin(
         availableTechonologies.map(item => (
-          <BuildOrderItemView key={`${item.entity.name}-${item.level}`} item={item} />
+          <BuildItemView key={`${item.entity.name}-${item.level}`} item={item} />
         )),
         i => (
           <Separator key={i} />

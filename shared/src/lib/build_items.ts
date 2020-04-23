@@ -4,30 +4,44 @@ import {isBuildableAvailableOnPlanet} from '@shared/lib/requirement_tree';
 import {Account} from '@shared/models/account';
 import {BuildItem} from '@shared/models/build_item';
 import {Buildable, BuildableRequirement} from '@shared/models/buildable';
-import {NaniteFactory, ResearchLab, RoboticsFactory} from '@shared/models/building';
+import {
+  CrystalMine,
+  DeuteriumSynthesizer,
+  FusionReactor,
+  MetalMine,
+  NaniteFactory,
+  ResearchLab,
+  RoboticsFactory,
+  SolarPlant,
+} from '@shared/models/building';
 import {Planet} from '@shared/models/planet';
 import {
-  incrementResources,
-  makeResources,
+  CrystalAmount,
+  DeuteriumAmount,
+  MetalAmount,
   multiplyResources,
   Resources,
   substractResources,
+  ZERO_CRYSTAL,
+  ZERO_DEUTERIUM,
+  ZERO_METAL,
 } from '@shared/models/resource';
+import {Crawler, SolarSatellite} from '@shared/models/ships';
 import {hoursToMilliseconds, Milliseconds, ZERO} from '@shared/models/time';
 import {divide, max, neverHappens, substract, sum} from '@shared/utils/type_utils';
 
 export function getBuildItemCost(buildItem: BuildItem): Resources {
   if (buildItem.type === 'building') {
-    return buildItem.building.cost(buildItem.level);
+    return buildItem.buildable.cost(buildItem.level);
   }
   if (buildItem.type === 'technology') {
-    return buildItem.technology.cost(buildItem.level);
+    return buildItem.buildable.cost(buildItem.level);
   }
   if (buildItem.type === 'ship') {
-    return multiplyResources(buildItem.ship.cost, buildItem.quantity);
+    return multiplyResources(buildItem.buildable.cost, buildItem.quantity);
   }
   if (buildItem.type === 'defense') {
-    return multiplyResources(buildItem.defense.cost, buildItem.quantity);
+    return multiplyResources(buildItem.buildable.cost, buildItem.quantity);
   }
   neverHappens(
     buildItem,
@@ -143,15 +157,15 @@ export function buildItemsToMeetRequirementOnPlanet(
 
   for (let nextLevel = currentLevel + 1; nextLevel <= level; nextLevel++) {
     if (entity.type === 'technology') {
-      items.push({type: entity.type, technology: entity, level: nextLevel});
+      items.push({type: 'technology', buildable: entity, level: nextLevel, planetId: planet.id});
     } else if (entity.type === 'building') {
-      items.push({type: entity.type, building: entity, level: nextLevel, planet});
+      items.push({type: 'building', buildable: entity, level: nextLevel, planetId: planet.id});
     } else {
       neverHappens(entity, `Unknown entity type ${entity['type']}`);
     }
   }
 
-  if (currentLevel === 0 && !isBuildableAvailableOnPlanet(account, planet, entity)) {
+  if (currentLevel === 0 && !isBuildableAvailableOnPlanet(account, planet, entity).isAvailable) {
     for (const entityRequirement of entity.requirements) {
       items.push(...buildItemsToMeetRequirementOnPlanet(account, planet, entityRequirement));
     }
@@ -165,7 +179,7 @@ export function buildItemsToUnlockBuildableOnPlanet(
   planet: Planet,
   buildable: Buildable
 ): BuildItem[] {
-  if (isBuildableAvailableOnPlanet(account, planet, buildable)) {
+  if (isBuildableAvailableOnPlanet(account, planet, buildable).isAvailable) {
     return [];
   }
   const items: BuildItem[] = [];
@@ -177,24 +191,56 @@ export function buildItemsToUnlockBuildableOnPlanet(
 
 export function buildItemCost(buildItem: BuildItem): Resources {
   if (buildItem.type === 'building') {
-    return buildItem.building.cost(buildItem.level);
+    return buildItem.buildable.cost(buildItem.level);
   }
   if (buildItem.type === 'technology') {
-    return buildItem.technology.cost(buildItem.level);
+    return buildItem.buildable.cost(buildItem.level);
   }
   if (buildItem.type === 'ship') {
-    return multiplyResources(buildItem.ship.cost, buildItem.quantity);
+    return multiplyResources(buildItem.buildable.cost, buildItem.quantity);
   }
   if (buildItem.type === 'defense') {
-    return multiplyResources(buildItem.defense.cost, buildItem.quantity);
+    return multiplyResources(buildItem.buildable.cost, buildItem.quantity);
   }
   neverHappens(buildItem, `Unknown build item type ${buildItem['type']}`);
 }
 
 export function buildItemsCost(buildItems: BuildItem[]): Resources {
-  const cost = makeResources({});
+  const metal: MetalAmount = ZERO_METAL;
+  const crystal: CrystalAmount = ZERO_CRYSTAL;
+  const deuterium: DeuteriumAmount = ZERO_DEUTERIUM;
   for (const buildItem of buildItems) {
-    incrementResources(cost, buildItemCost(buildItem));
+    const cost = buildItemCost(buildItem);
+    sum(metal, cost.metal);
+    sum(crystal, cost.crystal);
+    sum(deuterium, cost.deuterium);
   }
-  return cost;
+  return {metal, crystal, deuterium};
+}
+
+export function buildItemToString(buildItem: BuildItem): string {
+  return buildItem.type === 'technology' || buildItem.type === 'building'
+    ? `${buildItem.buildable.name} lvl ${buildItem.level} on ${buildItem.planetId}`
+    : `${buildItem.buildable.name} x ${buildItem.quantity} on ${buildItem.planetId}`;
+}
+
+export function buildableRequirementToString(item: BuildableRequirement): string {
+  return `${item.entity.name} lvl ${item.level}`;
+}
+
+export function isEnergyConsumerBuildable(buildable: Buildable): boolean {
+  return (
+    (buildable.type === 'building' &&
+      (buildable === MetalMine ||
+        buildable === CrystalMine ||
+        buildable === DeuteriumSynthesizer)) ||
+    (buildable.type === 'ship' && buildable === Crawler)
+  );
+}
+
+export function isEnergyProducerBuildable(buildable: Buildable): boolean {
+  return (
+    (buildable.type === 'building' && buildable === SolarPlant && buildable === FusionReactor) ||
+    (buildable.type === 'ship' && buildable === SolarSatellite)
+  );
 }

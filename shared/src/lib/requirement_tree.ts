@@ -1,3 +1,4 @@
+import {buildableRequirementToString} from '@shared/lib/build_items';
 import {Account} from '@shared/models/account';
 import {Buildable, BuildableRequirement} from '@shared/models/buildable';
 import {Building} from '@shared/models/building';
@@ -15,7 +16,7 @@ interface RequirementTreeNode {
   children: RequirementTreeNode[];
 }
 
-function requirementsAreEqual(
+export function buildableRequirementAreEqual(
   requirement1: BuildableRequirement,
   requirement2: BuildableRequirement
 ): boolean {
@@ -78,7 +79,7 @@ function removeRequirementFromTreeNode<Node extends {children: RequirementTreeNo
   requirement: BuildableRequirement
 ): void {
   node.children = node.children.filter(child => {
-    if (requirementsAreEqual(child.requirement, requirement)) {
+    if (buildableRequirementAreEqual(child.requirement, requirement)) {
       if (child.children.length > 0) {
         throw new Error(
           `Can not remove requirement "${requirementToDebugString(
@@ -104,19 +105,25 @@ export function isBuildableAvailableOnPlanet(
   account: Account,
   planet: Planet,
   buildable: Buildable
-): boolean {
+): {isAvailable: false; reason: string} | {isAvailable: true} {
   for (const requirement of buildable.requirements) {
     if (requirement.entity.type === 'building') {
       if ((planet.buildingLevels.get(requirement.entity) ?? 0) < requirement.level) {
-        return false;
+        return {
+          isAvailable: false,
+          reason: `${buildableRequirementToString(requirement)} required`,
+        };
       }
     } else if (requirement.entity.type === 'technology') {
       if ((account.technologyLevels.get(requirement.entity) ?? 0) < requirement.level) {
-        return false;
+        return {
+          isAvailable: false,
+          reason: `${buildableRequirementToString(requirement)} required`,
+        };
       }
     } else {
       neverHappens(requirement.entity, `Invalid requirement type "${requirement.entity['type']}"`);
     }
   }
-  return true;
+  return {isAvailable: true};
 }

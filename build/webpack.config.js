@@ -99,7 +99,7 @@ function getWebpackConfig(directory, entryPoint, isFrontend) {
     output: {
       path: join(directory, 'dist'),
     },
-    devtool: 'source-map',
+    devtool: 'eval-source-map',
 
     module: {
       rules: isFrontend

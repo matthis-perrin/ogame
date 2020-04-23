@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import {Class} from '@shared/models/account';
 import {Building} from '@shared/models/building';
+import {Defense} from '@shared/models/defense';
 import {CrystalAmount, DeuteriumAmount, EnergyAmount, MetalAmount} from '@shared/models/resource';
 import {Ship} from '@shared/models/ships';
 import {Technology} from '@shared/models/technology';
@@ -169,7 +170,21 @@ export function getShipsBuildTime(
   naniteFactoryLevel: number,
   universeEconomySpeed: number
 ): Milliseconds {
-  const {metal, crystal} = ship.cost(0);
+  const {metal, crystal} = ship.cost;
+  const hours =
+    ((metal as number) + (crystal as number)) /
+    (2500 * (1 + shipyardLevel) * Math.pow(2, naniteFactoryLevel));
+  return hoursToMilliseconds((hours * quantity) / universeEconomySpeed);
+}
+
+export function getDefensesBuildTime(
+  defense: Defense,
+  quantity: number,
+  shipyardLevel: number,
+  naniteFactoryLevel: number,
+  universeEconomySpeed: number
+): Milliseconds {
+  const {metal, crystal} = defense.cost;
   const hours =
     ((metal as number) + (crystal as number)) /
     (2500 * (1 + shipyardLevel) * Math.pow(2, naniteFactoryLevel));
