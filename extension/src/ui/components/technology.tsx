@@ -2,16 +2,48 @@ import React, {FC, Fragment} from 'react';
 import styled from 'styled-components';
 
 import {COLOR_ORANGE, COLOR_RED} from '@src/models/constants';
+import {PlanetId} from '@src/models/planets';
 import {Technology} from '@src/models/technologies';
+import {addObjectives} from '@src/stores/store_account';
 
 interface TechnologyProps {
   name: string;
   technologies: {[techId: number]: Technology};
   techId: number;
+  planetId: PlanetId;
   required?: number;
 }
 
-export const TechnologyC: FC<TechnologyProps> = ({name, technologies, techId, required}) => {
+const SubTechnology: FC<{
+  technology: Technology;
+  missingAmount: number | undefined;
+  planetId: PlanetId;
+}> = ({technology, missingAmount, planetId}) => (
+  <Fragment>
+    <Value
+      onClick={e => {
+        e.stopPropagation();
+        addObjectives(planetId, {
+          techId: technology.techId,
+          value: technology.value,
+          target: technology.value + 1,
+        });
+      }}
+    >
+      {technology.value}
+    </Value>
+    {technology.target !== undefined ? <span>+{technology.target - technology.value}</span> : ''}
+    {missingAmount === undefined || missingAmount <= 0 ? '' : <span> ({missingAmount})</span>}
+  </Fragment>
+);
+
+export const TechnologyC: FC<TechnologyProps> = ({
+  name,
+  technologies,
+  techId,
+  planetId,
+  required,
+}) => {
   let technology: Technology | undefined;
   if (technologies.hasOwnProperty(techId)) {
     technology = technologies[techId];
@@ -33,12 +65,16 @@ export const TechnologyC: FC<TechnologyProps> = ({name, technologies, techId, re
   return (
     <Fragment>
       <TechnologyContainer className={className}>
-        {name}:{' '}
-        {technology !== undefined
-          ? `${technology.value}${
-              technology.target !== undefined ? `+${technology.target - technology.value}` : ''
-            }${missingAmount === undefined || missingAmount <= 0 ? '' : ` (${missingAmount})`}`
-          : '0'}
+        <span>{name}: </span>
+        {technology !== undefined ? (
+          <SubTechnology
+            technology={technology}
+            missingAmount={missingAmount}
+            planetId={planetId}
+          />
+        ) : (
+          <span>0</span>
+        )}
       </TechnologyContainer>
     </Fragment>
   );
@@ -50,5 +86,12 @@ const TechnologyContainer = styled.div`
   }
   &.orange {
     color: ${COLOR_ORANGE};
+  }
+`;
+
+const Value = styled.span`
+  cursor: pointer;
+  &:hover {
+    text-decoration: underline;
   }
 `;

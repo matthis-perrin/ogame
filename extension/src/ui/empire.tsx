@@ -46,6 +46,7 @@ import {Account} from '@src/models/account';
 import {
   COLLECTOR_BONUS_ENERGY,
   COLLECTOR_BONUS_FRET,
+  COLOR_GREEN,
   DEBRIS_PERCENTAGE,
   DEBRIS_SAT,
   INACTIVITY_TIME,
@@ -175,11 +176,10 @@ export const Empire: FC<EmpireProps> = ({account}) => {
                 const satNumber = planet.technologies.hasOwnProperty(SolarSatellite.id)
                   ? planet.technologies[SolarSatellite.id].value
                   : 0;
-                requiredSat =
-                  (satNumber as number) + Math.ceil(-planet.resources.energy / satEnergy);
+                requiredSat = satNumber + Math.ceil(-planet.resources.energy / satEnergy);
               }
               return (
-                <tr key={p.id}>
+                <PlanetLine key={p.id} className={p.id === account.currentPlanetId ? 'active' : ''}>
                   <td>
                     <Line>
                       <Resource
@@ -232,6 +232,7 @@ export const Empire: FC<EmpireProps> = ({account}) => {
                         name="M"
                         technologies={planet.technologies}
                         techId={MetalMine.id}
+                        planetId={planet.planetId}
                         required={
                           account.maxTechnologies.hasOwnProperty(MetalMine.id)
                             ? account.maxTechnologies[MetalMine.id]
@@ -242,6 +243,7 @@ export const Empire: FC<EmpireProps> = ({account}) => {
                         name="C"
                         technologies={planet.technologies}
                         techId={CrystalMine.id}
+                        planetId={planet.planetId}
                         required={
                           account.maxTechnologies.hasOwnProperty(CrystalMine.id)
                             ? account.maxTechnologies[CrystalMine.id]
@@ -252,6 +254,7 @@ export const Empire: FC<EmpireProps> = ({account}) => {
                         name="D"
                         technologies={planet.technologies}
                         techId={DeuteriumSynthesizer.id}
+                        planetId={planet.planetId}
                         required={
                           account.maxTechnologies.hasOwnProperty(DeuteriumSynthesizer.id)
                             ? account.maxTechnologies[DeuteriumSynthesizer.id]
@@ -266,6 +269,7 @@ export const Empire: FC<EmpireProps> = ({account}) => {
                         name="Sol"
                         technologies={planet.technologies}
                         techId={SolarPlant.id}
+                        planetId={planet.planetId}
                         required={
                           account.maxTechnologies.hasOwnProperty(SolarPlant.id)
                             ? account.maxTechnologies[SolarPlant.id]
@@ -276,6 +280,7 @@ export const Empire: FC<EmpireProps> = ({account}) => {
                         name="Sat"
                         technologies={planet.technologies}
                         techId={SolarSatellite.id}
+                        planetId={planet.planetId}
                         required={requiredSat}
                       />
                       <Energy name="E" amount={planet.resources.energy} />
@@ -287,6 +292,7 @@ export const Empire: FC<EmpireProps> = ({account}) => {
                         name="M"
                         technologies={planet.technologies}
                         techId={MetalStorage.id}
+                        planetId={planet.planetId}
                         required={
                           account.maxTechnologies.hasOwnProperty(MetalStorage.id)
                             ? account.maxTechnologies[MetalStorage.id]
@@ -297,6 +303,7 @@ export const Empire: FC<EmpireProps> = ({account}) => {
                         name="C"
                         technologies={planet.technologies}
                         techId={CrystalStorage.id}
+                        planetId={planet.planetId}
                         required={
                           account.maxTechnologies.hasOwnProperty(CrystalStorage.id)
                             ? account.maxTechnologies[CrystalStorage.id]
@@ -307,6 +314,7 @@ export const Empire: FC<EmpireProps> = ({account}) => {
                         name="D"
                         technologies={planet.technologies}
                         techId={DeuteriumTank.id}
+                        planetId={planet.planetId}
                         required={
                           account.maxTechnologies.hasOwnProperty(DeuteriumTank.id)
                             ? account.maxTechnologies[DeuteriumTank.id]
@@ -317,6 +325,7 @@ export const Empire: FC<EmpireProps> = ({account}) => {
                         name="Silo"
                         technologies={planet.technologies}
                         techId={MissileSilo.id}
+                        planetId={planet.planetId}
                         required={
                           account.maxTechnologies.hasOwnProperty(MissileSilo.id)
                             ? account.maxTechnologies[MissileSilo.id]
@@ -331,6 +340,7 @@ export const Empire: FC<EmpireProps> = ({account}) => {
                         name="Rob"
                         technologies={planet.technologies}
                         techId={RoboticsFactory.id}
+                        planetId={planet.planetId}
                         required={
                           account.maxTechnologies.hasOwnProperty(RoboticsFactory.id)
                             ? account.maxTechnologies[RoboticsFactory.id]
@@ -341,6 +351,7 @@ export const Empire: FC<EmpireProps> = ({account}) => {
                         name="Spa"
                         technologies={planet.technologies}
                         techId={Shipyard.id}
+                        planetId={planet.planetId}
                         required={
                           account.maxTechnologies.hasOwnProperty(Shipyard.id)
                             ? account.maxTechnologies[Shipyard.id]
@@ -351,11 +362,13 @@ export const Empire: FC<EmpireProps> = ({account}) => {
                         name="Lab"
                         technologies={planet.technologies}
                         techId={ResearchLab.id}
+                        planetId={planet.planetId}
                       />
                       <TechnologyC
                         name="Nan"
                         technologies={planet.technologies}
                         techId={NaniteFactory.id}
+                        planetId={planet.planetId}
                         required={
                           account.maxTechnologies.hasOwnProperty(NaniteFactory.id)
                             ? account.maxTechnologies[NaniteFactory.id]
@@ -370,24 +383,28 @@ export const Empire: FC<EmpireProps> = ({account}) => {
                         name="LM"
                         technologies={planet.technologies}
                         techId={RocketLauncher.id}
+                        planetId={planet.planetId}
                         required={Math.ceil(RATIO_LM * totalLoot)}
                       />
                       <TechnologyC
                         name="ALO"
                         technologies={planet.technologies}
                         techId={HeavyLaser.id}
+                        planetId={planet.planetId}
                         required={Math.ceil(RATIO_ALO * totalLoot)}
                       />
                       <TechnologyC
                         name="GAU"
                         technologies={planet.technologies}
                         techId={GaussCannon.id}
+                        planetId={planet.planetId}
                         required={Math.ceil(RATIO_GAU * totalLoot)}
                       />{' '}
                       <TechnologyC
                         name="PLA"
                         technologies={planet.technologies}
                         techId={PlasmaTurret.id}
+                        planetId={planet.planetId}
                         required={Math.ceil(RATIO_PLA * totalLoot)}
                       />
                     </Line>
@@ -398,18 +415,21 @@ export const Empire: FC<EmpireProps> = ({account}) => {
                         name="PB"
                         technologies={planet.technologies}
                         techId={SmallShieldDome.id}
+                        planetId={planet.planetId}
                         required={1}
                       />
                       <TechnologyC
                         name="GB"
                         technologies={planet.technologies}
                         techId={LargeShieldDome.id}
+                        planetId={planet.planetId}
                         required={1}
                       />
                       <TechnologyC
                         name="MIS"
                         technologies={planet.technologies}
                         techId={MissileInterceptor.id}
+                        planetId={planet.planetId}
                         required={
                           planet.technologies.hasOwnProperty(MissileSilo.id) &&
                           planet.technologies[MissileSilo.id].value >= 2
@@ -421,19 +441,36 @@ export const Empire: FC<EmpireProps> = ({account}) => {
                   </td>
                   <td onClick={() => goToShips(planet.planetId)} style={{cursor: 'pointer'}}>
                     <Line>
-                      <TechnologyC name="PT" technologies={planet.ships} techId={SmallCargo.id} />
+                      <TechnologyC
+                        name="PT"
+                        technologies={planet.ships}
+                        techId={SmallCargo.id}
+                        planetId={planet.planetId}
+                      />
                       <TechnologyC
                         name="GT"
                         technologies={planet.ships}
                         techId={LargeCargo.id}
+                        planetId={planet.planetId}
                         required={requiredGt}
                       />
-                      <TechnologyC name="REC" technologies={planet.ships} techId={Recycler.id} />
-                      <TechnologyC name="COLO" technologies={planet.ships} techId={ColonyShip.id} />
+                      <TechnologyC
+                        name="REC"
+                        technologies={planet.ships}
+                        techId={Recycler.id}
+                        planetId={planet.planetId}
+                      />
+                      <TechnologyC
+                        name="COLO"
+                        technologies={planet.ships}
+                        techId={ColonyShip.id}
+                        planetId={planet.planetId}
+                      />
                       <TechnologyC
                         name="ESP"
                         technologies={planet.ships}
                         techId={EspionageProbe.id}
+                        planetId={planet.planetId}
                       />
                     </Line>
                   </td>
@@ -452,7 +489,7 @@ export const Empire: FC<EmpireProps> = ({account}) => {
                       <Loot name="Total" amount={totalLoot} />
                     </Line>
                   </td>
-                </tr>
+                </PlanetLine>
               );
             }
             return (
@@ -468,6 +505,12 @@ export const Empire: FC<EmpireProps> = ({account}) => {
     </Fragment>
   );
 };
+
+const PlanetLine = styled.tr`
+  &.active {
+    border: 1px solid ${COLOR_GREEN};
+  }
+`;
 
 const Line = styled.div`
   height: 70px;

@@ -6,13 +6,12 @@ import {AllTechnologies} from '@shared/models/technology';
 
 import {PlanetId, PlanetName} from '@src/models/planets';
 
-export type TechnologyValue = number & {_: 'TechnologyValue'};
 export type ConstructionId = string & {_: 'ConstructionId'};
 
 export interface Technology {
   techId: number;
-  value: TechnologyValue;
-  target?: TechnologyValue;
+  value: number;
+  target?: number;
   targetEndSeconds?: number;
   constructionPlanetName?: PlanetName;
 }
@@ -21,8 +20,8 @@ export interface Construction {
   constructionId: ConstructionId;
   planetId: PlanetId;
   techId: number;
-  value: TechnologyValue;
-  target: TechnologyValue;
+  value: number;
+  target: number;
   targetEndSeconds: number;
 }
 

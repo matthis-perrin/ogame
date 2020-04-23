@@ -169,7 +169,7 @@ export function getShipsBuildTime(
   naniteFactoryLevel: number,
   universeEconomySpeed: number
 ): Milliseconds {
-  const {metal, crystal} = ship.cost;
+  const {metal, crystal} = ship.cost(0);
   const hours =
     ((metal as number) + (crystal as number)) /
     (2500 * (1 + shipyardLevel) * Math.pow(2, naniteFactoryLevel));

@@ -1,4 +1,4 @@
-import React, {FC, Fragment} from 'react';
+import React, {FC, Fragment, useState} from 'react';
 import styled from 'styled-components';
 
 import {getShipCargoCapacity} from '@shared/lib/formula';
@@ -21,6 +21,8 @@ interface MessagesProps {
 }
 
 export const Messages: FC<MessagesProps> = ({account}) => {
+  const [, refreshComponent] = useState();
+
   const messages: Message[] = [];
   const duplicatesByCoords: Map<PlanetCoords, Message[]> = new Map();
 
@@ -99,9 +101,10 @@ export const Messages: FC<MessagesProps> = ({account}) => {
                         deleteMessage(message.messageId);
                         // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                         delete account.messages[message.messageId];
+                        refreshComponent({});
                       }}
                     >
-                      Sup
+                      Del
                     </Hover>{' '}
                     <Hover
                       onClick={() => {

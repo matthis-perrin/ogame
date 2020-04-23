@@ -57,15 +57,12 @@ export const Fleets: FC<FleetsProps> = ({account}) => {
                   </td>
                   <Hover
                     onClick={() => {
+                      const planetId = findPlanetId(account.planetList, fleet.destinationName);
                       if (
-                        fleet.missionType === MissionTypeEnum.Espionage ||
-                        (fleet.missionType === MissionTypeEnum.Attacking && !fleet.returnFlight)
+                        planetId === undefined ||
+                        (fleet.missionType === MissionTypeEnum.Transport && !fleet.returnFlight)
                       ) {
                         goToMessages();
-                        return;
-                      }
-                      const planetId = findPlanetId(account.planetList, fleet.destinationName);
-                      if (planetId === undefined) {
                         return;
                       }
                       goToShips(planetId);

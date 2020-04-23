@@ -2,7 +2,7 @@ import $ from 'jquery';
 
 import {PlanetName} from '@src/models/planets';
 import {TechId} from '@src/models/resources';
-import {Technology, TechnologyValue} from '@src/models/technologies';
+import {Technology} from '@src/models/technologies';
 
 const planetNameRegex = /planète (.*) \[/;
 
@@ -51,8 +51,8 @@ export function parseTechnologies(): Technology[] {
           .attr('data-end');
         res.push({
           techId: parseFloat(technology) as TechId,
-          value: parseFloat(value) as TechnologyValue,
-          target: target !== undefined ? (parseFloat(target) as TechnologyValue) : undefined,
+          value: parseFloat(value),
+          target: target !== undefined ? parseFloat(target) : undefined,
           targetEndSeconds:
             targetEndSeconds !== undefined ? parseFloat(targetEndSeconds) : undefined,
           constructionPlanetName: target !== undefined ? constructionPlanetName : undefined,

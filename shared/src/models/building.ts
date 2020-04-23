@@ -10,7 +10,6 @@ import {
 
 export interface Building extends BuildableBase {
   type: 'building';
-  cost(level: number): Resources;
 }
 
 function makeBuilding(

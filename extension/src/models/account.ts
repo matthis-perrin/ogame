@@ -1,10 +1,12 @@
 import {Fleet} from '@src/models/fleets';
 import {Message} from '@src/models/messages';
+import {Objectives} from '@src/models/objectives';
 import {Planet, PlanetId, PlanetName} from '@src/models/planets';
 import {BaseResources, ResourcesWithEnergy, ResourcesWithSum} from '@src/models/resources';
 import {Construction, Technology} from '@src/models/technologies';
 
 export interface Account {
+  currentPlanetId: PlanetId;
   planetList: Planet[];
   planetDetails: {[planetId: string]: AccountPlanet};
   maxTechnologies: {[techId: number]: number};
@@ -14,6 +16,7 @@ export interface Account {
   constructions: {[constructionId: string]: Construction};
   inFlightResources: ResourcesWithSum;
   messages: {[messageId: string]: Message};
+  objectives: Objectives | undefined;
 }
 
 export interface ResourcesWithServerTime extends BaseResources {

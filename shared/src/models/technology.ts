@@ -10,7 +10,6 @@ import {
 
 export interface Technology extends BuildableBase {
   type: 'technology';
-  cost(level: number): Resources;
   isUseful: boolean;
 }
 

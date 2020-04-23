@@ -9,6 +9,7 @@ import {Constructions} from '@src/ui/constructions';
 import {Empire} from '@src/ui/empire';
 import {Fleets} from '@src/ui/fleets';
 import {Messages} from '@src/ui/messages';
+import {ObjectivesC} from '@src/ui/objectives';
 import {Research} from '@src/ui/research';
 
 export const App: FC = () => {
@@ -26,6 +27,8 @@ export const App: FC = () => {
             </Top>
             <Middle>
               <Empire account={account} />
+              <Separator />
+              <ObjectivesC account={account} />
             </Middle>
             <Bottom>
               <Constructions account={account} />

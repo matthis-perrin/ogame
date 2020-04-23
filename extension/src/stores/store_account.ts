@@ -10,7 +10,7 @@ import {Fleet, MissionTypeEnum} from '@src/models/fleets';
 import {Message} from '@src/models/messages';
 import {Planet, PlanetId} from '@src/models/planets';
 import {ResourceAmount, Resources, ResourcesWithSum} from '@src/models/resources';
-import {generateConstructionId, Technology} from '@src/models/technologies';
+import {generateConstructionId, Technology, TechnologyIndex} from '@src/models/technologies';
 import {sum} from '@src/ui/utils';
 
 let currentAccount: Account | undefined;
@@ -121,6 +121,7 @@ export function addPlanet(
   messages: Message[] | undefined
 ): void {
   const account: Account = {
+    currentPlanetId: planetId,
     planetList,
     planetDetails: currentAccount?.planetDetails ?? {},
     maxTechnologies: currentAccount?.maxTechnologies ?? {},
@@ -135,6 +136,7 @@ export function addPlanet(
       sum: 0 as ResourceAmount,
     },
     messages: {},
+    objectives: currentAccount?.objectives,
   };
 
   // Retrieve messages or replace with new ones
@@ -182,11 +184,12 @@ export function addPlanet(
         ) {
           continue;
         }
-        // Auto-removing non-returning attacking/expedition/espionage fleets when on messages page
+        // Auto-removing non-returning attacking/expedition/espionage/transporting-to-external fleets when on messages page
         if (
           (fleet.missionType === MissionTypeEnum.Attacking ||
             fleet.missionType === MissionTypeEnum.Expedition ||
-            fleet.missionType === MissionTypeEnum.Espionage) &&
+            fleet.missionType === MissionTypeEnum.Espionage ||
+            (fleet.missionType === MissionTypeEnum.Transport && destPlanetId === undefined)) &&
           !fleet.returnFlight &&
           document.location.search.includes('page=messages')
         ) {
@@ -346,6 +349,34 @@ export function addPlanet(
   setAccount(account);
 }
 
+export function addObjectives(planetId: PlanetId, technology: Technology): void {
+  if (currentAccount === undefined) {
+    return;
+  }
+  let objectives = currentAccount.objectives;
+  if (objectives === undefined) {
+    objectives = {
+      planetId,
+      technologies: [],
+      neededResources: {
+        metal: 0 as ResourceAmount,
+        crystal: 0 as ResourceAmount,
+        deuterium: 0 as ResourceAmount,
+      },
+    };
+  }
+  if (planetId !== objectives.planetId && objectives.technologies.length > 0) {
+    return;
+  }
+  // Handle uniqueness
+  if (objectives.technologies.find(_ => _.techId === technology.techId) !== undefined) {
+    return;
+  }
+  objectives.technologies.push(technology);
+  currentAccount.objectives = objectives;
+  setAccount(currentAccount);
+}
+
 export function useAccount(): [Account | undefined] {
   const [account, setInternalAccount] = useState(currentAccount);
   useEffect(() => {
@@ -367,6 +398,7 @@ function applyProduction(): void {
 
   // Building next tick account
   const account: Account = {
+    currentPlanetId: currentAccount.currentPlanetId,
     planetList: currentAccount.planetList,
     planetDetails: {},
     maxTechnologies: currentAccount.maxTechnologies,
@@ -376,6 +408,7 @@ function applyProduction(): void {
     constructions: {},
     inFlightResources: currentAccount.inFlightResources,
     messages: currentAccount.messages,
+    objectives: currentAccount.objectives,
   };
 
   // Using milliseconds to have below second UI refresh
@@ -420,9 +453,12 @@ function applyProduction(): void {
             notReturningFleet.destinationCoords === fleet.originCoords &&
             notReturningFleet.originCoords === fleet.destinationCoords
           ) {
-            fleet.resources.metal = 0 as ResourceAmount;
-            fleet.resources.crystal = 0 as ResourceAmount;
-            fleet.resources.deuterium = 0 as ResourceAmount;
+            fleet.resources = {
+              metal: 0 as ResourceAmount,
+              crystal: 0 as ResourceAmount,
+              deuterium: 0 as ResourceAmount,
+              sum: 0 as ResourceAmount,
+            };
           }
         }
       }
@@ -449,6 +485,37 @@ function applyProduction(): void {
 
   // Calculating new planet sum
   account.planetSum = calcPlanetSum(account.planetDetails);
+
+  // Calculating objectives
+  if (account.objectives !== undefined) {
+    account.objectives.neededResources = {
+      metal: 0 as ResourceAmount,
+      crystal: 0 as ResourceAmount,
+      deuterium: 0 as ResourceAmount,
+    };
+    for (const technology of account.objectives.technologies) {
+      const smartTech = TechnologyIndex.get(technology.techId);
+      if (smartTech === undefined || technology.target === undefined) {
+        continue;
+      }
+      if (smartTech.type === 'ship' || smartTech.type === 'defense') {
+        return;
+      }
+      const resources = smartTech.cost(technology.target);
+      account.objectives.neededResources.metal = sum([
+        account.objectives.neededResources.metal,
+        resources.metal,
+      ]);
+      account.objectives.neededResources.crystal = sum([
+        account.objectives.neededResources.crystal,
+        resources.crystal,
+      ]);
+      account.objectives.neededResources.deuterium = sum([
+        account.objectives.neededResources.deuterium,
+        resources.deuterium,
+      ]);
+    }
+  }
 
   setAccount(account);
 }
