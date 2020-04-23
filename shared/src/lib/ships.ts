@@ -17,7 +17,7 @@ import {CombustionDrive, HyperspaceDrive, ImpulseDrive} from '@shared/models/tec
 import {Milliseconds} from '@shared/models/time';
 import {Universe} from '@shared/models/universe';
 import {floor, min, multiply, sum} from '@shared/utils/type_utils';
-// GT 21750 = 7500 base + 9*750 recherche + 7500
+
 export function getShipDrive(
   ship: Ship,
   universe: Universe,

@@ -33,7 +33,7 @@ export function timeToString(milliseconds: Milliseconds): string {
     {value: hours, suffix: 'h'},
     {value: minutes, suffix: 'm'},
     {value: seconds, suffix: 's'},
-    {value: seconds, suffix: 'ms'},
+    // {value: remaining, suffix: 'ms'},
   ];
 
   while (components.length > 0 && components[0].value === 0) {

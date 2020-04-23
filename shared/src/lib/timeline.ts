@@ -53,7 +53,7 @@ import {
 import {Crawler, Ship, SolarSatellite} from '@shared/models/ships';
 import {EnergyTechnology, PlasmaTechnology} from '@shared/models/technology';
 import {hoursToMilliseconds, Milliseconds, NEVER, ONE_HOUR, ZERO} from '@shared/models/time';
-import {AccountTimeline, Transition, TransitionnedAccount} from '@shared/models/timeline';
+import {AccountTimeline, TransitionnedAccount} from '@shared/models/timeline';
 import {max, multiply, neverHappens, substract, sum} from '@shared/utils/type_utils';
 
 export function createAccountTimeline(account: Account, buildItems: BuildItem[]): AccountTimeline {
@@ -61,30 +61,30 @@ export function createAccountTimeline(account: Account, buildItems: BuildItem[])
   let currentAccount = account;
 
   for (const buildItem of buildItems) {
-    try {
-      // console.log(`Handling build item ${buildItemToString(buildItem)}`);
-      const newTransactions = advanceAccountTowardBuildItem(currentAccount, buildItem);
-      // console.log(newTransactions);
-      transitions.push(...newTransactions);
-      currentAccount = transitions[transitions.length - 1].transitionnedAccount;
-    } catch (err) {
-      console.log('Error while creating the account timeline');
-      console.error(err);
-      console.log('Transitions applied');
-      function transitionToString(transition: Transition): string {
-        if (transition.type === 'wait') {
-          return `[WAIT] ${transition.duration} (Reason: ${
-            transition.reason
-          })\nEvents: ${JSON.stringify(transition.events)}`;
-        }
-        return `[BUILD] ${buildItemToString(transition.buildItem)}`;
-      }
-      for (const transition of transitions) {
-        console.log(transitionToString(transition.transition));
-      }
-      advanceAccountTowardBuildItem(currentAccount, buildItem);
-      break;
-    }
+    // try {
+    // console.log(`Handling build item ${buildItemToString(buildItem)}`);
+    const newTransactions = advanceAccountTowardBuildItem(currentAccount, buildItem);
+    // console.log(newTransactions);
+    transitions.push(...newTransactions);
+    currentAccount = transitions[transitions.length - 1].transitionnedAccount;
+    // } catch (err) {
+    // console.log('Error while creating the account timeline');
+    // console.error(err);
+    // console.log('Transitions applied');
+    // function transitionToString(transition: Transition): string {
+    //   if (transition.type === 'wait') {
+    //     return `[WAIT] ${transition.duration} (Reason: ${
+    //       transition.reason
+    //     })\nEvents: ${JSON.stringify(transition.events)}`;
+    //   }
+    //   return `[BUILD] ${buildItemToString(transition.buildItem)}`;
+    // }
+    // for (const transition of transitions) {
+    //   console.log(transitionToString(transition.transition));
+    // }
+    // advanceAccountTowardBuildItem(currentAccount, buildItem);
+    // break;
+    // }
   }
 
   return {

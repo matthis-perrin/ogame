@@ -1,5 +1,4 @@
 import {isEnergyProducerBuildable} from '@shared/lib/build_items';
-import {coordinateToString} from '@shared/lib/coordinate';
 import {getMaxAllowedStandardUnitOnPlanet} from '@shared/lib/production';
 import {updateReadonlyMap} from '@shared/lib/readonly_update';
 import {fixFloatingPointAmount, toStandardUnits} from '@shared/lib/resources';
@@ -31,13 +30,16 @@ import {divide, floor, multiply} from '@shared/utils/type_utils';
 // Creation
 //
 
+let counter = 0;
+
 export function createPlanet(
   coordinates: Coordinates,
   fields: number,
   planetTemperature: number
 ): Planet {
+  counter++;
   return {
-    id: `planet-${coordinateToString(coordinates)}` as PlanetId,
+    id: `${counter}` as PlanetId,
     resources: makeResources({}),
     metadata: {
       coordinates,

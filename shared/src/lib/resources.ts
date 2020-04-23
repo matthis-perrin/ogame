@@ -11,7 +11,17 @@ export function toStandardUnits(account: Account, resources: Resources): Standar
 
 export function resourcesToString(resources: Resources): string {
   const {metal, crystal, deuterium} = resources;
-  return `M ${metal.toLocaleString()} - C ${crystal.toLocaleString()} - D ${deuterium.toLocaleString()}`;
+  const parts: string[] = [];
+  if (metal > 0) {
+    parts.push(`M${metal.toLocaleString(undefined, {maximumFractionDigits: 1})}`);
+  }
+  if (crystal > 0) {
+    parts.push(`C${crystal.toLocaleString(undefined, {maximumFractionDigits: 1})}`);
+  }
+  if (deuterium > 0) {
+    parts.push(`D${deuterium.toLocaleString(undefined, {maximumFractionDigits: 1})}`);
+  }
+  return parts.length === 0 ? 'no resources' : parts.join(' - ');
 }
 
 export function fixFloatingPointAmount<U, T extends number | Brand<number, U>>(amount: T): T {
