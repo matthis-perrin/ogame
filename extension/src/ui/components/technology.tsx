@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 import {COLOR_ORANGE, COLOR_RED} from '@src/models/constants';
 import {PlanetId} from '@src/models/planets';
-import {Technology} from '@src/models/technologies';
+import {Technology, TechnologyIndex} from '@src/models/technologies';
 import {addObjectives} from '@src/stores/store_account';
 
 interface TechnologyProps {
@@ -23,10 +23,15 @@ const SubTechnology: FC<{
     <Value
       onClick={e => {
         e.stopPropagation();
+        const smartTech = TechnologyIndex.get(technology.techId);
+        if (smartTech?.type !== 'building') {
+          return;
+        }
+        const currentValue = technology.target !== undefined ? technology.target : technology.value;
         addObjectives(planetId, {
           techId: technology.techId,
-          value: technology.value,
-          target: technology.value + 1,
+          value: currentValue,
+          target: currentValue + 1,
         });
       }}
     >

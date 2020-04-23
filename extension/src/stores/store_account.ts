@@ -1,14 +1,6 @@
 import {useEffect, useState} from 'react';
 
-import {getBuildItemCost} from '@shared/lib/build_items';
-import {BuildingBuildItem} from '@shared/models/build_item';
-import {
-  Building,
-  CrystalMine,
-  DeuteriumSynthesizer,
-  MetalMine,
-  SolarPlant,
-} from '@shared/models/building';
+import {CrystalMine, DeuteriumSynthesizer, MetalMine, SolarPlant} from '@shared/models/building';
 import {SolarSatellite} from '@shared/models/ships';
 
 import {persist} from '@src/controllers/storage';
@@ -572,7 +564,7 @@ function applyProduction(): void {
         continue;
       }
       if (smartTech.type === 'ship' || smartTech.type === 'defense') {
-        return;
+        continue;
       }
       const resources = smartTech.cost(technology.target);
       account.objectives.neededResources.metal = sum([

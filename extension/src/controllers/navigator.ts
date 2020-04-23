@@ -1,5 +1,6 @@
-import {MissionType, MissionTypeEnum} from '@src/models/fleets';
+import {MissionTypeEnum} from '@src/models/fleets';
 import {getCoords, PlanetCoords, PlanetId} from '@src/models/planets';
+import {BaseResources} from '@src/models/resources';
 import {TechnologyIndex} from '@src/models/technologies';
 
 export function goToTechnology(techId: number, planetId: PlanetId): void {
@@ -57,8 +58,17 @@ export function sendLargeCargos(
   from: PlanetId,
   planetCoords: PlanetCoords,
   missionType: MissionTypeEnum,
-  amount: number
+  amount: number,
+  resources?: BaseResources
 ): void {
   const coords = getCoords(planetCoords);
-  window.location.href = `${document.location.origin}${document.location.pathname}?page=ingame&component=fleetdispatch&galaxy=${coords.galaxy}&system=${coords.system}&position=${coords.position}&type=1&mission=${missionType}&am203=${amount}&cp=${from}`;
+  window.location.href = `${document.location.origin}${
+    document.location.pathname
+  }?page=ingame&component=fleetdispatch&galaxy=${coords.galaxy}&system=${coords.system}&position=${
+    coords.position
+  }&type=1&mission=${missionType}&am203=${amount}&cp=${from}${
+    resources !== undefined
+      ? `&metal=${resources.metal}&crystal=${resources.crystal}&deuterium=${resources.deuterium}`
+      : ''
+  }`;
 }

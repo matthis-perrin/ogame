@@ -113,7 +113,8 @@ export const ObjectivesC: FC<ObjectivesProps> = ({account}) => (
                         transfer.from,
                         findPlanetCoords(account.planetList, transfer.to),
                         MissionTypeEnum.Transport,
-                        requiredGt
+                        requiredGt,
+                        transfer.resources
                       )
                     }
                     className={requiredGt > gtAmount ? 'red' : ''}
