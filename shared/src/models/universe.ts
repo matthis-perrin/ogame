@@ -10,6 +10,7 @@ export interface Universe {
   readonly circularGalaxy: boolean;
   readonly circularSystem: boolean;
   readonly deuteriumConsumptionFactor: number;
+  readonly cargoInProbe: boolean;
 }
 
 export const Rosalind: Universe = {
@@ -24,4 +25,5 @@ export const Rosalind: Universe = {
   circularGalaxy: true,
   circularSystem: true,
   deuteriumConsumptionFactor: 0.8,
+  cargoInProbe: false,
 };

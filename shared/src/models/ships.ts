@@ -7,13 +7,17 @@ import {
   Technology,
 } from '@shared/models/technology';
 import {Unit} from '@shared/models/unit';
+import {Brand} from '@shared/utils/type_utils';
+
+export type ShipSpeed = Brand<number, 'ShipSpeed'>;
+export type ShipFuelConsumption = Brand<number, 'ShipFuelConsumption'>;
 
 export interface Ship extends Unit {
   readonly type: 'ship';
   readonly cargoCapacity: number;
-  readonly baseSpeed: number;
+  readonly baseSpeed: ShipSpeed;
   readonly initialDriveTechnology: Technology | undefined;
-  readonly fuelConsumption: number;
+  readonly fuelConsumption: ShipFuelConsumption;
 }
 
 export const EspionageProbe: Ship = {
@@ -25,9 +29,9 @@ export const EspionageProbe: Ship = {
   shieldPower: 0,
   weaponPower: 0,
   cargoCapacity: 1, // TODO - 5 on some universes
-  baseSpeed: 100000000,
+  baseSpeed: 100000000 as ShipSpeed,
   initialDriveTechnology: CombustionDrive,
-  fuelConsumption: 1,
+  fuelConsumption: 1 as ShipFuelConsumption,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
   component: 'shipyard',
@@ -43,9 +47,9 @@ export const SolarSatellite: Ship = {
   shieldPower: 1,
   weaponPower: 1,
   cargoCapacity: 0,
-  baseSpeed: 0,
+  baseSpeed: 0 as ShipSpeed,
   initialDriveTechnology: undefined,
-  fuelConsumption: 0,
+  fuelConsumption: 0 as ShipFuelConsumption,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
   component: 'supplies',
@@ -60,9 +64,9 @@ export const Crawler: Ship = {
   shieldPower: 1,
   weaponPower: 1,
   cargoCapacity: 0,
-  baseSpeed: 0,
+  baseSpeed: 0 as ShipSpeed,
   initialDriveTechnology: undefined,
-  fuelConsumption: 0,
+  fuelConsumption: 0 as ShipFuelConsumption,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
   component: 'shipyard',
@@ -77,9 +81,9 @@ export const SmallCargo: Ship = {
   shieldPower: 10,
   weaponPower: 5,
   cargoCapacity: 5000,
-  baseSpeed: 5000,
+  baseSpeed: 5000 as ShipSpeed,
   initialDriveTechnology: CombustionDrive,
-  fuelConsumption: 10,
+  fuelConsumption: 10 as ShipFuelConsumption,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
   component: 'shipyard',
@@ -94,9 +98,9 @@ export const LargeCargo: Ship = {
   shieldPower: 25,
   weaponPower: 5,
   cargoCapacity: 25000,
-  baseSpeed: 7500,
+  baseSpeed: 7500 as ShipSpeed,
   initialDriveTechnology: CombustionDrive,
-  fuelConsumption: 50,
+  fuelConsumption: 50 as ShipFuelConsumption,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
   component: 'shipyard',
@@ -112,9 +116,9 @@ export const Recycler: Ship = {
   shieldPower: 10,
   weaponPower: 1,
   cargoCapacity: 20000,
-  baseSpeed: 2000,
+  baseSpeed: 2000 as ShipSpeed,
   initialDriveTechnology: CombustionDrive,
-  fuelConsumption: 300,
+  fuelConsumption: 300 as ShipFuelConsumption,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
   component: 'shipyard',
@@ -129,9 +133,9 @@ export const ColonyShip: Ship = {
   shieldPower: 100,
   weaponPower: 50,
   cargoCapacity: 7500,
-  baseSpeed: 2500,
+  baseSpeed: 2500 as ShipSpeed,
   initialDriveTechnology: ImpulseDrive,
-  fuelConsumption: 1000,
+  fuelConsumption: 1000 as ShipFuelConsumption,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
   component: 'shipyard',
@@ -146,9 +150,9 @@ export const LightFighter: Ship = {
   shieldPower: 10,
   weaponPower: 50,
   cargoCapacity: 50,
-  baseSpeed: 12500,
+  baseSpeed: 12500 as ShipSpeed,
   initialDriveTechnology: CombustionDrive,
-  fuelConsumption: 20,
+  fuelConsumption: 20 as ShipFuelConsumption,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
   component: 'shipyard',
@@ -163,9 +167,9 @@ export const Cruiser: Ship = {
   shieldPower: 50,
   weaponPower: 400,
   cargoCapacity: 800,
-  baseSpeed: 15000,
+  baseSpeed: 15000 as ShipSpeed,
   initialDriveTechnology: ImpulseDrive,
-  fuelConsumption: 300,
+  fuelConsumption: 300 as ShipFuelConsumption,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
   component: 'shipyard',
@@ -180,9 +184,9 @@ export const HeavyFighter: Ship = {
   shieldPower: 25,
   weaponPower: 150,
   cargoCapacity: 100,
-  baseSpeed: 10000,
+  baseSpeed: 10000 as ShipSpeed,
   initialDriveTechnology: ImpulseDrive,
-  fuelConsumption: 75,
+  fuelConsumption: 75 as ShipFuelConsumption,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
   component: 'shipyard',
@@ -197,9 +201,9 @@ export const Pathfinder: Ship = {
   shieldPower: 100,
   weaponPower: 200,
   cargoCapacity: 10000,
-  baseSpeed: 12000,
+  baseSpeed: 12000 as ShipSpeed,
   initialDriveTechnology: HyperspaceDrive,
-  fuelConsumption: 300,
+  fuelConsumption: 300 as ShipFuelConsumption,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
   component: 'shipyard',
@@ -214,9 +218,9 @@ export const Battleship: Ship = {
   shieldPower: 200,
   weaponPower: 1000,
   cargoCapacity: 1500,
-  baseSpeed: 10000,
+  baseSpeed: 10000 as ShipSpeed,
   initialDriveTechnology: HyperspaceDrive,
-  fuelConsumption: 500,
+  fuelConsumption: 500 as ShipFuelConsumption,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
   component: 'shipyard',
@@ -231,9 +235,9 @@ export const BattleCruiser: Ship = {
   shieldPower: 400,
   weaponPower: 700,
   cargoCapacity: 750,
-  baseSpeed: 10000,
+  baseSpeed: 10000 as ShipSpeed,
   initialDriveTechnology: HyperspaceDrive,
-  fuelConsumption: 250,
+  fuelConsumption: 250 as ShipFuelConsumption,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
   component: 'shipyard',
@@ -248,9 +252,9 @@ export const Destroyer: Ship = {
   shieldPower: 500,
   weaponPower: 2000,
   cargoCapacity: 2000,
-  baseSpeed: 5000,
+  baseSpeed: 5000 as ShipSpeed,
   initialDriveTechnology: HyperspaceDrive,
-  fuelConsumption: 1000,
+  fuelConsumption: 1000 as ShipFuelConsumption,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
   component: 'shipyard',
@@ -265,9 +269,9 @@ export const Bomber: Ship = {
   shieldPower: 500,
   weaponPower: 1000,
   cargoCapacity: 500,
-  baseSpeed: 4000,
+  baseSpeed: 4000 as ShipSpeed,
   initialDriveTechnology: ImpulseDrive,
-  fuelConsumption: 700,
+  fuelConsumption: 700 as ShipFuelConsumption,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
   component: 'shipyard',
@@ -283,22 +287,26 @@ export const Reaper: Ship = {
   shieldPower: 700,
   weaponPower: 2800,
   cargoCapacity: 10000,
-  baseSpeed: 7000,
+  baseSpeed: 7000 as ShipSpeed,
   initialDriveTechnology: HyperspaceDrive,
-  fuelConsumption: 1100,
+  fuelConsumption: 1100 as ShipFuelConsumption,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
   component: 'shipyard',
 };
 
-export const AllShips: Ship[] = [
+export const CargoShip: Ship[] = [SmallCargo, LargeCargo];
+
+export const CivilianShips: Ship[] = [
+  ...CargoShip,
   EspionageProbe,
   SolarSatellite,
   Crawler,
-  SmallCargo,
-  LargeCargo,
   Recycler,
   ColonyShip,
+];
+
+export const WarShips: Ship[] = [
   LightFighter,
   Cruiser,
   HeavyFighter,
@@ -309,3 +317,5 @@ export const AllShips: Ship[] = [
   Bomber,
   Reaper,
 ];
+
+export const AllShips: Ship[] = [...WarShips, ...CivilianShips];
