@@ -2,7 +2,7 @@ import {Fleet} from '@src/models/fleets';
 import {Message} from '@src/models/messages';
 import {Objectives} from '@src/models/objectives';
 import {Planet, PlanetId, PlanetName} from '@src/models/planets';
-import {BaseResources, ResourcesWithEnergy, ResourcesWithSum} from '@src/models/resources';
+import {BaseResources, ResourcesWithEnergyAndSum, ResourcesWithSum} from '@src/models/resources';
 import {Construction, Technology} from '@src/models/technologies';
 
 export interface Account {
@@ -14,7 +14,8 @@ export interface Account {
   fleets: {[fleetId: string]: Fleet};
   planetSum: AccountPlanet | undefined;
   constructions: {[constructionId: string]: Construction};
-  inFlightResources: ResourcesWithSum;
+  inFlightResources: {[planetCoords: string]: ResourcesWithSum};
+  inFlightSum: ResourcesWithSum;
   messages: {[messageId: string]: Message};
   objectives: Objectives | undefined;
 }
@@ -26,9 +27,9 @@ export interface ResourcesWithServerTime extends BaseResources {
 export interface AccountPlanet {
   planetId: PlanetId;
   truth: ResourcesWithServerTime;
-  resources: ResourcesWithEnergy;
-  storages: BaseResources;
-  productions: BaseResources;
+  resources: ResourcesWithEnergyAndSum;
+  storages: ResourcesWithSum;
+  productions: ResourcesWithSum;
   technologies: {[techId: number]: Technology};
   ships: {[techId: number]: Technology};
 }

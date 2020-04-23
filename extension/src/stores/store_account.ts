@@ -57,16 +57,19 @@ function calcPlanetSum(planetDetails: {[planetId: string]: AccountPlanet}): Acco
       crystal: cystalResources as ResourceAmount,
       deuterium: deuteriumResources as ResourceAmount,
       energy: energyResources as ResourceAmount,
+      sum: sum([metalResources, cystalResources, deuteriumResources]),
     },
     storages: {
       metal: metalStorages as ResourceAmount,
       crystal: cystalStorages as ResourceAmount,
       deuterium: deuteriumStorages as ResourceAmount,
+      sum: sum([metalStorages, cystalStorages, deuteriumStorages]),
     },
     productions: {
       metal: metalProductions as ResourceAmount,
       crystal: crystalProductions as ResourceAmount,
       deuterium: deuteriumProductions as ResourceAmount,
+      sum: sum([metalProductions, crystalProductions, deuteriumProductions]),
     },
     technologies: {},
     ships: {},
@@ -75,29 +78,47 @@ function calcPlanetSum(planetDetails: {[planetId: string]: AccountPlanet}): Acco
 
 function calcInFlightResources(
   planetList: Planet[],
-  fleets: {[fleetId: string]: Fleet}
-): ResourcesWithSum {
-  let metal = 0 as ResourceAmount;
-  let crystal = 0 as ResourceAmount;
-  let deuterium = 0 as ResourceAmount;
+  fleets: {
+    [fleetId: string]: Fleet;
+  }
+): [{[planetCoords: string]: ResourcesWithSum}, ResourcesWithSum] {
+  const inFlightResources: {[planetCoords: string]: ResourcesWithSum} = {};
+  const inFlightSum: ResourcesWithSum = {
+    metal: 0 as ResourceAmount,
+    crystal: 0 as ResourceAmount,
+    deuterium: 0 as ResourceAmount,
+    sum: 0 as ResourceAmount,
+  };
+
+  const planetIndex: Set<string> = new Set();
+  planetList.forEach(planet => planetIndex.add(planet.coords));
+
   for (const fleetId in fleets) {
     if (fleets.hasOwnProperty(fleetId)) {
       const fleet = fleets[fleetId];
-      const destinationIsMyPlanet = findPlanetId(planetList, fleet.destinationName) !== undefined;
-      const returnFromAttacking =
-        fleet.missionType === MissionTypeEnum.Attacking && fleet.returnFlight;
-      const deploying = fleet.missionType === MissionTypeEnum.Deployment;
-      const transportingToMyPlanet =
-        fleet.missionType === MissionTypeEnum.Transport && destinationIsMyPlanet;
-      if (returnFromAttacking || deploying || transportingToMyPlanet) {
-        metal = sum([metal, fleet.resources.metal]);
-        crystal = sum([crystal, fleet.resources.crystal]);
-        deuterium = sum([deuterium, fleet.resources.deuterium]);
+      const inFlight = inFlightResources.hasOwnProperty(fleet.destinationCoords)
+        ? inFlightResources[fleet.destinationCoords]
+        : {
+            metal: 0 as ResourceAmount,
+            crystal: 0 as ResourceAmount,
+            deuterium: 0 as ResourceAmount,
+            sum: 0 as ResourceAmount,
+          };
+      inFlight.metal = sum([inFlight.metal, fleet.resources.metal]);
+      inFlight.crystal = sum([inFlight.crystal, fleet.resources.crystal]);
+      inFlight.deuterium = sum([inFlight.deuterium, fleet.resources.deuterium]);
+      inFlight.sum = sum([inFlight.metal, inFlight.crystal, inFlight.deuterium]);
+      inFlightResources[fleet.destinationCoords] = inFlight;
+      if (planetIndex.has(fleet.destinationCoords)) {
+        inFlightSum.metal = sum([inFlightSum.metal, inFlight.metal]);
+        inFlightSum.crystal = sum([inFlightSum.crystal, inFlight.crystal]);
+        inFlightSum.deuterium = sum([inFlightSum.deuterium, inFlight.deuterium]);
+        inFlightSum.sum = sum([inFlightSum.sum, inFlight.sum]);
       }
     }
   }
-  const resourcesSum = sum([metal, crystal, deuterium]);
-  return {metal, crystal, deuterium, sum: resourcesSum};
+
+  return [inFlightResources, inFlightSum];
 }
 
 export function setAccount(account: Account, persistent = true): void {
@@ -129,7 +150,8 @@ export function addPlanet(
     fleets: {},
     constructions: currentAccount?.constructions ?? {},
     planetSum: undefined,
-    inFlightResources: currentAccount?.inFlightResources ?? {
+    inFlightResources: {},
+    inFlightSum: {
       metal: 0 as ResourceAmount,
       crystal: 0 as ResourceAmount,
       deuterium: 0 as ResourceAmount,
@@ -218,7 +240,12 @@ export function addPlanet(
   }
 
   // Calculate inflight resourses
-  account.inFlightResources = calcInFlightResources(planetList, account.fleets);
+  const [inFlightResources, inFlightSum] = calcInFlightResources(
+    account.planetList,
+    account.fleets
+  );
+  account.inFlightResources = inFlightResources;
+  account.inFlightSum = inFlightSum;
 
   // Handle new constructions
   const handleConstruction = (t: Technology): void => {
@@ -305,6 +332,18 @@ export function addPlanet(
         ]);
 
   // Saving planet data
+  const metalProd = sum([
+    resources.resources.metal.baseProduction,
+    resources.techs[MetalMine.id].production.metal * productionCoefficient,
+  ]);
+  const crystalProd = sum([
+    resources.resources.crystal.baseProduction,
+    resources.techs[CrystalMine.id].production.crystal * productionCoefficient,
+  ]);
+  const deuteriumProd = sum([
+    resources.resources.deuterium.baseProduction,
+    resources.techs[DeuteriumSynthesizer.id].production.deuterium * productionCoefficient,
+  ]);
   account.planetDetails[planetId] = {
     planetId,
     truth: {
@@ -318,25 +357,27 @@ export function addPlanet(
       crystal: resources.resources.crystal.amount,
       deuterium: resources.resources.deuterium.amount,
       energy: resources.resources.energy.amount,
+      sum: sum([
+        resources.resources.metal.amount,
+        resources.resources.crystal.amount,
+        resources.resources.deuterium.amount,
+      ]),
     },
     storages: {
       metal: resources.resources.metal.storage,
       crystal: resources.resources.crystal.storage,
       deuterium: resources.resources.deuterium.storage,
+      sum: sum([
+        resources.resources.metal.storage,
+        resources.resources.crystal.storage,
+        resources.resources.deuterium.storage,
+      ]),
     },
     productions: {
-      metal: sum([
-        resources.resources.metal.baseProduction,
-        resources.techs[MetalMine.id].production.metal * productionCoefficient,
-      ]),
-      crystal: sum([
-        resources.resources.crystal.baseProduction,
-        resources.techs[CrystalMine.id].production.crystal * productionCoefficient,
-      ]),
-      deuterium: sum([
-        resources.resources.deuterium.baseProduction,
-        resources.techs[DeuteriumSynthesizer.id].production.deuterium * productionCoefficient,
-      ]),
+      metal: metalProd,
+      crystal: crystalProd,
+      deuterium: deuteriumProd,
+      sum: sum([metalProd, crystalProd, deuteriumProd]),
     },
     technologies: technologiesObj,
     ships: shipsObj,
@@ -362,7 +403,9 @@ export function addObjectives(planetId: PlanetId, technology: Technology): void 
         metal: 0 as ResourceAmount,
         crystal: 0 as ResourceAmount,
         deuterium: 0 as ResourceAmount,
+        sum: 0 as ResourceAmount,
       },
+      resourceTransfers: [],
     };
   }
   if (planetId !== objectives.planetId && objectives.technologies.length > 0) {
@@ -406,7 +449,13 @@ function applyProduction(): void {
     fleets: {},
     planetSum: undefined,
     constructions: {},
-    inFlightResources: currentAccount.inFlightResources,
+    inFlightResources: {},
+    inFlightSum: {
+      metal: 0 as ResourceAmount,
+      crystal: 0 as ResourceAmount,
+      deuterium: 0 as ResourceAmount,
+      sum: 0 as ResourceAmount,
+    },
     messages: currentAccount.messages,
     objectives: currentAccount.objectives,
   };
@@ -420,14 +469,21 @@ function applyProduction(): void {
     if (currentAccount.planetDetails.hasOwnProperty(planetId)) {
       const planet = currentAccount.planetDetails[planetId];
       const elaspedSeconds = (nowMillis - planet.truth.serverTimeSeconds * 1000) / 1000;
+      const metal = sum([planet.truth.metal, planet.productions.metal * elaspedSeconds]);
+      const crystal = sum([planet.truth.crystal, planet.productions.crystal * elaspedSeconds]);
+      const deuterium = sum([
+        planet.truth.deuterium,
+        planet.productions.deuterium * elaspedSeconds,
+      ]);
       account.planetDetails[planetId] = {
         planetId: planet.planetId,
         truth: planet.truth,
         resources: {
-          metal: sum([planet.truth.metal, planet.productions.metal * elaspedSeconds]),
-          crystal: sum([planet.truth.crystal, planet.productions.crystal * elaspedSeconds]),
-          deuterium: sum([planet.truth.deuterium, planet.productions.deuterium * elaspedSeconds]),
+          metal,
+          crystal,
+          deuterium,
           energy: planet.resources.energy,
+          sum: sum([metal, crystal, deuterium]),
         },
         productions: planet.productions,
         storages: planet.storages,
@@ -472,6 +528,14 @@ function applyProduction(): void {
     }
   }
 
+  // Calculate inflight resourses
+  const [inFlightResources, inFlightSum] = calcInFlightResources(
+    account.planetList,
+    account.fleets
+  );
+  account.inFlightResources = inFlightResources;
+  account.inFlightSum = inFlightSum;
+
   // Calculating constructions
   for (const constructionId in currentAccount.constructions) {
     if (currentAccount.constructions.hasOwnProperty(constructionId)) {
@@ -492,6 +556,7 @@ function applyProduction(): void {
       metal: 0 as ResourceAmount,
       crystal: 0 as ResourceAmount,
       deuterium: 0 as ResourceAmount,
+      sum: 0 as ResourceAmount,
     };
     for (const technology of account.objectives.technologies) {
       const smartTech = TechnologyIndex.get(technology.techId);
@@ -514,6 +579,56 @@ function applyProduction(): void {
         account.objectives.neededResources.deuterium,
         resources.deuterium,
       ]);
+    }
+    let inflight: ResourcesWithSum = {
+      metal: 0 as ResourceAmount,
+      crystal: 0 as ResourceAmount,
+      deuterium: 0 as ResourceAmount,
+      sum: 0 as ResourceAmount,
+    };
+    const planetCoords = account.planetList.find(p => p.id === account.objectives?.planetId)
+      ?.coords;
+    if (planetCoords !== undefined && account.inFlightResources.hasOwnProperty(planetCoords)) {
+      inflight = account.inFlightResources[planetCoords];
+    }
+    account.objectives.resourceTransfers = [];
+    let metalSent = 0;
+    let crystalSent = 0;
+    let deuteriumSent = 0;
+    const planetDetails = Object.keys(account.planetDetails).map(key => account.planetDetails[key]);
+    planetDetails.sort((a, b) => b.resources.sum - a.resources.sum);
+    for (const planet of planetDetails) {
+      if (planet.planetId === account.objectives.planetId) {
+        continue;
+      }
+      const metalToSend = Math.min(
+        Math.max(0, account.objectives.neededResources.metal - inflight.metal - metalSent),
+        planet.resources.metal
+      );
+      const crystalToSend = Math.min(
+        Math.max(0, account.objectives.neededResources.crystal - inflight.crystal - crystalSent),
+        planet.resources.crystal
+      );
+      const deuteriumToSend = Math.min(
+        Math.max(
+          0,
+          account.objectives.neededResources.deuterium - inflight.deuterium - deuteriumSent
+        ),
+        planet.resources.deuterium
+      );
+      account.objectives.resourceTransfers.push({
+        from: planet.planetId,
+        to: account.objectives.planetId,
+        resources: {
+          metal: metalToSend as ResourceAmount,
+          crystal: crystalToSend as ResourceAmount,
+          deuterium: deuteriumToSend as ResourceAmount,
+          sum: sum([metalToSend, crystalToSend, deuteriumToSend]),
+        },
+      });
+      metalSent += metalToSend;
+      crystalSent += crystalToSend;
+      deuteriumSent += deuteriumToSend;
     }
   }
 

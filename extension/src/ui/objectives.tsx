@@ -1,8 +1,13 @@
 import React, {FC, Fragment} from 'react';
 import styled from 'styled-components';
 
+import {getShipCargoCapacity} from '@shared/lib/formula';
+import {LargeCargo} from '@shared/models/ships';
+import {HyperspaceTechnology} from '@shared/models/technology';
+
 import {goToTechnology} from '@src/controllers/navigator';
 import {Account, findPlanetName} from '@src/models/account';
+import {COLLECTOR_BONUS_FRET} from '@src/models/constants';
 import {techShortName} from '@src/models/technologies';
 import {Table, Title} from '@src/ui/common';
 import {Resource} from '@src/ui/components/resource';
@@ -69,11 +74,47 @@ export const ObjectivesC: FC<ObjectivesProps> = ({account}) => {
                   <Resource name="M" amount={account.objectives.neededResources.metal} />
                   <Resource name="C" amount={account.objectives.neededResources.crystal} />
                   <Resource name="D" amount={account.objectives.neededResources.deuterium} />
+                  <Resource name="Σ" amount={account.objectives.neededResources.sum} />
                 </td>
+              </tr>
+              <tr>
+                <EmptyLine></EmptyLine>
               </tr>
             </tbody>
           )}
         </Table>
+        {account.objectives === undefined ? (
+          ''
+        ) : (
+          <Table>
+            <tbody>
+              {account.objectives.resourceTransfers.map(transfer => {
+                const hyperLevel = account.accountTechnologies.hasOwnProperty(
+                  HyperspaceTechnology.id
+                )
+                  ? account.accountTechnologies[HyperspaceTechnology.id].value
+                  : 0;
+                const fretGt = getShipCargoCapacity(LargeCargo, hyperLevel, COLLECTOR_BONUS_FRET);
+                const requiredGt = Math.ceil(transfer.resources.sum / fretGt);
+                return (
+                  <tr key={`${transfer.from}_${transfer.to}`}>
+                    <td>{findPlanetName(account.planetList, transfer.from)}</td>
+                    <td>
+                      <Resource name="M" amount={transfer.resources.metal} />
+                    </td>
+                    <td>
+                      <Resource name="C" amount={transfer.resources.crystal} />
+                    </td>
+                    <td>
+                      <Resource name="D" amount={transfer.resources.deuterium} />
+                    </td>
+                    <td>GT: {requiredGt}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </Table>
+        )}
       </Container>
     </Fragment>
   );

@@ -10,44 +10,34 @@ interface PlanetSumProps {
 }
 
 export const PlanetSum: FC<PlanetSumProps> = ({account, planetSum}) => {
-  const resourcesSum = sum([
-    planetSum.resources.metal,
-    planetSum.resources.crystal,
-    planetSum.resources.deuterium,
-    account.inFlightResources.sum,
-  ]);
-  const storagesSum = sum([
-    planetSum.storages.metal,
-    planetSum.storages.crystal,
-    planetSum.storages.deuterium,
-  ]);
-  const productionsSum = sum([
-    planetSum.productions.metal,
-    planetSum.productions.crystal,
-    planetSum.productions.deuterium,
-  ]);
+  const resourcesSum = sum([planetSum.resources.sum, account.inFlightSum.sum]);
 
   return (
     <Fragment>
       <Resource
         name="M"
-        amount={sum([planetSum.resources.metal, account.inFlightResources.metal])}
+        amount={sum([planetSum.resources.metal, account.inFlightSum.metal])}
         storage={planetSum.storages.metal}
         production={planetSum.productions.metal}
       />
       <Resource
         name="C"
-        amount={sum([planetSum.resources.crystal, account.inFlightResources.crystal])}
+        amount={sum([planetSum.resources.crystal, account.inFlightSum.crystal])}
         storage={planetSum.storages.crystal}
         production={planetSum.productions.crystal}
       />
       <Resource
         name="D"
-        amount={sum([planetSum.resources.deuterium, account.inFlightResources.deuterium])}
+        amount={sum([planetSum.resources.deuterium, account.inFlightSum.deuterium])}
         storage={planetSum.storages.deuterium}
         production={planetSum.productions.deuterium}
       />
-      <Resource name="Σ" amount={resourcesSum} storage={storagesSum} production={productionsSum} />
+      <Resource
+        name="Σ"
+        amount={resourcesSum}
+        storage={planetSum.storages.sum}
+        production={planetSum.productions.sum}
+      />
     </Fragment>
   );
 };

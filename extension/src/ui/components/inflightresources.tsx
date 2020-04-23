@@ -9,9 +9,9 @@ interface InFlightResourcesProps {
 
 export const InFlightResources: FC<InFlightResourcesProps> = ({account}) => (
   <Fragment>
-    <Resource name="M" amount={account.inFlightResources.metal} />
-    <Resource name="C" amount={account.inFlightResources.crystal} />
-    <Resource name="D" amount={account.inFlightResources.deuterium} />
-    <Resource name="Σ" amount={account.inFlightResources.sum} />
+    <Resource name="M" amount={account.inFlightSum.metal} />
+    <Resource name="C" amount={account.inFlightSum.crystal} />
+    <Resource name="D" amount={account.inFlightSum.deuterium} />
+    <Resource name="Σ" amount={account.inFlightSum.sum} />
   </Fragment>
 );

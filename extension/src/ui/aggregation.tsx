@@ -19,7 +19,7 @@ export const Aggregation: FC<AggregationProps> = ({account}) => (
           <th>
             <Title>Flottes</Title>
           </th>
-          <th colSpan={2}>
+          <th colSpan={3}>
             <Title>Total</Title>
           </th>
         </tr>

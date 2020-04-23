@@ -30,6 +30,10 @@ export interface ResourcesWithEnergy extends BaseResources {
   energy: ResourceAmount;
 }
 
+export interface ResourcesWithEnergyAndSum extends ResourcesWithEnergy {
+  sum: ResourceAmount;
+}
+
 export interface ResourcesWithSum extends BaseResources {
   sum: ResourceAmount;
 }

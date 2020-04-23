@@ -67,7 +67,7 @@ export const Messages: FC<MessagesProps> = ({account}) => {
     }
   }
 
-  const lootMargin = 10000;
+  const lootMargin = 20000;
 
   return (
     <Fragment>
