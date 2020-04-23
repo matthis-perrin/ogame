@@ -1,7 +1,7 @@
 export interface Officers {
-  commander: boolean;
-  fleetAdmiral: boolean;
-  engineer: boolean;
-  geologist: boolean;
-  technocrat: boolean;
+  readonly commander: boolean;
+  readonly fleetAdmiral: boolean;
+  readonly engineer: boolean;
+  readonly geologist: boolean;
+  readonly technocrat: boolean;
 }

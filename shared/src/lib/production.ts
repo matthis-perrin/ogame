@@ -209,7 +209,9 @@ export function getPlanetProductionPerHour(
   );
   const satelliteEnergyProduction = getSatelliteEnergyProductionPerHour(
     solarSatelliteCount,
-    planetTemperature
+    planetTemperature,
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+    account.class === Class.Collector ? 0.1 : 0
   );
   const energyProductionBeforeBonuses = sum(
     solarPlantEnergyProduction,
@@ -248,7 +250,7 @@ export function getPlanetProductionPerHour(
 
 export function getAccountProductionPerHour(account: Account): Resources {
   let accountProd: Resources = makeResources({});
-  for (const planet of account.planets) {
+  for (const planet of account.planets.values()) {
     const {prod} = getPlanetProductionPerHour(account, planet);
     accountProd = addResources(accountProd, prod);
   }

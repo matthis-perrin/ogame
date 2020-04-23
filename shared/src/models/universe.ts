@@ -1,15 +1,16 @@
 export interface Universe {
-  flightSpeed: number;
-  economySpeed: number;
-  researchSpeed: number;
-  planetSizeBonus: number;
-  numberOfGalaxy: number;
-  numberOfSystem: number;
-  shipInDebrisFieldRatio: number;
-  defenseInDebrisFieldRatio: number;
-  circularGalaxy: boolean;
-  circularSystem: boolean;
-  deuteriumConsumptionFactor: number;
+  readonly flightSpeed: number;
+  readonly economySpeed: number;
+  readonly researchSpeed: number;
+  readonly planetSizeBonus: number;
+  readonly numberOfGalaxy: number;
+  readonly numberOfSystem: number;
+  readonly shipInDebrisFieldRatio: number;
+  readonly defenseInDebrisFieldRatio: number;
+  readonly circularGalaxy: boolean;
+  readonly circularSystem: boolean;
+  readonly deuteriumConsumptionFactor: number;
+  readonly cargoInProbe: boolean;
 }
 
 export const Rosalind: Universe = {
@@ -24,4 +25,5 @@ export const Rosalind: Universe = {
   circularGalaxy: true,
   circularSystem: true,
   deuteriumConsumptionFactor: 0.8,
+  cargoInProbe: false,
 };

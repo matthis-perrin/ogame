@@ -1,5 +1,5 @@
 import {getShipCargoCapacity} from '@shared/lib/formula';
-import {BuildableBase} from '@shared/models/buildable';
+import {Buildable} from '@shared/models/buildable';
 import {AllBuildings} from '@shared/models/building';
 import {AllDefenses} from '@shared/models/defense';
 import {AllShips, Ship} from '@shared/models/ships';
@@ -31,8 +31,8 @@ export function generateConstructionId(planetId: PlanetId, techId: number): Cons
   return `${planetId}_${techId}` as ConstructionId;
 }
 
-export const TechnologyIndex: Map<number, BuildableBase> = new Map();
-function buildIndex(buildable: BuildableBase): void {
+export const TechnologyIndex: Map<number, Buildable> = new Map();
+function buildIndex(buildable: Buildable): void {
   TechnologyIndex.set(buildable.id, buildable);
 }
 AllTechnologies.forEach(buildIndex);

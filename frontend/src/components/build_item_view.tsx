@@ -1,7 +1,8 @@
 import React, {FC} from 'react';
 import styled from 'styled-components';
 
-import {BuildOrderItem} from '@shared/lib/build_order';
+import {buildItemCost} from '@shared/lib/build_items';
+import {BuildItem} from '@shared/models/build_item';
 import {BuildableType} from '@shared/models/buildable';
 import {neverHappens} from '@shared/utils/type_utils';
 
@@ -23,16 +24,20 @@ function colorForBuildableType(type: BuildableType): string {
   neverHappens(type, `Could not get the color of the BuildableType "${type}"`);
 }
 
-export const BuildOrderItemView: FC<{item: BuildOrderItem}> = ({item}) => (
-  <Wrapper style={{borderLeft: `solid 6px ${colorForBuildableType(item.entity.type)}`}}>
-    <Name>{item.entity.name}</Name>
-    <Level>{`lvl ${item.level}`}</Level>
+export const BuildItemView: FC<{item: BuildItem}> = ({item}) => (
+  <Wrapper style={{borderLeft: `solid 6px ${colorForBuildableType(item.buildable.type)}`}}>
+    <Name>{item.buildable.name}</Name>
+    <Metric>
+      {item.type === 'technology' || item.type === 'building'
+        ? `lvl ${item.level}`
+        : `x ${item.quantity}`}
+    </Metric>
     <Cost>
-      <ResourcesView resources={item.entity.cost(item.level)} />
+      <ResourcesView resources={buildItemCost(item)} />
     </Cost>
   </Wrapper>
 );
-BuildOrderItemView.displayName = 'BuildOrderItemView';
+BuildItemView.displayName = 'BuildItemView';
 
 const Wrapper = styled.div`
   display: flex;
@@ -42,7 +47,7 @@ const Wrapper = styled.div`
 const Name = styled.div`
   flex-shrink: 0;
 `;
-const Level = styled.div`
+const Metric = styled.div`
   flex-grow: 1;
   margin: 0 12px;
 `;

@@ -1,10 +1,21 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import {Class} from '@shared/models/account';
 import {Building} from '@shared/models/building';
+import {
+  Coordinates,
+  Distance,
+  DISTANCE_BETWEEN_GALAXY,
+  DISTANCE_BETWEEN_PLANET,
+  DISTANCE_BETWEEN_SYSTEM,
+  SpeedModifier,
+} from '@shared/models/coordinates';
+import {Defense} from '@shared/models/defense';
 import {CrystalAmount, DeuteriumAmount, EnergyAmount, MetalAmount} from '@shared/models/resource';
-import {Ship} from '@shared/models/ships';
+import {Ship, ShipFuelConsumption, ShipSpeed} from '@shared/models/ships';
 import {Technology} from '@shared/models/technology';
 import {hoursToMilliseconds, Milliseconds} from '@shared/models/time';
+import {Universe} from '@shared/models/universe';
+import {multiply, sum} from '@shared/utils/type_utils';
 
 export function getMaxCrawlerCount(
   metalMineLevel: number,
@@ -169,7 +180,21 @@ export function getShipsBuildTime(
   naniteFactoryLevel: number,
   universeEconomySpeed: number
 ): Milliseconds {
-  const {metal, crystal} = ship.cost(0);
+  const {metal, crystal} = ship.cost;
+  const hours =
+    ((metal as number) + (crystal as number)) /
+    (2500 * (1 + shipyardLevel) * Math.pow(2, naniteFactoryLevel));
+  return hoursToMilliseconds((hours * quantity) / universeEconomySpeed);
+}
+
+export function getDefensesBuildTime(
+  defense: Defense,
+  quantity: number,
+  shipyardLevel: number,
+  naniteFactoryLevel: number,
+  universeEconomySpeed: number
+): Milliseconds {
+  const {metal, crystal} = defense.cost;
   const hours =
     ((metal as number) + (crystal as number)) /
     (2500 * (1 + shipyardLevel) * Math.pow(2, naniteFactoryLevel));
@@ -177,7 +202,7 @@ export function getShipsBuildTime(
 }
 
 //
-// SHIPS FRET
+// SHIPS FLIGHT
 //
 
 export function getShipCargoCapacity(
@@ -186,4 +211,57 @@ export function getShipCargoCapacity(
   classBonus: number
 ): number {
   return Math.floor(ship.cargoCapacity * (1 + 0.05 * hyperspaceTechnologyLevel + classBonus));
+}
+
+function entityGap(e1: number, e2: number, count: number, isCircular: boolean): number {
+  const smallest = Math.min(e1, e2);
+  const largest = Math.max(e1, e2);
+  return isCircular ? Math.min(largest - smallest, smallest - largest + count) : largest - smallest;
+}
+
+export function getDistance(from: Coordinates, to: Coordinates, universe: Universe): Distance {
+  const {numberOfGalaxy, numberOfSystem, circularGalaxy, circularSystem} = universe;
+  if (from.galaxy !== to.galaxy) {
+    const galaxyGap = entityGap(from.galaxy, to.galaxy, numberOfGalaxy, true);
+    return multiply(DISTANCE_BETWEEN_GALAXY, galaxyGap);
+  }
+  if (from.solarSystem !== to.solarSystem) {
+    const systemGap = entityGap(from.solarSystem, to.solarSystem, numberOfSystem, circularGalaxy);
+    return sum(multiply(DISTANCE_BETWEEN_SYSTEM, systemGap), 2700 as Distance);
+  }
+  if (from.position !== to.position) {
+    const positionGap = entityGap(from.position, to.position, numberOfSystem, circularSystem);
+    return sum(multiply(DISTANCE_BETWEEN_PLANET, positionGap), 1000 as Distance);
+  }
+  return DISTANCE_BETWEEN_PLANET;
+}
+
+export function getFlightDuration(
+  distance: Distance,
+  speed: ShipSpeed,
+  speedModifier: SpeedModifier,
+  universe: Universe
+): Milliseconds {
+  return ((1000 * (10 + (3500 / speedModifier) * Math.sqrt((10 * distance) / speed))) /
+    universe.flightSpeed) as Milliseconds;
+}
+
+export function getFuelConsumption(
+  baseFuelConsumption: ShipFuelConsumption,
+  distance: Distance,
+  shipSpeed: number,
+  fleetSpeed: number,
+  shipCount: number
+): DeuteriumAmount {
+  if (shipSpeed < fleetSpeed) {
+    throw new Error(
+      `Ship speed (${shipSpeed}) can not be smaller than the fleet speed (${fleetSpeed})`
+    );
+  }
+  return (1 +
+    Math.ceil(
+      shipCount *
+        ((baseFuelConsumption * distance) / 35000) *
+        Math.pow(1 + fleetSpeed / shipSpeed, 2)
+    )) as DeuteriumAmount;
 }

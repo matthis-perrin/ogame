@@ -53,7 +53,7 @@ export function getExtraDefensesToBuildOnPlanet(
 ): {defense: Defense; quantity: number}[] {
   const defensesToBuild: {defense: Defense; quantity: number}[] = [];
   for (const {defense, quantity} of targetDefenses) {
-    const currentQuantity = planet.defense.get(defense) ?? 0;
+    const currentQuantity = planet.defenses.get(defense) ?? 0;
     let inProgressQuantity = 0;
     planet.inProgressDefenses?.defenses.forEach(d => {
       if (d.defense === defense) {
