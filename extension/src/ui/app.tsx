@@ -10,7 +10,6 @@ import {Empire} from '@src/ui/empire';
 import {Fleets} from '@src/ui/fleets';
 import {Messages} from '@src/ui/messages';
 import {ObjectivesC} from '@src/ui/objectives';
-import {Research} from '@src/ui/research';
 
 export const App: FC = () => {
   const [account] = useAccount();
@@ -23,7 +22,6 @@ export const App: FC = () => {
           <div>
             <Top>
               <Aggregation account={account} />
-              <Research account={account} />
             </Top>
             <Middle>
               <Empire account={account} />

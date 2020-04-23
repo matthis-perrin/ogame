@@ -14,7 +14,7 @@ import {Message} from '@src/models/messages';
 import {PlanetCoords} from '@src/models/planets';
 import {Table, Title} from '@src/ui/common';
 import {Resource} from '@src/ui/components/resource';
-import {time} from '@src/ui/utils';
+import {sum, time} from '@src/ui/utils';
 
 interface MessagesProps {
   account: Account;
@@ -66,6 +66,8 @@ export const Messages: FC<MessagesProps> = ({account}) => {
       }
     }
   }
+
+  const lootMargin = 10000;
 
   return (
     <Fragment>
@@ -120,7 +122,7 @@ export const Messages: FC<MessagesProps> = ({account}) => {
                         );
                         sendLargeCargos(
                           message.planetCoords,
-                          Math.ceil(message.resources.sum / fretGt)
+                          Math.ceil(sum([message.resources.sum, lootMargin]) / fretGt)
                         );
                       }}
                       className={attackingFleets.has(message.planetCoords) ? 'orange' : ''}
