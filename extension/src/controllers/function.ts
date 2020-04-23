@@ -1,7 +1,7 @@
 import {PROBES_AMOUNT} from '@src/models/constants';
 import {getCoords, PlanetCoords} from '@src/models/planets';
 
-function runScript(scriptStr: string): void {
+export function runScript(scriptStr: string): void {
   const script = document.createElement('script');
   script.textContent = scriptStr;
   document.head.appendChild(script);
