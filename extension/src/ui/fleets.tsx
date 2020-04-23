@@ -2,9 +2,10 @@ import React, {FC, Fragment} from 'react';
 import styled from 'styled-components';
 
 import {goToFleets, goToMessages, goToShips} from '@src/controllers/navigator';
-import {Account, findPlanetId} from '@src/models/account';
+import {Account} from '@src/models/account';
 import {COLOR_GREEN} from '@src/models/constants';
 import {Fleet, MissionTypeEnum, missionTypeString} from '@src/models/fleets';
+import {findPlanetId} from '@src/models/planets';
 import {Table, Title} from '@src/ui/common';
 import {PlanetCoordsC} from '@src/ui/components/planetcoords';
 import {Resource} from '@src/ui/components/resource';
@@ -62,7 +63,7 @@ export const Fleets: FC<FleetsProps> = ({account}) => {
                         planetId === undefined ||
                         (fleet.missionType === MissionTypeEnum.Transport && !fleet.returnFlight)
                       ) {
-                        goToMessages();
+                        goToMessages(planetId);
                         return;
                       }
                       goToShips(planetId);

@@ -4,11 +4,11 @@ import {CrystalMine, DeuteriumSynthesizer, MetalMine, SolarPlant} from '@shared/
 import {SolarSatellite} from '@shared/models/ships';
 
 import {persist} from '@src/controllers/storage';
-import {Account, AccountPlanet, findPlanetId} from '@src/models/account';
+import {Account, AccountPlanet} from '@src/models/account';
 import {ACCOUNT_TECHNOLOGIES, MAX_TECHNOLOGIES, UI_REFRESH_RATE} from '@src/models/constants';
 import {Fleet, MissionTypeEnum} from '@src/models/fleets';
 import {Message} from '@src/models/messages';
-import {Planet, PlanetId} from '@src/models/planets';
+import {findPlanetId, Planet, PlanetId} from '@src/models/planets';
 import {ResourceAmount, Resources, ResourcesWithSum} from '@src/models/resources';
 import {generateConstructionId, Technology, TechnologyIndex} from '@src/models/technologies';
 import {sum} from '@src/ui/utils';
@@ -110,10 +110,10 @@ function calcInFlightResources(
       inFlight.sum = sum([inFlight.metal, inFlight.crystal, inFlight.deuterium]);
       inFlightResources[fleet.destinationCoords] = inFlight;
       if (planetIndex.has(fleet.destinationCoords)) {
-        inFlightSum.metal = sum([inFlightSum.metal, inFlight.metal]);
-        inFlightSum.crystal = sum([inFlightSum.crystal, inFlight.crystal]);
-        inFlightSum.deuterium = sum([inFlightSum.deuterium, inFlight.deuterium]);
-        inFlightSum.sum = sum([inFlightSum.sum, inFlight.sum]);
+        inFlightSum.metal = sum([inFlightSum.metal, fleet.resources.metal]);
+        inFlightSum.crystal = sum([inFlightSum.crystal, fleet.resources.crystal]);
+        inFlightSum.deuterium = sum([inFlightSum.deuterium, fleet.resources.deuterium]);
+        inFlightSum.sum = sum([inFlightSum.sum, fleet.resources.sum]);
       }
     }
   }
@@ -599,6 +599,9 @@ function applyProduction(): void {
     planetDetails.sort((a, b) => b.resources.sum - a.resources.sum);
     for (const planet of planetDetails) {
       if (planet.planetId === account.objectives.planetId) {
+        metalSent += planet.resources.metal;
+        crystalSent += planet.resources.crystal;
+        deuteriumSent += planet.resources.deuterium;
         continue;
       }
       const metalToSend = Math.min(

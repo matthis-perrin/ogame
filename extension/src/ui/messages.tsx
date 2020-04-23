@@ -1,17 +1,16 @@
 import React, {FC, Fragment, useState} from 'react';
 import styled from 'styled-components';
 
-import {getShipCargoCapacity} from '@shared/lib/formula';
 import {LargeCargo} from '@shared/models/ships';
-import {HyperspaceTechnology} from '@shared/models/technology';
 
 import {deleteMessage, sendProbes} from '@src/controllers/function';
 import {goToMessages, sendLargeCargos} from '@src/controllers/navigator';
 import {Account} from '@src/models/account';
-import {COLLECTOR_BONUS_FRET, COLOR_ORANGE, COLOR_RED} from '@src/models/constants';
+import {COLOR_ORANGE, COLOR_RED} from '@src/models/constants';
 import {MissionTypeEnum} from '@src/models/fleets';
 import {Message} from '@src/models/messages';
 import {PlanetCoords} from '@src/models/planets';
+import {getFretCapacity} from '@src/models/technologies';
 import {Table, Title} from '@src/ui/common';
 import {Resource} from '@src/ui/components/resource';
 import {sum, time} from '@src/ui/utils';
@@ -110,18 +109,11 @@ export const Messages: FC<MessagesProps> = ({account}) => {
                     </Hover>{' '}
                     <Hover
                       onClick={() => {
-                        const hyperLevel = account.accountTechnologies.hasOwnProperty(
-                          HyperspaceTechnology.id
-                        )
-                          ? account.accountTechnologies[HyperspaceTechnology.id].value
-                          : 0;
-                        const fretGt = getShipCargoCapacity(
-                          LargeCargo,
-                          hyperLevel,
-                          COLLECTOR_BONUS_FRET
-                        );
+                        const fretGt = getFretCapacity(account.accountTechnologies, LargeCargo);
                         sendLargeCargos(
+                          account.currentPlanetId,
                           message.planetCoords,
+                          MissionTypeEnum.Attacking,
                           Math.ceil(sum([message.resources.sum, lootMargin]) / fretGt)
                         );
                       }}

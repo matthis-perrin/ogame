@@ -2,8 +2,9 @@ import React, {FC, Fragment} from 'react';
 import styled from 'styled-components';
 
 import {goToTechnology} from '@src/controllers/navigator';
-import {Account, findPlanetName} from '@src/models/account';
+import {Account} from '@src/models/account';
 import {COLOR_GREEN} from '@src/models/constants';
+import {findPlanetName} from '@src/models/planets';
 import {Construction, techShortName} from '@src/models/technologies';
 import {Table, Title} from '@src/ui/common';
 import {time} from '@src/ui/utils';

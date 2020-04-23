@@ -16,6 +16,18 @@ export interface Coords {
   position: number;
 }
 
+export function findPlanetName(planetList: Planet[], planetId: PlanetId): PlanetName {
+  return planetList.find(_ => _.id === planetId)?.name ?? ('' as PlanetName);
+}
+
+export function findPlanetId(planetList: Planet[], planetName: PlanetName): PlanetId | undefined {
+  return planetList.find(_ => _.name === planetName)?.id;
+}
+
+export function findPlanetCoords(planetList: Planet[], planetId: PlanetId): PlanetCoords {
+  return planetList.find(_ => _.id === planetId)?.coords ?? ('[1:1:1]' as PlanetCoords);
+}
+
 const coordsRegex = /^\[(\d+):(\d+):(\d+)\]$/;
 export function getCoords(planetCoords: PlanetCoords): Coords {
   const match = coordsRegex.exec(planetCoords);

@@ -1,7 +1,7 @@
 import React, {FC, Fragment} from 'react';
 import styled from 'styled-components';
 
-import {getSatelliteEnergyProductionPerHour, getShipCargoCapacity} from '@shared/lib/formula';
+import {getSatelliteEnergyProductionPerHour} from '@shared/lib/formula';
 import {
   CrystalMine,
   CrystalStorage,
@@ -33,7 +33,6 @@ import {
   SmallCargo,
   SolarSatellite,
 } from '@shared/models/ships';
-import {HyperspaceTechnology} from '@shared/models/technology';
 
 import {
   goToDefenses,
@@ -45,7 +44,6 @@ import {
 import {Account} from '@src/models/account';
 import {
   COLLECTOR_BONUS_ENERGY,
-  COLLECTOR_BONUS_FRET,
   COLOR_GREEN,
   DEBRIS_PERCENTAGE,
   DEBRIS_SAT,
@@ -56,6 +54,7 @@ import {
   RATIO_PLA,
 } from '@src/models/constants';
 import {ResourceAmount} from '@src/models/resources';
+import {getFretCapacity} from '@src/models/technologies';
 import {Table, Title} from '@src/ui/common';
 import {Energy} from '@src/ui/components/energy';
 import {Loot} from '@src/ui/components/loot';
@@ -122,14 +121,11 @@ export const Empire: FC<EmpireProps> = ({account}) => (
               ? planet.technologies[SolarSatellite.id].value * DEBRIS_SAT * DEBRIS_PERCENTAGE
               : 0;
             const totalLoot = inactivityLoot + satelliteLoot;
-            const hyperLevel = account.accountTechnologies.hasOwnProperty(HyperspaceTechnology.id)
-              ? account.accountTechnologies[HyperspaceTechnology.id].value
-              : 0;
             const ptAmount = planet.ships.hasOwnProperty(SmallCargo.id)
               ? planet.ships[SmallCargo.id].value
               : 0;
-            const fretPt = getShipCargoCapacity(SmallCargo, hyperLevel, COLLECTOR_BONUS_FRET);
-            const fretGt = getShipCargoCapacity(LargeCargo, hyperLevel, COLLECTOR_BONUS_FRET);
+            const fretPt = getFretCapacity(account.accountTechnologies, SmallCargo);
+            const fretGt = getFretCapacity(account.accountTechnologies, LargeCargo);
             const requiredGt = Math.ceil((planet.resources.sum - ptAmount * fretPt) / fretGt);
             let requiredSat = 0;
             if (planet.resources.energy < 0) {

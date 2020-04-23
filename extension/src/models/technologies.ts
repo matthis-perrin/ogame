@@ -1,9 +1,11 @@
+import {getShipCargoCapacity} from '@shared/lib/formula';
 import {BuildableBase} from '@shared/models/buildable';
 import {AllBuildings} from '@shared/models/building';
 import {AllDefenses} from '@shared/models/defense';
-import {AllShips} from '@shared/models/ships';
-import {AllTechnologies} from '@shared/models/technology';
+import {AllShips, Ship} from '@shared/models/ships';
+import {AllTechnologies, HyperspaceTechnology} from '@shared/models/technology';
 
+import {COLLECTOR_BONUS_FRET} from '@src/models/constants';
 import {PlanetId, PlanetName} from '@src/models/planets';
 
 export type ConstructionId = string & {_: 'ConstructionId'};
@@ -48,4 +50,11 @@ export function techShortName(techId: number): string {
     return 'Protection des vaisseaux';
   }
   return name;
+}
+
+export function getFretCapacity(technologies: {[techId: number]: Technology}, ship: Ship): number {
+  const hyperLevel = technologies.hasOwnProperty(HyperspaceTechnology.id)
+    ? technologies[HyperspaceTechnology.id].value
+    : 0;
+  return getShipCargoCapacity(ship, hyperLevel, COLLECTOR_BONUS_FRET);
 }

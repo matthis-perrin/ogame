@@ -1,3 +1,4 @@
+import {MissionType, MissionTypeEnum} from '@src/models/fleets';
 import {getCoords, PlanetCoords, PlanetId} from '@src/models/planets';
 import {TechnologyIndex} from '@src/models/technologies';
 
@@ -46,11 +47,18 @@ export function goToGalaxy(planetCoords: PlanetCoords): void {
   window.location.href = `${document.location.origin}${document.location.pathname}?page=ingame&component=galaxy&galaxy=${coords.galaxy}&system=${coords.system}&position=${coords.position}`;
 }
 
-export function goToMessages(): void {
-  window.location.href = `${document.location.origin}${document.location.pathname}?page=messages`;
+export function goToMessages(planetId?: PlanetId): void {
+  window.location.href = `${document.location.origin}${document.location.pathname}?page=messages${
+    planetId !== undefined ? `&cp=${planetId}` : ''
+  }`;
 }
 
-export function sendLargeCargos(planetCoords: PlanetCoords, amount: number): void {
+export function sendLargeCargos(
+  from: PlanetId,
+  planetCoords: PlanetCoords,
+  missionType: MissionTypeEnum,
+  amount: number
+): void {
   const coords = getCoords(planetCoords);
-  window.location.href = `${document.location.origin}${document.location.pathname}?page=ingame&component=fleetdispatch&galaxy=${coords.galaxy}&system=${coords.system}&position=${coords.position}&type=1&mission=1&am203=${amount}`;
+  window.location.href = `${document.location.origin}${document.location.pathname}?page=ingame&component=fleetdispatch&galaxy=${coords.galaxy}&system=${coords.system}&position=${coords.position}&type=1&mission=${missionType}&am203=${amount}&cp=${from}`;
 }
