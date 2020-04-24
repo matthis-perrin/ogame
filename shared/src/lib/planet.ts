@@ -39,7 +39,7 @@ export function createPlanet(
 ): Planet {
   counter++;
   return {
-    id: `${counter}` as PlanetId,
+    id: `P${counter}` as PlanetId,
     resources: makeResources({}),
     metadata: {
       coordinates,

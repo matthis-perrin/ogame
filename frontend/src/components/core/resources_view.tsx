@@ -114,7 +114,7 @@ const UnitView: FC<{
   return (
     <UnitViewWrapper>
       <UnitSprite style={{backgroundPosition: getBackgroundPosition(type)}} />
-      <Amount>{amountToString(Math.floor(amount))}</Amount>
+      <AmountClass>{amountToString(Math.floor(amount))}</AmountClass>
     </UnitViewWrapper>
   );
 };

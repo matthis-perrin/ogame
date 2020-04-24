@@ -154,10 +154,10 @@ function advanceAccountTowardBuildItem(
       },
     ];
   } else {
-    const {newAccount, events} = advanceAccountInTime(account, waitTime.time);
+    const {newAccount, events, actualAdvanceTime} = advanceAccountInTime(account, waitTime.time);
     return [
       {
-        transition: {type: 'wait', duration: waitTime.time, reason: waitTime.reason, events},
+        transition: {type: 'wait', duration: actualAdvanceTime, reason: waitTime.reason, events},
         transitionnedAccount: newAccount,
       },
       ...advanceAccountTowardBuildItem(newAccount, buildItem),
@@ -358,13 +358,16 @@ function buildItemsToTransitions(
     throw new Error(`Item can not be applied in the past`);
   }
   if (earliest.time > ZERO) {
-    const {events, newAccount, fullyAdvanced} = advanceAccountInTime(account, earliest.time);
+    const {events, newAccount, fullyAdvanced, actualAdvanceTime} = advanceAccountInTime(
+      account,
+      earliest.time
+    );
     currentAccount = newAccount;
     transitions.push({
       transitionnedAccount: newAccount,
       transition: {
         type: 'wait',
-        duration: earliest.time,
+        duration: actualAdvanceTime,
         reason: earliest.reason,
         events,
       },
@@ -536,7 +539,12 @@ export function applyBuildItem(account: Account, buildItem: BuildItem): Account 
 function advanceAccountInTime(
   account: Account,
   time: Milliseconds
-): {newAccount: Account; events: string[]; fullyAdvanced: boolean} {
+): {
+  newAccount: Account;
+  events: string[];
+  fullyAdvanced: boolean;
+  actualAdvanceTime: Milliseconds;
+} {
   const newCurrentTime = sum(account.currentTime, time < 1 ? ONE_MILLISECOND : time);
   let newAccount = account;
 
@@ -599,6 +607,7 @@ function advanceAccountInTime(
 
   // We got the maxTime, we increase the resources on each planet and update
   // finished constructions.
+  const actualAdvanceTime = substract(maxTime, newAccount.currentTime);
   for (const planet of newAccount.planets.values()) {
     const {prod} = getPlanetProductionPerHour(newAccount, planet);
     const {newPlanet, newEvents} = directlyAdvancePlanetInTime(
@@ -625,7 +634,12 @@ function advanceAccountInTime(
   }
 
   newAccount = updateAccountCurrentTime(newAccount, maxTime);
-  return {newAccount, events, fullyAdvanced: maxTime === newCurrentTime};
+  return {
+    newAccount,
+    events,
+    fullyAdvanced: maxTime === newCurrentTime,
+    actualAdvanceTime,
+  };
 }
 
 // Do not use directly! This function does not perform any check regarding the prod rate changing
