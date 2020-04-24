@@ -74,18 +74,18 @@ export function getAccountTimeline(target: Buildable, account: Account): Account
       return [item, score];
     });
 
-    // // Cheapest first
-    // return availableItemsAndScore.sort((a, b) => b[1] - a[1])[0][0];
+    // Cheapest first
+    return availableItemsAndScore.sort((a, b) => b[1] - a[1])[0][0];
 
-    // Weighted Random
-    const r = Math.random() * totalScore;
-    let current = 0;
-    for (const [item, score] of availableItemsAndScore) {
-      current += score;
-      if (r < current) {
-        return item;
-      }
-    }
+    // // Weighted Random
+    // const r = Math.random() * totalScore;
+    // let current = 0;
+    // for (const [item, score] of availableItemsAndScore) {
+    //   current += score;
+    //   if (r < current) {
+    //     return item;
+    //   }
+    // }
 
     throw new Error(`Failure to pick a build order item`);
   }

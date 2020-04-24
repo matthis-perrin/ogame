@@ -12,7 +12,7 @@ import {
   isEnergyConsumerBuildable,
 } from '@shared/lib/build_items';
 import {
-  getCheapestBuildItemsForMissingEnergyPerHour,
+  getCheapestEnergyBuildItemsForEnergyPerHour,
   getInProgressEnergyDeltaPerHour,
 } from '@shared/lib/energy';
 import {
@@ -66,7 +66,7 @@ import {
   ZERO,
 } from '@shared/models/time';
 import {AccountTimeline, TransitionnedAccount} from '@shared/models/timeline';
-import {max, multiply, neverHappens, substract, sum} from '@shared/utils/type_utils';
+import {ceil, max, multiply, neverHappens, substract, sum} from '@shared/utils/type_utils';
 
 export function createAccountTimeline(account: Account, buildItems: BuildItem[]): AccountTimeline {
   const start = Date.now();
@@ -96,7 +96,7 @@ export function createAccountTimeline(account: Account, buildItems: BuildItem[])
       // for (const transition of transitions) {
       //   console.log(transitionToString(transition.transition));
       // }
-      // advanceAccountTowardBuildItem(currentAccount, buildItem);
+      advanceAccountTowardBuildItem(currentAccount, buildItem);
       break;
     }
   }
@@ -172,15 +172,13 @@ function requiredBuildItemsFromEnergyCheck(account: Account): BuildItem[] {
   const energyLevel = account.technologyLevels.get(EnergyTechnology) ?? 0;
   for (const planet of account.planets.values()) {
     const {energyConsumption, energyProduction} = getPlanetProductionPerHour(account, planet);
-    if (
-      sum(energyProduction, getInProgressEnergyDeltaPerHour(account, planet, energyLevel)) <=
-      energyConsumption
-    ) {
-      const buildItems = getCheapestBuildItemsForMissingEnergyPerHour(
-        account,
-        planet,
-        substract(energyConsumption, energyProduction)
-      );
+    const energyNeeded = substract(
+      energyConsumption,
+      sum(energyProduction, getInProgressEnergyDeltaPerHour(account, planet, energyLevel))
+    );
+    console.log(energyNeeded);
+    if (energyNeeded > 0) {
+      const buildItems = getCheapestEnergyBuildItemsForEnergyPerHour(account, planet, energyNeeded);
       requiredBuildItems.push(...buildItems);
     }
   }
@@ -547,7 +545,7 @@ function advanceAccountInTime(
   fullyAdvanced: boolean;
   actualAdvanceTime: Milliseconds;
 } {
-  const newCurrentTime = sum(account.currentTime, time < 1 ? ONE_MILLISECOND : time);
+  const newCurrentTime = sum(account.currentTime, time);
   let newAccount = account;
 
   // We need to advance the account step by step if there is something in progress that
@@ -590,7 +588,7 @@ function advanceAccountInTime(
             timeCursor,
             getShipsBuildTime(ship, quantity, shipyardLevel, naniteLevel, economySpeed)
           );
-          if (timeCursor > maxTime) {
+          if (timeCursor > maxTime && timeCursor > account.currentTime) {
             break;
           }
         } else {
@@ -601,11 +599,16 @@ function advanceAccountInTime(
           if (timeCursor <= maxTime) {
             maxTime = timeCursor;
           }
-          break;
+          if (timeCursor > account.currentTime) {
+            break;
+          }
         }
       }
     }
   }
+
+  // Always advance by a whole number of milliseconds to prevent rounding errors
+  maxTime = ceil(maxTime);
 
   // We got the maxTime, we increase the resources on each planet and update
   // finished constructions.
@@ -689,8 +692,8 @@ function directlyAdvancePlanetInTime(
     const remainingDefensesToBuild: {defense: Defense; quantity: number}[] = [];
     const planetDefenses = new Map(newPlanet.defenses.entries());
 
-    let timeCusor = newPlanet.inProgressDefenses.startTime;
-    let newDefenseStart = timeCusor;
+    let timeCursor = newPlanet.inProgressDefenses.startTime;
+    let newDefenseStart = timeCursor;
     let done = false;
     for (const {defense, quantity} of newPlanet.inProgressDefenses.defenses) {
       if (done) {
@@ -704,19 +707,19 @@ function directlyAdvancePlanetInTime(
         economySpeed
       );
       const allDefensesBuildTime = multiply(defenseBuildTime, quantity);
-      const timeAfterAllDefensesBuilt = sum(timeCusor, allDefensesBuildTime);
+      const timeAfterAllDefensesBuilt = sum(timeCursor, allDefensesBuildTime);
       if (timeAfterAllDefensesBuilt <= newCurrentTime) {
-        timeCusor = timeAfterAllDefensesBuilt;
+        timeCursor = timeAfterAllDefensesBuilt;
         planetDefenses.set(defense, (planetDefenses.get(defense) ?? 0) + quantity);
         events.push(
           `Creating ${quantity} x ${defense.name} (0 left in queue) on planet ${planet.id}.`
         );
       } else {
         const maxBuildableDefenses = Math.floor(
-          substract(newCurrentTime, timeCusor) / defenseBuildTime
+          substract(newCurrentTime, timeCursor) / defenseBuildTime
         );
-        timeCusor = sum(timeCusor, multiply(defenseBuildTime, maxBuildableDefenses));
-        newDefenseStart = timeCusor;
+        timeCursor = sum(timeCursor, multiply(defenseBuildTime, maxBuildableDefenses));
+        newDefenseStart = timeCursor;
         planetDefenses.set(defense, (planetDefenses.get(defense) ?? 0) + maxBuildableDefenses);
         const remainingDefense = quantity - maxBuildableDefenses;
         events.push(
@@ -749,8 +752,8 @@ function directlyAdvancePlanetInTime(
     const remainingShipsToBuild: {ship: Ship; quantity: number}[] = [];
     const planetShips = new Map(newPlanet.ships.entries());
 
-    let timeCusor = newPlanet.inProgressShips.startTime;
-    let newShipStart = timeCusor;
+    let timeCursor = newPlanet.inProgressShips.startTime;
+    let newShipStart = timeCursor;
     let done = false;
     for (const {ship, quantity} of newPlanet.inProgressShips.ships) {
       if (done) {
@@ -758,17 +761,17 @@ function directlyAdvancePlanetInTime(
       }
       const shipBuildTime = getShipsBuildTime(ship, 1, shipyardLevel, naniteLevel, economySpeed);
       const allShipsBuildTime = multiply(shipBuildTime, quantity);
-      const timeAfterAllShipsBuilt = sum(timeCusor, allShipsBuildTime);
+      const timeAfterAllShipsBuilt = sum(timeCursor, allShipsBuildTime);
       if (timeAfterAllShipsBuilt <= newCurrentTime) {
-        timeCusor = timeAfterAllShipsBuilt;
+        timeCursor = timeAfterAllShipsBuilt;
         planetShips.set(ship, (planetShips.get(ship) ?? 0) + quantity);
         events.push(
           `Creating ${quantity} x ${ship.name} (0 left in queue) on planet ${planet.id}.`
         );
       } else {
-        const maxBuildableShips = Math.floor(substract(newCurrentTime, timeCusor) / shipBuildTime);
-        timeCusor = sum(timeCusor, multiply(shipBuildTime, maxBuildableShips));
-        newShipStart = timeCusor;
+        const maxBuildableShips = Math.floor(substract(newCurrentTime, timeCursor) / shipBuildTime);
+        timeCursor = sum(timeCursor, multiply(shipBuildTime, maxBuildableShips));
+        newShipStart = timeCursor;
         planetShips.set(ship, (planetShips.get(ship) ?? 0) + maxBuildableShips);
         const remainingShip = quantity - maxBuildableShips;
         events.push(

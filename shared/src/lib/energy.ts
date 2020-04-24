@@ -2,6 +2,7 @@ import {buildItemsCost, buildItemsToUnlockBuildableOnPlanet} from '@shared/lib/b
 import {
   getExtraDefensesToBuildOnPlanet,
   getRequiredDefenseForStealableResources,
+  getStealableResourcesProtectedByDefense,
 } from '@shared/lib/defense';
 import {
   getCrawlerEnergyConsumptionPerHour,
@@ -12,10 +13,8 @@ import {
   getSatelliteEnergyProductionPerHour,
   getSolarPlantEnergyProductionPerHour,
 } from '@shared/lib/formula';
-import {
-  getMaxStealableStandardUnitOnPlanet,
-  getRecyclableStandardUnitOnPlanet,
-} from '@shared/lib/planet';
+import {getRecyclableStandardUnitFromShips} from '@shared/lib/planet';
+import {toStandardUnits} from '@shared/lib/resources';
 import {Account, Class} from '@shared/models/account';
 import {BuildItem} from '@shared/models/build_item';
 import {
@@ -26,13 +25,19 @@ import {
   SolarPlant,
 } from '@shared/models/building';
 import {Planet} from '@shared/models/planet';
-import {addResources, EnergyAmount, multiplyResources, ZERO_ENERGY} from '@shared/models/resource';
+import {
+  addResources,
+  divideResources,
+  EnergyAmount,
+  multiplyResources,
+  ZERO_ENERGY,
+} from '@shared/models/resource';
 import {Crawler, SolarSatellite} from '@shared/models/ships';
 import {multiply, substract, sum} from '@shared/utils/type_utils';
 
 // Note - We assume the SolarPlant and the SolarSatellite don't have requirements
 // TODO - Include FusionReactor and EnergyTechnology?
-export function getCheapestBuildItemsForMissingEnergyPerHour(
+export function getCheapestEnergyBuildItemsForEnergyPerHour(
   account: Account,
   planet: Planet,
   energy: EnergyAmount
@@ -45,6 +50,14 @@ export function getCheapestBuildItemsForMissingEnergyPerHour(
   // Solar Plant cost
   const solarPlantLevel = planet.buildingLevels.get(SolarPlant) ?? 0;
   const nextLevelSolarPlantCost = SolarPlant.cost(solarPlantLevel + 1);
+  const solarPlantEnergyIncrease = substract(
+    getSolarPlantEnergyProductionPerHour(solarPlantLevel + 1),
+    getSolarPlantEnergyProductionPerHour(solarPlantLevel)
+  );
+  const solarPlantCostPerEnergy = divideResources(
+    nextLevelSolarPlantCost,
+    solarPlantEnergyIncrease
+  );
 
   // // Solar Plant time to build
   // const timeToGetResourcesForSolarPlant = timeToProduceAtLeast(
@@ -74,18 +87,33 @@ export function getCheapestBuildItemsForMissingEnergyPerHour(
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     account.class === Class.Collector ? 0.1 : 0
   );
-  const neededSatellites = Math.ceil(energy / energyProductionPerSatellite);
 
-  const recyclableStandardUnit = getRecyclableStandardUnitOnPlanet(account, planet, [
-    {ship: SolarSatellite, quantity: neededSatellites},
+  const requiredSatellitesCount = Math.max(1, Math.ceil(energy / energyProductionPerSatellite));
+  const satelliteCountToCompareWithSolarPlant = Math.max(
+    requiredSatellitesCount,
+    Math.ceil(solarPlantEnergyIncrease / energyProductionPerSatellite)
+  );
+
+  const recyclableStandardUnit = getRecyclableStandardUnitFromShips(account, [
+    {ship: SolarSatellite, quantity: satelliteCountToCompareWithSolarPlant},
   ]);
-  const maxStealableStandardUnitOnPlanet = getMaxStealableStandardUnitOnPlanet(account, planet);
+  const standardUnitProtectedByDefense = getStealableResourcesProtectedByDefense(
+    Array.from(planet.defenses.entries()).map(([defense, quantity]) => ({defense, quantity}))
+  );
   const defenseRequired = getRequiredDefenseForStealableResources(
-    sum(recyclableStandardUnit, maxStealableStandardUnitOnPlanet)
+    sum(recyclableStandardUnit, standardUnitProtectedByDefense)
   );
   const extraDefenseRequired = getExtraDefensesToBuildOnPlanet(planet, defenseRequired);
 
-  let totalSatelliteCost = multiplyResources(SolarSatellite.cost, neededSatellites);
+  let totalSatelliteCost = multiplyResources(
+    SolarSatellite.cost,
+    satelliteCountToCompareWithSolarPlant
+  );
+  const extraSatelliteBuildItems = buildItemsToUnlockBuildableOnPlanet(
+    account,
+    planet,
+    SolarSatellite
+  );
   const extraDefenseBuildItems: BuildItem[] = [];
   for (const {defense, quantity} of extraDefenseRequired) {
     extraDefenseBuildItems.push(...buildItemsToUnlockBuildableOnPlanet(account, planet, defense));
@@ -96,7 +124,13 @@ export function getCheapestBuildItemsForMissingEnergyPerHour(
       planetId: planet.id,
     });
   }
+  totalSatelliteCost = addResources(totalSatelliteCost, buildItemsCost(extraSatelliteBuildItems));
   totalSatelliteCost = addResources(totalSatelliteCost, buildItemsCost(extraDefenseBuildItems));
+
+  const satelliteCostPerEnergy = divideResources(
+    totalSatelliteCost,
+    satelliteCountToCompareWithSolarPlant * energyProductionPerSatellite
+  );
 
   // // Satellite time to build
   // const timeToGetResourcesForSatelliteAndDefense = timeToProduceAtLeast(
@@ -128,13 +162,53 @@ export function getCheapestBuildItemsForMissingEnergyPerHour(
   //   timeToBuildHalfOfTheSatellites
   // );
 
+  console.log('');
+  console.log('');
+  console.log(`------ ENERGY ${energy} CHECK ------`);
+  console.log('solarPlantLevel', solarPlantLevel);
+  console.log('nextLevelSolarPlantCost', nextLevelSolarPlantCost);
+  console.log('solarPlantEnergyIncrease', solarPlantEnergyIncrease);
+  console.log('solarPlantCostPerEnergy', solarPlantCostPerEnergy);
+  console.log('energyProductionPerSatellite', energyProductionPerSatellite);
+  console.log('requiredSatellitesCount', requiredSatellitesCount);
+  console.log('satelliteCountToCompareWithSolarPlant', satelliteCountToCompareWithSolarPlant);
+  console.log('recyclableStandardUnit', recyclableStandardUnit);
+  console.log('standardUnitProtectedByDefense', standardUnitProtectedByDefense);
+  console.log('defenseRequired', defenseRequired);
+  console.log('extraDefenseRequired', extraDefenseRequired);
+  console.log('extraSatelliteBuildItems', extraSatelliteBuildItems);
+  console.log('extraDefenseBuildItems', extraDefenseBuildItems);
+  console.log('buildItemsCost(extraDefenseBuildItems)', buildItemsCost(extraDefenseBuildItems));
+  console.log('totalSatelliteCost', totalSatelliteCost);
+  console.log('satelliteCostPerEnergy', satelliteCostPerEnergy);
+  console.log(
+    'toStandardUnits(account, solarPlantCostPerEnergy)',
+    toStandardUnits(account, solarPlantCostPerEnergy)
+  );
+  console.log(
+    'toStandardUnits(account, satelliteCostPerEnergy)',
+    toStandardUnits(account, satelliteCostPerEnergy)
+  );
+  console.log('--------------------------');
+
   // Choose the best (cheapest) one
-  if (nextLevelSolarPlantCost > totalSatelliteCost) {
+  if (
+    toStandardUnits(account, solarPlantCostPerEnergy) >
+    toStandardUnits(account, satelliteCostPerEnergy)
+  ) {
+    console.log(`========> CHOSE ${requiredSatellitesCount} SATELLITE <========`);
     return [
-      {type: 'ship', buildable: SolarSatellite, quantity: neededSatellites, planetId: planet.id},
+      ...extraSatelliteBuildItems,
+      {
+        type: 'ship',
+        buildable: SolarSatellite,
+        quantity: requiredSatellitesCount,
+        planetId: planet.id,
+      },
       ...extraDefenseBuildItems,
     ];
   } else {
+    console.log(`========> CHOSE SOLAR PLANT ${solarPlantLevel + 1} <========`);
     return [
       {type: 'building', buildable: SolarPlant, level: solarPlantLevel + 1, planetId: planet.id},
     ];

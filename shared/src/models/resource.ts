@@ -1,5 +1,5 @@
 import {fixFloatingPointAmount} from '@shared/lib/resources';
-import {Brand, multiply, substract, sum} from '@shared/utils/type_utils';
+import {Brand, divide, multiply, substract, sum} from '@shared/utils/type_utils';
 
 export enum ResourceType {
   Metal = 'metal',
@@ -45,6 +45,14 @@ export function multiplyResources(r: Resources, times: number): Resources {
     metal: fixFloatingPointAmount(multiply(r.metal, times)),
     crystal: fixFloatingPointAmount(multiply(r.crystal, times)),
     deuterium: fixFloatingPointAmount(multiply(r.deuterium, times)),
+  };
+}
+
+export function divideResources(r: Resources, times: number): Resources {
+  return {
+    metal: fixFloatingPointAmount(divide(r.metal, times)),
+    crystal: fixFloatingPointAmount(divide(r.crystal, times)),
+    deuterium: fixFloatingPointAmount(divide(r.deuterium, times)),
   };
 }
 

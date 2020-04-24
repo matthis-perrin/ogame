@@ -47,6 +47,16 @@ export function getRequiredDefenseForStealableResources(
   throw new Error(`Could not find a defense line to protect ${standardUnit} standard units`);
 }
 
+export function getStealableResourcesProtectedByDefense(
+  defenses: {defense: Defense; quantity: number}[]
+): StandardUnitAmount {
+  const defenseLineCoef = defenses.map(({defense, quantity}) => {
+    const quantityForOneMillion = baseDefenseLineForOneMillion.get(defense) ?? 0;
+    return quantityForOneMillion > 0 ? quantity / quantityForOneMillion : 0;
+  });
+  return (Math.max(0, ...defenseLineCoef) * 1000 * 1000) as StandardUnitAmount;
+}
+
 export function getExtraDefensesToBuildOnPlanet(
   planet: Planet,
   targetDefenses: {defense: Defense; quantity: number}[]

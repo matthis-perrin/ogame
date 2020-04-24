@@ -174,6 +174,9 @@ export function divide<T>(value: Brand<number, T>, divider: number): Brand<numbe
 export function floor<T>(value: Brand<number, T>): Brand<number, T> {
   return Math.floor(value) as Brand<number, T>;
 }
+export function ceil<T>(value: Brand<number, T>): Brand<number, T> {
+  return Math.ceil(value) as Brand<number, T>;
+}
 export function min<T>(...args: Brand<number, T>[]): Brand<number, T> {
   return Math.min(...args) as Brand<number, T>;
 }

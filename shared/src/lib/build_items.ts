@@ -206,14 +206,14 @@ export function buildItemCost(buildItem: BuildItem): Resources {
 }
 
 export function buildItemsCost(buildItems: BuildItem[]): Resources {
-  const metal: MetalAmount = ZERO_METAL;
-  const crystal: CrystalAmount = ZERO_CRYSTAL;
-  const deuterium: DeuteriumAmount = ZERO_DEUTERIUM;
+  let metal: MetalAmount = ZERO_METAL;
+  let crystal: CrystalAmount = ZERO_CRYSTAL;
+  let deuterium: DeuteriumAmount = ZERO_DEUTERIUM;
   for (const buildItem of buildItems) {
     const cost = buildItemCost(buildItem);
-    sum(metal, cost.metal);
-    sum(crystal, cost.crystal);
-    sum(deuterium, cost.deuterium);
+    metal = sum(metal, cost.metal);
+    crystal = sum(crystal, cost.crystal);
+    deuterium = sum(deuterium, cost.deuterium);
   }
   return {metal, crystal, deuterium};
 }
