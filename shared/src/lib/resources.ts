@@ -26,5 +26,5 @@ export function resourcesToString(resources: Resources): string {
 
 export function fixFloatingPointAmount<U, T extends number | Brand<number, U>>(amount: T): T {
   // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-  return (Math.round((amount as number) * 10e8) / 10e8) as T;
+  return (amount < 10e-6 ? 0 : Math.round((amount as number) * 10e8) / 10e8) as T;
 }

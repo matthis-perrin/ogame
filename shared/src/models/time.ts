@@ -3,6 +3,7 @@ import {Brand, multiply, substract} from '@shared/utils/type_utils';
 export type Milliseconds = Brand<number, 'Milliseconds'>;
 
 export const ZERO = 0 as Milliseconds;
+export const ONE_MILLISECOND = 1 as Milliseconds;
 export const ONE_SECOND = 1000 as Milliseconds;
 export const ONE_MINUTE = (60 * ONE_SECOND) as Milliseconds;
 export const ONE_HOUR = (60 * ONE_MINUTE) as Milliseconds;

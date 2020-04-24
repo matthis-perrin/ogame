@@ -5,7 +5,12 @@ import {
   updateAccountInProgressTechnology,
   updateAccountPlanet,
 } from '@shared/lib/account';
-import {buildItemCost, buildItemToString, isEnergyConsumerBuildable} from '@shared/lib/build_items';
+import {
+  buildItemCost,
+  buildItemToString,
+  getBuildItemCost,
+  isEnergyConsumerBuildable,
+} from '@shared/lib/build_items';
 import {
   getCheapestBuildItemsForMissingEnergyPerHour,
   getInProgressEnergyDeltaPerHour,
@@ -52,7 +57,14 @@ import {
 } from '@shared/models/resource';
 import {Crawler, Ship, SolarSatellite} from '@shared/models/ships';
 import {EnergyTechnology, PlasmaTechnology} from '@shared/models/technology';
-import {hoursToMilliseconds, Milliseconds, NEVER, ONE_HOUR, ZERO} from '@shared/models/time';
+import {
+  hoursToMilliseconds,
+  Milliseconds,
+  NEVER,
+  ONE_HOUR,
+  ONE_MILLISECOND,
+  ZERO,
+} from '@shared/models/time';
 import {AccountTimeline, TransitionnedAccount} from '@shared/models/timeline';
 import {max, multiply, neverHappens, substract, sum} from '@shared/utils/type_utils';
 
@@ -68,7 +80,8 @@ export function createAccountTimeline(account: Account, buildItems: BuildItem[])
       transitions.push(...newTransactions);
       currentAccount = transitions[transitions.length - 1].transitionnedAccount;
     } catch (err) {
-      console.log('Error while creating the account timeline');
+      console.log(`Error creating the account timeline while applying item`, buildItem);
+      console.log(`Cost for item: ${resourcesToString(getBuildItemCost(buildItem))}`);
       console.error(err);
       // console.log('Transitions applied');
       // function transitionToString(transition: Transition): string {
@@ -401,6 +414,7 @@ export function applyBuildItem(account: Account, buildItem: BuildItem): Account 
   const cost = buildItemCost(buildItem);
   const newPlanetResources = substractResources(newPlanet.resources, cost);
   if (hasNegativeAmount(newPlanetResources)) {
+    console.log(newPlanetResources);
     throw new Error(
       `Not enough resources for ${buildItemToString(buildItem)} (has ${resourcesToString(
         newPlanet.resources
@@ -523,7 +537,7 @@ function advanceAccountInTime(
   account: Account,
   time: Milliseconds
 ): {newAccount: Account; events: string[]; fullyAdvanced: boolean} {
-  const newCurrentTime = sum(account.currentTime, time);
+  const newCurrentTime = sum(account.currentTime, time < 1 ? ONE_MILLISECOND : time);
   let newAccount = account;
 
   // We need to advance the account step by step if there is something in progress that

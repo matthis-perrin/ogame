@@ -1,3 +1,4 @@
+import {fixFloatingPointAmount} from '@shared/lib/resources';
 import {Brand, multiply, substract, sum} from '@shared/utils/type_utils';
 
 export enum ResourceType {
@@ -25,33 +26,33 @@ export interface Resources {
 export function makeResources(values: {m?: number; c?: number; d?: number}): Resources {
   const {m = 0, c = 0, d = 0} = values;
   return {
-    metal: m as MetalAmount,
-    crystal: c as CrystalAmount,
-    deuterium: d as DeuteriumAmount,
+    metal: fixFloatingPointAmount(m) as MetalAmount,
+    crystal: fixFloatingPointAmount(c) as CrystalAmount,
+    deuterium: fixFloatingPointAmount(d) as DeuteriumAmount,
   };
 }
 
 export function addResources(r1: Resources, r2: Resources): Resources {
   return {
-    metal: sum(r1.metal, r2.metal),
-    crystal: sum(r1.crystal, r2.crystal),
-    deuterium: sum(r1.deuterium, r2.deuterium),
+    metal: fixFloatingPointAmount(sum(r1.metal, r2.metal)),
+    crystal: fixFloatingPointAmount(sum(r1.crystal, r2.crystal)),
+    deuterium: fixFloatingPointAmount(sum(r1.deuterium, r2.deuterium)),
   };
 }
 
 export function multiplyResources(r: Resources, times: number): Resources {
   return {
-    metal: multiply(r.metal, times),
-    crystal: multiply(r.crystal, times),
-    deuterium: multiply(r.deuterium, times),
+    metal: fixFloatingPointAmount(multiply(r.metal, times)),
+    crystal: fixFloatingPointAmount(multiply(r.crystal, times)),
+    deuterium: fixFloatingPointAmount(multiply(r.deuterium, times)),
   };
 }
 
 export function substractResources(r1: Resources, r2: Resources): Resources {
   return {
-    metal: substract(r1.metal, r2.metal),
-    crystal: substract(r1.crystal, r2.crystal),
-    deuterium: substract(r1.deuterium, r2.deuterium),
+    metal: fixFloatingPointAmount(substract(r1.metal, r2.metal)),
+    crystal: fixFloatingPointAmount(substract(r1.crystal, r2.crystal)),
+    deuterium: fixFloatingPointAmount(substract(r1.deuterium, r2.deuterium)),
   };
 }
 
