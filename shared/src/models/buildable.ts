@@ -18,7 +18,7 @@ export interface BuildableBase {
   // Not readonly because we need to update it post creation to avoid circular dependencies
   readonly requirements: BuildableRequirement[];
   readonly component: string; // In URL
-  readonly sprite?: string;
+  readonly sprite: string;
 }
 
 export type Buildable = Technology | Building | Ship | Defense;

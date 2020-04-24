@@ -40,24 +40,12 @@ function makeBuilding(
   };
 }
 
-// metalMine '0 0',
-// crystalMine '5.25% 0',
-// deuteriumSynthesizer '0.52% 0',
-// solarPlant '15.78% 0',
-// fusionPlant '21.05% 0',
-// roboticsFactory '0 17.24%',
-// naniteFactory '26.31% 17.24%',
-// shipyard '5.25% 17.24%',
-// metalStorage '31.57% 0',
-// crystalStorage '6.84% 0',
-// deuteriumStorage '2.1% 0',
-// researchLaboratory '0.52% 17.24%',
+// // Other sprites
 // terraformer '31.57% 17.24%',
 // allianceDepot '15.78% 17.24%',
 // moonbase '36.84% 17.24%',
 // sensorPhalanx '42.1% 17.24%',
 // jumpGate '47.36% 17.24%',
-// missileSilo '21.05% 17.24%',
 // repairDock '52.62% 17.24%',
 
 export const MetalMine = makeBuilding(

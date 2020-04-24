@@ -18,6 +18,7 @@ export const RocketLauncher: Defense = {
   rapidFire: new Map<Unit, number>(),
   requirements: [],
   component: 'defenses',
+  sprite: '0 34.48%',
 };
 
 export const LightLaser: Defense = {
@@ -32,6 +33,7 @@ export const LightLaser: Defense = {
   rapidFire: new Map<Unit, number>(),
   requirements: [],
   component: 'defenses',
+  sprite: '5.25% 34.48%',
 };
 
 export const HeavyLaser: Defense = {
@@ -46,6 +48,7 @@ export const HeavyLaser: Defense = {
   rapidFire: new Map<Unit, number>(),
   requirements: [],
   component: 'defenses',
+  sprite: '10.52% 34.48%',
 };
 
 export const IonCannon: Defense = {
@@ -60,6 +63,7 @@ export const IonCannon: Defense = {
   rapidFire: new Map<Unit, number>(),
   requirements: [],
   component: 'defenses',
+  sprite: '21.05% 34.48%',
 };
 
 // TODO - Max 1 by planet
@@ -75,6 +79,7 @@ export const SmallShieldDome: Defense = {
   rapidFire: new Map<Unit, number>(),
   requirements: [],
   component: 'defenses',
+  sprite: '31.57% 34.48%',
 };
 
 // TODO - Max 1 by planet
@@ -90,6 +95,7 @@ export const LargeShieldDome: Defense = {
   rapidFire: new Map<Unit, number>(),
   requirements: [],
   component: 'defenses',
+  sprite: '36.84% 34.48%',
 };
 
 export const GaussCannon: Defense = {
@@ -104,6 +110,7 @@ export const GaussCannon: Defense = {
   rapidFire: new Map<Unit, number>(),
   requirements: [],
   component: 'defenses',
+  sprite: '15.78% 34.48%',
 };
 
 export const PlasmaTurret: Defense = {
@@ -118,6 +125,7 @@ export const PlasmaTurret: Defense = {
   rapidFire: new Map<Unit, number>(),
   requirements: [],
   component: 'defenses',
+  sprite: '26.31% 34.48%',
 };
 
 export const MissileInterceptor: Defense = {
@@ -132,6 +140,7 @@ export const MissileInterceptor: Defense = {
   rapidFire: new Map<Unit, number>(),
   requirements: [],
   component: 'defenses',
+  sprite: '42.1% 34.48%',
 };
 
 export const MissileInterplanetary: Defense = {
@@ -146,6 +155,7 @@ export const MissileInterplanetary: Defense = {
   rapidFire: new Map<Unit, number>(),
   requirements: [],
   component: 'defenses',
+  sprite: '47.36% 34.48%',
 };
 
 export const AllDefenses: Defense[] = [
