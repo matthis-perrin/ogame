@@ -1,4 +1,4 @@
-import {PAGES_SHIPS, PAGES_TECHNOLOGIES} from '@src/models/constants';
+import {PAGES_SHIPS, PAGES_TECHNOLOGIES, UI_REFRESH_RATE} from '@src/models/constants';
 import {PlanetId} from '@src/models/planets';
 import {Technology} from '@src/models/technologies';
 import {parseFleets} from '@src/parsers/fleets';
@@ -7,7 +7,8 @@ import {parseMeta} from '@src/parsers/meta';
 import {parsePlanets} from '@src/parsers/planets';
 import {parseResources} from '@src/parsers/resources';
 import {parseTechnologies} from '@src/parsers/technologies';
-import {addPlanet} from '@src/stores/store_account';
+import {addPlanet} from '@src/stores/account/planet';
+import {applyProduction} from '@src/stores/account/production';
 
 /* eslint-disable no-console */
 export function parseUI(): void {
@@ -78,6 +79,8 @@ export function parseUI(): void {
         fleets,
         messages
       );
+
+      setInterval(applyProduction, UI_REFRESH_RATE);
     })
     .catch(err => {
       console.error(err);

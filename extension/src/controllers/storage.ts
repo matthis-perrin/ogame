@@ -1,6 +1,6 @@
 import {Account} from '@src/models/account';
 import {SESSION_ID, SESSION_ID_LOCAL_STORAGE_KEY} from '@src/models/constants';
-import {setAccount} from '@src/stores/store_account';
+import {setAccount} from '@src/stores/account';
 
 const ACCOUNT_LOCAL_STORAGE_KEY = 'titanraccoon';
 

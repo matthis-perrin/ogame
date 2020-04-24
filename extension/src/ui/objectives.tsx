@@ -5,7 +5,7 @@ import {LargeCargo} from '@shared/models/ships';
 
 import {goToTechnology, sendLargeCargos} from '@src/controllers/navigator';
 import {Account} from '@src/models/account';
-import {COLOR_RED} from '@src/models/constants';
+import {COLOR_GREEN, COLOR_RED} from '@src/models/constants';
 import {MissionTypeEnum} from '@src/models/fleets';
 import {findPlanetCoords, findPlanetName} from '@src/models/planets';
 import {getFretCapacity, techShortName} from '@src/models/technologies';
@@ -66,20 +66,34 @@ export const ObjectivesC: FC<ObjectivesProps> = ({account}) => (
             <tr>
               <EmptyLine></EmptyLine>
             </tr>
-            <tr>
+          </tbody>
+        )}
+      </Table>
+      {account.objectives === undefined ? (
+        ''
+      ) : (
+        <Table>
+          <tbody>
+            <Status className={account.objectives.enoughResources ? 'green' : 'red'}>
               <td>
                 <Resource name="M" amount={account.objectives.neededResources.metal} />
+              </td>
+              <td>
                 <Resource name="C" amount={account.objectives.neededResources.crystal} />
+              </td>
+              <td>
                 <Resource name="D" amount={account.objectives.neededResources.deuterium} />
+              </td>
+              <td>
                 <Resource name="Σ" amount={account.objectives.neededResources.sum} />
               </td>
-            </tr>
+            </Status>
             <tr>
               <EmptyLine></EmptyLine>
             </tr>
           </tbody>
-        )}
-      </Table>
+        </Table>
+      )}
       {account.objectives === undefined ? (
         ''
       ) : (
@@ -96,7 +110,18 @@ export const ObjectivesC: FC<ObjectivesProps> = ({account}) => (
                   : 0;
               }
               return (
-                <tr key={`${transfer.from}_${transfer.to}`}>
+                <HoverGT
+                  key={`${transfer.from}_${transfer.to}`}
+                  onClick={() =>
+                    sendLargeCargos(
+                      transfer.from,
+                      findPlanetCoords(account.planetList, transfer.to),
+                      MissionTypeEnum.Transport,
+                      requiredGt,
+                      transfer.resources
+                    )
+                  }
+                >
                   <td>{findPlanetName(account.planetList, transfer.from)}</td>
                   <td>
                     <Resource name="M" amount={transfer.resources.metal} />
@@ -107,21 +132,8 @@ export const ObjectivesC: FC<ObjectivesProps> = ({account}) => (
                   <td>
                     <Resource name="D" amount={transfer.resources.deuterium} />
                   </td>
-                  <Hover
-                    onClick={() =>
-                      sendLargeCargos(
-                        transfer.from,
-                        findPlanetCoords(account.planetList, transfer.to),
-                        MissionTypeEnum.Transport,
-                        requiredGt,
-                        transfer.resources
-                      )
-                    }
-                    className={requiredGt > gtAmount ? 'red' : ''}
-                  >
-                    GT: {requiredGt}
-                  </Hover>
-                </tr>
+                  <td className={requiredGt > gtAmount ? 'red' : ''}>GT: {requiredGt}</td>
+                </HoverGT>
               );
             })}
           </tbody>
@@ -147,10 +159,19 @@ const HoverLine = styled.tr`
   }
 `;
 
-const Hover = styled.td`
+const HoverGT = styled.tr`
   cursor: pointer;
   &:hover {
     text-decoration: underline;
+  }
+  td.red {
+    color: ${COLOR_RED};
+  }
+`;
+
+const Status = styled.tr`
+  &.green {
+    color: ${COLOR_GREEN};
   }
   &.red {
     color: ${COLOR_RED};

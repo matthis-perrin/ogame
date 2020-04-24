@@ -68,7 +68,9 @@ export function sendLargeCargos(
     coords.position
   }&type=1&mission=${missionType}&am203=${amount}&cp=${from}${
     resources !== undefined
-      ? `&metal=${resources.metal}&crystal=${resources.crystal}&deuterium=${resources.deuterium}`
+      ? `&metal=${Math.ceil(resources.metal)}&crystal=${Math.ceil(
+          resources.crystal
+        )}&deuterium=${Math.ceil(resources.deuterium)}`
       : ''
   }`;
 }

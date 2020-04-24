@@ -13,4 +13,5 @@ export interface Objectives {
   technologies: Technology[];
   neededResources: ResourcesWithSum;
   resourceTransfers: ResourceTransfer[];
+  enoughResources: boolean;
 }

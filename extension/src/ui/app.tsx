@@ -2,7 +2,7 @@ import React, {FC, Fragment} from 'react';
 import styled from 'styled-components';
 
 import {COLOR_WHITE} from '@src/models/constants';
-import {useAccount} from '@src/stores/store_account';
+import {useAccount} from '@src/stores/account';
 import {Aggregation} from '@src/ui/aggregation';
 import {Separator} from '@src/ui/components/separator';
 import {Constructions} from '@src/ui/constructions';

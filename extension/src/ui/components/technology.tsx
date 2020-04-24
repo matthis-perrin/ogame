@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import {COLOR_ORANGE, COLOR_RED} from '@src/models/constants';
 import {PlanetId} from '@src/models/planets';
 import {Technology, TechnologyIndex} from '@src/models/technologies';
-import {addObjectives} from '@src/stores/store_account';
+import {addObjectives} from '@src/stores/account/objectives';
 
 interface TechnologyProps {
   name: string;
