@@ -15,7 +15,7 @@ export const AccountView: FC<{account: Account}> = ({account}) => {
         {Array.from(account.planets.values())
           .sort((p1, p2) => p1.id.localeCompare(p2.id))
           .map(p => (
-            <PlanetView key={p.id} planet={p} />
+            <PlanetView key={p.id} account={account} planet={p} />
           ))}
       </PlanetsWrapper>
     </Wrapper>

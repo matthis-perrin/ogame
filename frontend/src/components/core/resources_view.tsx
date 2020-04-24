@@ -13,10 +13,11 @@ import {neverHappens} from '@shared/utils/type_utils';
 
 import {UnitSprite} from '@src/components/core/sprite';
 
-export const ResourcesView: FC<{resources: Resources; showAll?: boolean}> = ({
-  resources,
-  showAll,
-}) => {
+export const ResourcesView: FC<{
+  resources: Resources;
+  energy?: EnergyAmount;
+  showAll?: boolean;
+}> = ({resources, energy, showAll}) => {
   const {metal, crystal, deuterium} = resources;
   const elements: JSX.Element[] = [];
   if (metal > 0 || showAll) {
@@ -27,6 +28,9 @@ export const ResourcesView: FC<{resources: Resources; showAll?: boolean}> = ({
   }
   if (deuterium > 0 || showAll) {
     elements.push(<Deuterium key="deuterium" amount={deuterium} />);
+  }
+  if (energy !== undefined && (energy > 0 || showAll)) {
+    elements.push(<Energy key="energy" amount={energy} />);
   }
   return (
     <ResourcesWrapper>
@@ -105,12 +109,15 @@ function amountToString(amount: number): string {
 const UnitView: FC<{
   type: UnitType;
   amount: number;
-}> = ({type, amount}) => (
-  <UnitViewWrapper>
-    <UnitSprite style={{backgroundPosition: getBackgroundPosition(type)}} />
-    <Amount>{amountToString(Math.floor(amount))}</Amount>
-  </UnitViewWrapper>
-);
+}> = ({type, amount}) => {
+  const AmountClass = amount < 0 ? NegativeAmount : PositiveAmount;
+  return (
+    <UnitViewWrapper>
+      <UnitSprite style={{backgroundPosition: getBackgroundPosition(type)}} />
+      <Amount>{amountToString(Math.floor(amount))}</Amount>
+    </UnitViewWrapper>
+  );
+};
 UnitView.displayName = 'UnitView';
 
 const UnitViewWrapper = styled.div`
@@ -122,5 +129,11 @@ const UnitViewWrapper = styled.div`
 const Amount = styled.div`
   font-size: 14px;
   margin-top: 4px;
+`;
+
+const NegativeAmount = styled(Amount)`
+  color: #f44;
+`;
+const PositiveAmount = styled(Amount)`
   color: #999;
 `;
