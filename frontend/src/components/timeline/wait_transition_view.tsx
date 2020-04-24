@@ -16,7 +16,7 @@ export const WaitTransitionView: FC<{transition: WaitTransition}> = ({transition
     <Events>
       <EventTitle>Events: </EventTitle>
       {transition.events.map(e => (
-        <Event>{`- ${e}`}</Event>
+        <Event key={e}>{`- ${e}`}</Event>
       ))}
     </Events>
   </Wrapper>

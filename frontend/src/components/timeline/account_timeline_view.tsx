@@ -75,13 +75,13 @@ const TransitionWrapper = styled.div``;
 
 const UnselectedTransitionWrapper = styled(TransitionWrapper)`
   &:hover {
-    background-color: #ffffff30;
+    background-color: #ffffff15;
     cursor: pointer;
   }
 `;
 
 const SelectedTransitionWrapper = styled(TransitionWrapper)`
-  background-color: #ffffff50;
+  background-color: #ffffff30;
 `;
 
 export const AccountTime: FC<{account: Account}> = ({account}) => {

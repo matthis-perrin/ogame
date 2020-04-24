@@ -61,30 +61,30 @@ export function createAccountTimeline(account: Account, buildItems: BuildItem[])
   let currentAccount = account;
 
   for (const buildItem of buildItems) {
-    // try {
-    // console.log(`Handling build item ${buildItemToString(buildItem)}`);
-    const newTransactions = advanceAccountTowardBuildItem(currentAccount, buildItem);
-    // console.log(newTransactions);
-    transitions.push(...newTransactions);
-    currentAccount = transitions[transitions.length - 1].transitionnedAccount;
-    // } catch (err) {
-    // console.log('Error while creating the account timeline');
-    // console.error(err);
-    // console.log('Transitions applied');
-    // function transitionToString(transition: Transition): string {
-    //   if (transition.type === 'wait') {
-    //     return `[WAIT] ${transition.duration} (Reason: ${
-    //       transition.reason
-    //     })\nEvents: ${JSON.stringify(transition.events)}`;
-    //   }
-    //   return `[BUILD] ${buildItemToString(transition.buildItem)}`;
-    // }
-    // for (const transition of transitions) {
-    //   console.log(transitionToString(transition.transition));
-    // }
-    // advanceAccountTowardBuildItem(currentAccount, buildItem);
-    // break;
-    // }
+    try {
+      // console.log(`Handling build item ${buildItemToString(buildItem)}`);
+      const newTransactions = advanceAccountTowardBuildItem(currentAccount, buildItem);
+      // console.log(newTransactions);
+      transitions.push(...newTransactions);
+      currentAccount = transitions[transitions.length - 1].transitionnedAccount;
+    } catch (err) {
+      console.log('Error while creating the account timeline');
+      console.error(err);
+      // console.log('Transitions applied');
+      // function transitionToString(transition: Transition): string {
+      //   if (transition.type === 'wait') {
+      //     return `[WAIT] ${transition.duration} (Reason: ${
+      //       transition.reason
+      //     })\nEvents: ${JSON.stringify(transition.events)}`;
+      //   }
+      //   return `[BUILD] ${buildItemToString(transition.buildItem)}`;
+      // }
+      // for (const transition of transitions) {
+      //   console.log(transitionToString(transition.transition));
+      // }
+      // advanceAccountTowardBuildItem(currentAccount, buildItem);
+      break;
+    }
   }
 
   return {
@@ -412,10 +412,9 @@ export function applyBuildItem(account: Account, buildItem: BuildItem): Account 
   const roboticsLevel = newPlanet.buildingLevels.get(RoboticsFactory) ?? 0;
   const naniteLevel = newPlanet.buildingLevels.get(NaniteFactory) ?? 0;
   const shipyardLevel = newPlanet.buildingLevels.get(Shipyard) ?? 0;
-  newAccount = updateAccountPlanet(
-    newAccount,
-    updatePlanetResources(newPlanet, newPlanetResources)
-  );
+
+  newPlanet = updatePlanetResources(newPlanet, newPlanetResources);
+  newAccount = updateAccountPlanet(newAccount, newPlanet);
 
   if (buildItem.type === 'technology') {
     if (newAccount.inProgressTechnology !== undefined) {
