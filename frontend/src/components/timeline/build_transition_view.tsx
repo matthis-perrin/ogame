@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 import {BuildTransition} from '@shared/models/timeline';
 
-import {BuildItemView} from '@src/components/build_item';
+import {BuildItemView} from '@src/components/core/build_item_view';
 
 export const BuildTransitionView: FC<{transition: BuildTransition}> = ({transition}) => (
   <Wrapper>

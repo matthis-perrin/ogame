@@ -11,7 +11,7 @@ import {
 import {arrayJoin} from '@shared/utils/array_utils';
 import {neverHappens} from '@shared/utils/type_utils';
 
-import {UnitSprite} from '@src/components/sprite';
+import {UnitSprite} from '@src/components/core/sprite';
 
 export const ResourcesView: FC<{resources: Resources; showAll?: boolean}> = ({
   resources,
@@ -85,10 +85,10 @@ function amountToString(amount: number): string {
   let amountToDisplay = amount;
   let suffix = '';
 
-  if (amount > 10 * 1000 * 1000 * 1000) {
+  if (amount > 1000 * 1000 * 1000) {
     amountToDisplay = amount / (1000 * 1000 * 1000);
     suffix = 'G';
-  } else if (amount > 10 * 1000 * 1000) {
+  } else if (amount > 1000 * 1000) {
     amountToDisplay = amount / (1000 * 1000);
     suffix = 'M';
   } else if (amount > 10 * 1000) {
@@ -108,7 +108,7 @@ const UnitView: FC<{
 }> = ({type, amount}) => (
   <UnitViewWrapper>
     <UnitSprite style={{backgroundPosition: getBackgroundPosition(type)}} />
-    <Amount>{amountToString(amount)}</Amount>
+    <Amount>{amountToString(Math.floor(amount))}</Amount>
   </UnitViewWrapper>
 );
 UnitView.displayName = 'UnitView';

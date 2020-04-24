@@ -42,5 +42,8 @@ export function timeToString(milliseconds: Milliseconds): string {
   while (components.length > 0 && components[components.length - 1].value === 0) {
     components.pop();
   }
+  if (components.length === 0) {
+    return 'start';
+  }
   return components.map(({value, suffix}) => `${value}${suffix}`).join(' ');
 }

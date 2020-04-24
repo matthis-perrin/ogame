@@ -5,8 +5,8 @@ import {Account} from '@shared/models/account';
 import {timeToString} from '@shared/models/time';
 import {AccountTimeline} from '@shared/models/timeline';
 
-import {BuildTransitionView} from '@src/components/build_transition_view';
-import {WaitTransitionView} from '@src/components/wait_transition_view';
+import {BuildTransitionView} from '@src/components/timeline/build_transition_view';
+import {WaitTransitionView} from '@src/components/timeline/wait_transition_view';
 import {setAppState, useAppStore} from '@src/lib/store';
 
 export const AccountTimelineView: FC<{accountTimeline: AccountTimeline}> = ({accountTimeline}) => {

@@ -1,8 +1,8 @@
 import React, {FC} from 'react';
 import styled from 'styled-components';
 
-import {AccountTimelineView} from '@src/components/account_timeline_view';
-import {AccountView} from '@src/components/account_view';
+import {AccountView} from '@src/components/account/account_view';
+import {AccountTimelineView} from '@src/components/timeline/account_timeline_view';
 import {useAppStore} from '@src/lib/store';
 
 export const App: FC = () => {

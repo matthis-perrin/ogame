@@ -3,11 +3,15 @@ import styled from 'styled-components';
 
 import {BuildItem} from '@shared/models/build_item';
 
-import {ResourcesView} from '@src/components/resources_view';
-import {Sprite} from '@src/components/sprite';
+import {ResourcesView} from '@src/components/core/resources_view';
+import {Sprite} from '@src/components/core/sprite';
 
 export const BuildItemView: FC<{buildItem: BuildItem}> = ({buildItem}) => {
-  if (buildItem.type === 'ship' || buildItem.type === 'defense') {
+  if (
+    buildItem.type === 'ship' ||
+    buildItem.type === 'defense' ||
+    buildItem.buildable.sprite === undefined
+  ) {
     // eslint-disable-next-line no-console
     console.log(buildItem);
     throw new Error(`Not handled yet`);
@@ -18,7 +22,7 @@ export const BuildItemView: FC<{buildItem: BuildItem}> = ({buildItem}) => {
       <Left>
         <Sprite
           style={{
-            backgroundPosition: buildItem.buildable.sprite ?? '30px 30px',
+            backgroundPosition: buildItem.buildable.sprite,
           }}
         />
       </Left>

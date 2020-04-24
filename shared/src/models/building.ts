@@ -16,6 +16,7 @@ export interface Building extends BuildableBase {
 function makeBuilding(
   id: number,
   name: string,
+  shortName: string,
   sprite: string,
   baseCost: Resources,
   component: string,
@@ -26,6 +27,7 @@ function makeBuilding(
     type: 'building',
     sprite,
     name,
+    shortName,
     cost: (level: number) => ({
       metal: Math.floor(baseCost.metal * Math.pow(costExponential, level - 1)) as MetalAmount,
       crystal: Math.floor(baseCost.crystal * Math.pow(costExponential, level - 1)) as CrystalAmount,
@@ -61,6 +63,7 @@ function makeBuilding(
 export const MetalMine = makeBuilding(
   1,
   'Mine de métal',
+  'Mine de métal',
   '0 0',
   makeResources({m: 60, c: 15, d: 0}),
   'supplies',
@@ -69,6 +72,7 @@ export const MetalMine = makeBuilding(
 
 export const MetalStorage = makeBuilding(
   22,
+  'Hangar de métal',
   'Hangar de métal',
   '31.57% 0',
   makeResources({m: 1000, c: 0, d: 0}),
@@ -79,6 +83,7 @@ export const MetalStorage = makeBuilding(
 export const CrystalMine = makeBuilding(
   2,
   'Mine de cristal',
+  'Mine de cristal',
   '5.25% 0',
   makeResources({m: 48, c: 24, d: 0}),
   'supplies',
@@ -87,6 +92,7 @@ export const CrystalMine = makeBuilding(
 
 export const CrystalStorage = makeBuilding(
   23,
+  'Hangar de cristal',
   'Hangar de cristal',
   '6.84% 0',
   makeResources({m: 1000, c: 500, d: 0}),
@@ -97,6 +103,7 @@ export const CrystalStorage = makeBuilding(
 export const DeuteriumSynthesizer = makeBuilding(
   3,
   'Synthétiseur de deutérium',
+  'Synth. de deut',
   '0.52% 0',
   makeResources({m: 225, c: 75, d: 0}),
   'supplies',
@@ -106,6 +113,7 @@ export const DeuteriumSynthesizer = makeBuilding(
 export const DeuteriumTank = makeBuilding(
   24,
   'Réservoir de deutérium',
+  'Rés. de deut',
   '2.1% 0',
   makeResources({m: 1000, c: 1000, d: 0}),
   'supplies',
@@ -115,6 +123,7 @@ export const DeuteriumTank = makeBuilding(
 export const SolarPlant = makeBuilding(
   4,
   'Centrale électrique solaire',
+  'Centrale solaire',
   '15.78% 0',
   makeResources({m: 75, c: 30, d: 0}),
   'supplies',
@@ -124,6 +133,7 @@ export const SolarPlant = makeBuilding(
 export const FusionReactor = makeBuilding(
   12,
   'Centrale électrique de fusion',
+  'Centrale de fusion',
   '21.05% 0',
   makeResources({m: 900, c: 360, d: 180}),
   'supplies',
@@ -133,6 +143,7 @@ export const FusionReactor = makeBuilding(
 export const ResearchLab = makeBuilding(
   31,
   'Laboratoire de recherche',
+  'Laboratoire',
   '0.52% 17.24%',
   makeResources({m: 200, c: 400, d: 200}),
   'facilities',
@@ -141,6 +152,7 @@ export const ResearchLab = makeBuilding(
 
 export const RoboticsFactory = makeBuilding(
   14,
+  'Usine de robots',
   'Usine de robots',
   '0 17.24%',
   makeResources({m: 400, c: 120, d: 200}),
@@ -151,6 +163,7 @@ export const RoboticsFactory = makeBuilding(
 export const Shipyard = makeBuilding(
   21,
   'Chantier spatial',
+  'Chantier spatial',
   '5.25% 17.24%',
   makeResources({m: 400, c: 200, d: 100}),
   'facilities',
@@ -160,6 +173,7 @@ export const Shipyard = makeBuilding(
 export const NaniteFactory = makeBuilding(
   15,
   'Usine de nanites',
+  'Nanites',
   '26.31% 17.24%',
   makeResources({m: 1000000, c: 500000, d: 100000}),
   'facilities',
@@ -168,6 +182,7 @@ export const NaniteFactory = makeBuilding(
 
 export const MissileSilo = makeBuilding(
   44,
+  'Silo de missiles',
   'Silo de missiles',
   '21.05% 17.24%',
   makeResources({m: 20000, c: 20000, d: 1000}),

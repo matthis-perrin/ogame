@@ -14,6 +14,7 @@ export interface BuildableBase {
   readonly id: number;
   readonly type: BuildableType;
   readonly name: string;
+  readonly shortName: string;
   // Not readonly because we need to update it post creation to avoid circular dependencies
   readonly requirements: BuildableRequirement[];
   readonly component: string; // In URL
