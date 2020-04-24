@@ -7,27 +7,43 @@ import {AccountTimeline} from '@shared/models/timeline';
 
 import {BuildTransitionView} from '@src/components/build_transition_view';
 import {WaitTransitionView} from '@src/components/wait_transition_view';
+import {setAppState, useAppStore} from '@src/lib/store';
 
 export const AccountTimelineView: FC<{accountTimeline: AccountTimeline}> = ({accountTimeline}) => {
+  const {selectedAccount} = useAppStore();
   const {start, transitions} = accountTimeline;
-  const totalTime = transitions[transitions.length - 1].transitionnedAccount.currentTime;
+  const totalTime = transitions[transitions.length - 1]?.transitionnedAccount.currentTime ?? 0;
   return (
     <Wrapper>
       <Header>
         <Title>Timeline</Title>
         <SubTitle>{`Total: ${timeToString(totalTime)}`}</SubTitle>
       </Header>
-      <AccountTime account={start}></AccountTime>
-      {transitions.map(({transition, transitionnedAccount}) => (
-        <React.Fragment key={Math.random()}>
-          {transition.type === 'wait' ? (
-            <WaitTransitionView transition={transition} />
-          ) : (
-            <BuildTransitionView transition={transition} />
-          )}
-          <AccountTime account={transitionnedAccount} />
-        </React.Fragment>
-      ))}
+      <div onClick={() => setAppState({accountTimeline, selectedAccount: start})}>
+        <AccountTime account={start}></AccountTime>
+      </div>
+      {transitions.map(({transition, transitionnedAccount}) => {
+        const transitionKey =
+          transition.type === 'wait' ? transition.duration : transition.buildItem.buildable.id;
+        const key = `${transitionnedAccount.currentTime}-${transitionKey}`;
+        const WrapperClass =
+          selectedAccount === transitionnedAccount
+            ? SelectedTransitionWrapper
+            : UnselectedTransitionWrapper;
+        return (
+          <WrapperClass
+            onClick={() => setAppState({accountTimeline, selectedAccount: transitionnedAccount})}
+            key={key}
+          >
+            {transition.type === 'wait' ? (
+              <WaitTransitionView transition={transition} />
+            ) : (
+              <BuildTransitionView transition={transition} />
+            )}
+            <AccountTime account={transitionnedAccount} />
+          </WrapperClass>
+        );
+      })}
     </Wrapper>
   );
 };
@@ -55,9 +71,24 @@ const SubTitle = styled.div`
   color: #aaa;
 `;
 
+const TransitionWrapper = styled.div``;
+
+const UnselectedTransitionWrapper = styled(TransitionWrapper)`
+  &:hover {
+    background-color: #ffffff30;
+    cursor: pointer;
+  }
+`;
+
+const SelectedTransitionWrapper = styled(TransitionWrapper)`
+  background-color: #ffffff50;
+`;
+
 export const AccountTime: FC<{account: Account}> = ({account}) => {
   const {currentTime} = account;
-  return <TimeWrapper>{currentTime === 0 ? 'START' : timeToString(currentTime)}</TimeWrapper>;
+  return (
+    <TimeWrapper>{currentTime === 0 ? 'START' : `Time: ${timeToString(currentTime)}`}</TimeWrapper>
+  );
 };
 AccountTime.displayName = 'AccountTime';
 

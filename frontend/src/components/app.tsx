@@ -1,23 +1,27 @@
 import React, {FC} from 'react';
 import styled from 'styled-components';
 
-import {createNewAccount} from '@shared/lib/account';
-import {Destroyer} from '@shared/models/ships';
-import {Rosalind} from '@shared/models/universe';
-
 import {AccountTimelineView} from '@src/components/account_timeline_view';
-import {getAccountTimeline} from '@src/lib/timeline';
+import {AccountView} from '@src/components/account_view';
+import {useAppStore} from '@src/lib/store';
 
-export const App: FC = () => (
-  <Wrapper>
-    <TimelineWrapper>
-      <AccountTimelineView
-        accountTimeline={getAccountTimeline(Destroyer, createNewAccount(Rosalind))}
-      />
-    </TimelineWrapper>
-    <ContentWrapper></ContentWrapper>
-  </Wrapper>
-);
+export const App: FC = () => {
+  const {selectedAccount, accountTimeline} = useAppStore();
+  return (
+    <Wrapper>
+      <TimelineWrapper>
+        {accountTimeline ? (
+          <AccountTimelineView accountTimeline={accountTimeline} />
+        ) : (
+          <React.Fragment />
+        )}
+      </TimelineWrapper>
+      <ContentWrapper>
+        {selectedAccount ? <AccountView account={selectedAccount} /> : <React.Fragment />}
+      </ContentWrapper>
+    </Wrapper>
+  );
+};
 App.displayName = 'App';
 
 const timelineWidth = 500;

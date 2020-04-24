@@ -101,7 +101,7 @@ module.exports = {
         caughtErrors: 'all',
       },
     ],
-    '@typescript-eslint/no-use-before-define': 'warn',
+    '@typescript-eslint/no-use-before-define': 'off',
     '@typescript-eslint/no-useless-constructor': 'warn',
     '@typescript-eslint/no-var-requires': 'warn',
     // '@typescript-eslint/prefer-as-const': 'warn', // not in 2.17.0, just in master

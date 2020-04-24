@@ -18,7 +18,7 @@ export const BuildItemView: FC<{buildItem: BuildItem}> = ({buildItem}) => {
       <Left>
         <Sprite
           style={{
-            backgroundPosition: buildItem.buildable.sprite ?? '0 0',
+            backgroundPosition: buildItem.buildable.sprite ?? '30px 30px',
           }}
         />
       </Left>
