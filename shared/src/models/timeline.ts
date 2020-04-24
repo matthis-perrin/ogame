@@ -3,6 +3,7 @@ import {BuildItem} from '@shared/models/build_item';
 import {Milliseconds} from '@shared/models/time';
 
 export interface AccountTimeline {
+  computationTime: number;
   start: Account;
   transitions: TransitionnedAccount[];
 }

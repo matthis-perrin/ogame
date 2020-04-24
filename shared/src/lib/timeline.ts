@@ -69,6 +69,7 @@ import {AccountTimeline, TransitionnedAccount} from '@shared/models/timeline';
 import {max, multiply, neverHappens, substract, sum} from '@shared/utils/type_utils';
 
 export function createAccountTimeline(account: Account, buildItems: BuildItem[]): AccountTimeline {
+  const start = Date.now();
   const transitions: TransitionnedAccount[] = [];
   let currentAccount = account;
 
@@ -101,6 +102,7 @@ export function createAccountTimeline(account: Account, buildItems: BuildItem[])
   }
 
   return {
+    computationTime: Date.now() - start,
     start: account,
     transitions,
   };

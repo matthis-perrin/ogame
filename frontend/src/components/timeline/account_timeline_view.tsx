@@ -11,13 +11,14 @@ import {setAppState, useAppStore} from '@src/lib/store';
 
 export const AccountTimelineView: FC<{accountTimeline: AccountTimeline}> = ({accountTimeline}) => {
   const {selectedAccount} = useAppStore();
-  const {start, transitions} = accountTimeline;
+  const {computationTime, start, transitions} = accountTimeline;
   const totalTime = transitions[transitions.length - 1]?.transitionnedAccount.currentTime ?? 0;
   return (
     <Wrapper>
       <Header>
         <Title>Timeline</Title>
         <SubTitle>{`Total: ${timeToString(totalTime)}`}</SubTitle>
+        <SubTitle>{`Computation time: ${computationTime}ms`}</SubTitle>
       </Header>
       <div onClick={() => setAppState({accountTimeline, selectedAccount: start})}>
         <AccountTime account={start}></AccountTime>
@@ -55,7 +56,7 @@ const Wrapper = styled.div`
 `;
 
 const Header = styled.div`
-  height: 64px;
+  height: 96px;
   display: flex;
   flex-direction: column;
   align-items: center;
