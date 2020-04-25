@@ -3,6 +3,7 @@ import {Building} from '@shared/models/building';
 import {Defense} from '@shared/models/defense';
 import {PlanetId} from '@shared/models/planet';
 import {Ship} from '@shared/models/ships';
+import {Stock} from '@shared/models/stock';
 import {Technology} from '@shared/models/technology';
 
 interface BuildItemBase {
@@ -35,4 +36,15 @@ export interface TechnologyBuildItem extends BuildItemBase {
   level: number;
 }
 
-export type BuildItem = ShipBuildItem | DefenseBuildItem | BuildingBuildItem | TechnologyBuildItem;
+export interface StockBuildItem extends BuildItemBase {
+  type: 'stock';
+  buildable: Stock;
+  quantity: number;
+}
+
+export type BuildItem =
+  | ShipBuildItem
+  | DefenseBuildItem
+  | BuildingBuildItem
+  | TechnologyBuildItem
+  | StockBuildItem;

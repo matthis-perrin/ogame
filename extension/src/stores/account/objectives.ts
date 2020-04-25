@@ -6,6 +6,7 @@ import {LargeCargo} from '@shared/models/ships';
 import {CombustionDrive, HyperspaceDrive, ImpulseDrive} from '@shared/models/technology';
 import {Rosalind} from '@shared/models/universe';
 
+import {startObjectivesBot} from '@src/bots/objectives';
 import {Account} from '@src/models/account';
 import {MissionTypeEnum} from '@src/models/fleets';
 import {findPlanetCoords, findPlanetName, getCoords, PlanetId} from '@src/models/planets';
@@ -346,9 +347,9 @@ export function updateObjectivesTransfers(account: Account): void {
   if (account.objectives === undefined) {
     return;
   }
-  for (const fleetIf in account.fleets) {
-    if (account.fleets.hasOwnProperty(fleetIf)) {
-      const fleet = account.fleets[fleetIf];
+  for (const fleetId in account.fleets) {
+    if (account.fleets.hasOwnProperty(fleetId)) {
+      const fleet = account.fleets[fleetId];
       if (
         (fleet.missionType === MissionTypeEnum.Transport ||
           fleet.missionType === MissionTypeEnum.Deployment) &&
@@ -373,4 +374,5 @@ export function updateObjectivesTransfers(account: Account): void {
       }
     }
   }
+  startObjectivesBot();
 }

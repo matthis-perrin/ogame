@@ -119,7 +119,7 @@ export function createAccountTimeline(account: Account, buildItems: BuildItem[])
 }
 
 function buildItemAlreadyApplied(account: Account, buildItem: BuildItem): boolean {
-  if (buildItem.type === 'ship' || buildItem.type === 'defense') {
+  if (buildItem.type === 'ship' || buildItem.type === 'defense' || buildItem.type === 'stock') {
     return false;
   }
   if (buildItem.type === 'technology') {
@@ -249,7 +249,7 @@ function dedupBuildItems(buildItems: BuildItem[]): BuildItem[] {
   const dedupedBuildItems: BuildItem[] = [];
   const alreadyUsed = new Set<string>();
   for (const buildItem of buildItems) {
-    if (buildItem.type === 'defense' || buildItem.type === 'ship') {
+    if (buildItem.type === 'defense' || buildItem.type === 'ship' || buildItem.type === 'stock') {
       dedupedBuildItems.push(buildItem);
     } else if (buildItem.buildable.type === 'building') {
       const hash = `${buildItem.buildable.id}-${buildItem.level}-${buildItem.planetId}`;
@@ -475,6 +475,10 @@ function timeBeforeApplyingBuildItem(
     return mergeWaitTime(timeBeforeShipyardOrNaniteDoneOnPlanet(account, planet));
   }
 
+  if (buildItem.type === 'stock') {
+    return mergeWaitTime(APPLY_NOW);
+  }
+
   neverHappens(buildItem, `Unknown build item type "${buildItem['type']}"`);
 }
 
@@ -692,6 +696,10 @@ export function applyBuildItem(account: Account, buildItem: BuildItem): Account 
     return updateAccountPlanet(newAccount, newPlanet);
   }
 
+  if (buildItem.type === 'stock') {
+    return newAccount;
+  }
+
   neverHappens(buildItem, `Unknown build item type "${buildItem['type']}"`);
 }
 
@@ -706,7 +714,7 @@ function advanceAccountInTime(
 } {
   const newCurrentTime = sum(account.currentTime, time);
   if (newCurrentTime > 1000 * 3600 * 24 * 365 * 3) {
-    throw 'Passed 3 years';
+    throw new Error('Passed 3 years');
   }
   let newAccount = account;
 

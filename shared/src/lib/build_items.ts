@@ -43,6 +43,9 @@ export function getBuildItemCost(buildItem: BuildItem): Resources {
   if (buildItem.type === 'defense') {
     return multiplyResources(buildItem.buildable.cost, buildItem.quantity);
   }
+  if (buildItem.type === 'stock') {
+    return multiplyResources(buildItem.buildable.cost, buildItem.quantity);
+  }
   neverHappens(
     buildItem,
     `Cannot compute build buildItem cost. Unknown type "${buildItem['type']}"`
@@ -115,7 +118,7 @@ export function getTimeBeforeBuildItemQueueable(
     }
   }
 
-  if (buildItem.type === 'ship' || buildItem.type === 'defense') {
+  if (buildItem.type === 'ship' || buildItem.type === 'defense' || buildItem.type === 'stock') {
     return ZERO;
   }
 
@@ -184,6 +187,13 @@ function buildableToBuildItem(planet: Planet, buildable: Buildable): BuildItem {
   } else if (buildable.type === 'defense') {
     return {
       type: 'defense',
+      quantity: 1,
+      buildable,
+      planetId: planet.id,
+    };
+  } else if (buildable.type === 'stock') {
+    return {
+      type: 'stock',
       quantity: 1,
       buildable,
       planetId: planet.id,
@@ -264,6 +274,9 @@ export function buildItemCost(buildItem: BuildItem): Resources {
     return multiplyResources(buildItem.buildable.cost, buildItem.quantity);
   }
   if (buildItem.type === 'defense') {
+    return multiplyResources(buildItem.buildable.cost, buildItem.quantity);
+  }
+  if (buildItem.type === 'stock') {
     return multiplyResources(buildItem.buildable.cost, buildItem.quantity);
   }
   neverHappens(buildItem, `Unknown build item type ${buildItem['type']}`);

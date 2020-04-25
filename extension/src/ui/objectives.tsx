@@ -20,6 +20,7 @@ interface ObjectivesProps {
 
 export const ObjectivesC: FC<ObjectivesProps> = ({account}) => {
   const nowSeconds = Math.floor(new Date().getTime() / 1000);
+
   return (
     <Fragment>
       <Container>
@@ -167,7 +168,7 @@ export const ObjectivesC: FC<ObjectivesProps> = ({account}) => {
                       sendLargeCargos(
                         transfer.from,
                         findPlanetCoords(account.planetList, transfer.to),
-                        MissionTypeEnum.Transport,
+                        MissionTypeEnum.Deployment,
                         requiredGt,
                         transfer.resources
                       );

@@ -1,9 +1,10 @@
 import {Building} from '@shared/models/building';
 import {Defense} from '@shared/models/defense';
 import {Ship} from '@shared/models/ships';
+import {Stock} from '@shared/models/stock';
 import {Technology} from '@shared/models/technology';
 
-export type BuildableType = 'technology' | 'building' | 'ship' | 'defense';
+export type BuildableType = 'technology' | 'building' | 'ship' | 'defense' | 'stock';
 
 export interface BuildableRequirement {
   readonly entity: Building | Technology;
@@ -21,4 +22,4 @@ export interface BuildableBase {
   readonly sprite: string;
 }
 
-export type Buildable = Technology | Building | Ship | Defense;
+export type Buildable = Technology | Building | Ship | Defense | Stock;

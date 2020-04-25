@@ -9,7 +9,7 @@ import {Sprite} from '@src/components/core/sprite';
 
 export const BuildItemView: FC<{buildItem: BuildItem}> = ({buildItem}) => {
   const metricText =
-    buildItem.type === 'ship' || buildItem.type === 'defense'
+    buildItem.type === 'ship' || buildItem.type === 'defense' || buildItem.type === 'stock'
       ? `x ${buildItem.quantity}`
       : `Niv. ${buildItem.level}`;
 
