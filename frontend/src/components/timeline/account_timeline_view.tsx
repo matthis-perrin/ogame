@@ -24,6 +24,9 @@ export const AccountTimelineView: FC<{accountTimeline: AccountTimeline}> = ({acc
         <AccountTime account={start}></AccountTime>
       </div>
       {transitions.map(({transition, transitionnedAccount}) => {
+        if (transition === undefined) {
+          throw new Error('Trying to render an AccountTimeline generated in perf mode');
+        }
         const WrapperClass =
           selectedAccount === transitionnedAccount
             ? SelectedTransitionWrapper

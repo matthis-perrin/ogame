@@ -7,7 +7,7 @@ import {Technology} from '@shared/models/technology';
 import {Milliseconds, NEVER, ZERO} from '@shared/models/time';
 import {neverHappens} from '@shared/utils/type_utils';
 
-interface RequirementTree {
+export interface RequirementTree {
   target: Buildable;
   children: RequirementTreeNode[];
 }

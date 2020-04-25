@@ -5,11 +5,12 @@ import {Milliseconds} from '@shared/models/time';
 export interface AccountTimeline {
   computationTime: number;
   start: Account;
+  end: Account;
   transitions: TransitionnedAccount[];
 }
 
 export interface TransitionnedAccount {
-  transition: Transition;
+  transition?: Transition;
   transitionnedAccount: Account;
 }
 

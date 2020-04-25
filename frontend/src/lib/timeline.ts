@@ -14,80 +14,24 @@ import {
   removeRequirementFromTree,
 } from '@shared/lib/requirement_tree';
 import {toStandardUnits} from '@shared/lib/resources';
-import {createAccountTimeline} from '@shared/lib/timeline';
 import {Account} from '@shared/models/account';
 import {BuildItem} from '@shared/models/build_item';
 import {BuildableRequirement} from '@shared/models/buildable';
+import {CrystalMine, DeuteriumSynthesizer, MetalMine} from '@shared/models/building';
 import {Planet, PlanetId} from '@shared/models/planet';
-import {AccountTimeline} from '@shared/models/timeline';
+import {rand} from '@shared/utils/rand';
 
-export function getAccountTimeline(target: BuildItem, account: Account): AccountTimeline {
+export function generateBuildOrder(
+  target: BuildItem,
+  account: Account,
+  nextBuildableRequirement: (
+    account: Account,
+    planetId: PlanetId,
+    nextEssentialBuilds: BuildableRequirement[]
+  ) => BuildableRequirement
+): BuildItem[] {
   function getMainPlanet(): Planet {
     return Array.from(account.planets.values())[0];
-  }
-  const startPoint = {...account};
-
-  function buildRequirementToBuildItem(
-    requirement: BuildableRequirement,
-    planetId: PlanetId
-  ): BuildItem {
-    if (requirement.entity.type === 'building') {
-      return {
-        type: 'building',
-        buildable: requirement.entity,
-        level: requirement.level,
-        planetId,
-      };
-    }
-    return {
-      type: 'technology',
-      buildable: requirement.entity,
-      level: requirement.level,
-      planetId,
-    };
-  }
-
-  function nextBuildableRequirement(
-    nextEssentialBuilds: BuildableRequirement[]
-  ): BuildableRequirement {
-    const availableBuildings: BuildableRequirement[] = getAvailableBuildingsForPlanet(
-      account,
-      getMainPlanet().id
-    );
-    const availableTechonologies: BuildableRequirement[] = getAvailableTechnologiesForAccount(
-      account,
-      getMainPlanet().id
-    );
-    const availableItems = uniqBy(
-      [...availableBuildings, ...availableTechonologies, ...nextEssentialBuilds],
-      buildableRequirementToString
-    );
-    let totalScore = 0;
-    const availableItemsAndScore: [BuildableRequirement, number][] = availableItems.map(item => {
-      const score =
-        1 /
-        toStandardUnits(
-          account,
-          buildItemCost(buildRequirementToBuildItem(item, getMainPlanet().id))
-        );
-      totalScore += score;
-      return [item, score];
-    });
-
-    // // Cheapest first
-    // return availableItemsAndScore.sort((a, b) => b[1] - a[1])[0][0];
-
-    // Weighted Random
-    const r = Math.random() * totalScore;
-    let current = 0;
-    for (const [item, score] of availableItemsAndScore) {
-      current += score;
-      if (r < current) {
-        return item;
-      }
-    }
-
-    throw new Error(`Failure to pick a build order item`);
   }
 
   const buildOrder: BuildItem[] = [];
@@ -96,7 +40,7 @@ export function getAccountTimeline(target: BuildItem, account: Account): Account
   while (buildTree.children.length > 0) {
     let leaves = getRequirementTreeLeaves(buildTree);
     while (leaves.length > 0) {
-      const next = nextBuildableRequirement(leaves);
+      const next = nextBuildableRequirement(account, getMainPlanet().id, leaves);
       if (next.entity.type === 'building') {
         account = updateAccountPlanet(
           account,
@@ -118,7 +62,113 @@ export function getAccountTimeline(target: BuildItem, account: Account): Account
     }
   }
   buildOrder.push(target);
+  return buildOrder;
+}
 
-  const timeline = createAccountTimeline(startPoint, buildOrder);
-  return timeline;
+function buildRequirementToBuildItem(
+  requirement: BuildableRequirement,
+  planetId: PlanetId
+): BuildItem {
+  if (requirement.entity.type === 'building') {
+    return {
+      type: 'building',
+      buildable: requirement.entity,
+      level: requirement.level,
+      planetId,
+    };
+  }
+  return {
+    type: 'technology',
+    buildable: requirement.entity,
+    level: requirement.level,
+    planetId,
+  };
+}
+
+export function randomWeightedNextBuildableRequirement(
+  account: Account,
+  planetId: PlanetId,
+  nextEssentialBuilds: BuildableRequirement[]
+): BuildableRequirement {
+  const availableBuildings: BuildableRequirement[] = getAvailableBuildingsForPlanet(
+    account,
+    planetId
+  );
+  const availableTechonologies: BuildableRequirement[] = getAvailableTechnologiesForAccount(
+    account,
+    planetId
+  );
+  const availableItems = uniqBy(
+    [...availableBuildings, ...availableTechonologies, ...nextEssentialBuilds],
+    buildableRequirementToString
+  );
+
+  // // Pure random
+  // return availableItems[rand(0, availableItems.length - 1)];
+
+  let totalScore = 0;
+  const availableItemsAndScore: [BuildableRequirement, number][] = availableItems.map(item => {
+    const score =
+      1 / toStandardUnits(account, buildItemCost(buildRequirementToBuildItem(item, planetId)));
+    totalScore += score;
+    return [item, score];
+  });
+
+  // // Cheapest first
+  // return availableItemsAndScore.sort((a, b) => b[1] - a[1])[0][0];
+
+  // Weighted Random
+  const r = Math.random() * totalScore;
+  let current = 0;
+  for (const [item, score] of availableItemsAndScore) {
+    current += score;
+    if (r < current) {
+      return item;
+    }
+  }
+
+  throw new Error(`Failure to pick a build order item`);
+}
+
+export function randomWeightedBuildOrderWithOnlyMines(
+  target: BuildItem,
+  account: Account
+): BuildItem[] {
+  return generateBuildOrder(target, account, (account, planetId, nextEssentialBuilds) => {
+    const planet = account.planets.get(planetId);
+    if (!planet) {
+      throw new Error('Planet not found');
+    }
+    const availableMines: BuildableRequirement[] = [
+      {entity: MetalMine, level: (planet.buildingLevels.get(MetalMine) ?? 0) + 1},
+      {entity: CrystalMine, level: (planet.buildingLevels.get(CrystalMine) ?? 0) + 1},
+      {
+        entity: DeuteriumSynthesizer,
+        level: (planet.buildingLevels.get(DeuteriumSynthesizer) ?? 0) + 1,
+      },
+    ];
+    const availableItems = uniqBy(
+      [...availableMines, ...nextEssentialBuilds],
+      buildableRequirementToString
+    );
+
+    let totalScore = 0;
+    const availableItemsAndScore: [BuildableRequirement, number][] = availableItems.map(item => {
+      const score =
+        1 / toStandardUnits(account, buildItemCost(buildRequirementToBuildItem(item, planetId)));
+      totalScore += score;
+      return [item, score];
+    });
+
+    const r = Math.random() * totalScore;
+    let current = 0;
+    for (const [item, score] of availableItemsAndScore) {
+      current += score;
+      if (r < current) {
+        return item;
+      }
+    }
+
+    throw new Error(`Failure to pick a build order item`);
+  });
 }
