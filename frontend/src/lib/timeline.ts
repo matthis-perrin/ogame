@@ -17,11 +17,11 @@ import {toStandardUnits} from '@shared/lib/resources';
 import {createAccountTimeline} from '@shared/lib/timeline';
 import {Account} from '@shared/models/account';
 import {BuildItem} from '@shared/models/build_item';
-import {Buildable, BuildableRequirement} from '@shared/models/buildable';
+import {BuildableRequirement} from '@shared/models/buildable';
 import {Planet, PlanetId} from '@shared/models/planet';
 import {AccountTimeline} from '@shared/models/timeline';
 
-export function getAccountTimeline(target: Buildable, account: Account): AccountTimeline {
+export function getAccountTimeline(target: BuildItem, account: Account): AccountTimeline {
   function getMainPlanet(): Planet {
     return Array.from(account.planets.values())[0];
   }
@@ -91,7 +91,7 @@ export function getAccountTimeline(target: Buildable, account: Account): Account
   }
 
   const buildOrder: BuildItem[] = [];
-  const buildTree = computeRequirementTree(target);
+  const buildTree = computeRequirementTree(target.buildable);
 
   while (buildTree.children.length > 0) {
     let leaves = getRequirementTreeLeaves(buildTree);
@@ -117,22 +117,8 @@ export function getAccountTimeline(target: Buildable, account: Account): Account
       buildOrder.push(nextAsBuildItem);
     }
   }
+  buildOrder.push(target);
 
-  if (buildTree.target.type === 'building' || buildTree.target.type === 'technology') {
-    const lastEssential = {entity: buildTree.target, level: 1, planetId: getMainPlanet().id};
-    while (true) {
-      const next = nextBuildableRequirement([lastEssential]);
-      const nextAsBuildItem = buildRequirementToBuildItem(next, getMainPlanet().id);
-      buildOrder.push(nextAsBuildItem);
-      if (buildableRequirementAreEqual(next, lastEssential)) {
-        break;
-      }
-    }
-  }
-
-  // const tStart = performance.now();
   const timeline = createAccountTimeline(startPoint, buildOrder);
-  // const tEnd = performance.now();
-  // console.log(`Computed in ${tEnd - tStart} ms`);
   return timeline;
 }

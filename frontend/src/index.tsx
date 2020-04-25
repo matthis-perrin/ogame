@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 
 import {createNewAccount} from '@shared/lib/account';
 import {setupRapidFire, setupRequirements} from '@shared/models/dependencies';
-import {Destroyer} from '@shared/models/ships';
+import {SmallCargo} from '@shared/models/ships';
 import {Rosalind} from '@shared/models/universe';
 
 import {App} from '@src/components/app';
@@ -14,7 +14,12 @@ setupRapidFire();
 setupRequirements();
 
 setTimeout(() => {
-  const accountTimeline = getAccountTimeline(Destroyer, createNewAccount(Rosalind));
+  const account = createNewAccount(Rosalind);
+  const mainPlanet = Array.from(account.planets.values())[0];
+  const accountTimeline = getAccountTimeline(
+    {type: 'ship', buildable: SmallCargo, planetId: mainPlanet.id, quantity: 1},
+    account
+  );
   setAppState({accountTimeline, selectedAccount: accountTimeline.start});
 });
 
