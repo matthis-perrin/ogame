@@ -1,6 +1,6 @@
 import {getBuildingBuildTime, getTechnologyBuildTime} from '@shared/lib/formula';
 import {getPlanetProductionPerHour} from '@shared/lib/production';
-import {isBuildableAvailableOnPlanet} from '@shared/lib/requirement_tree';
+import {isBuildItemAvailable} from '@shared/lib/requirement_tree';
 import {Account} from '@shared/models/account';
 import {BuildItem} from '@shared/models/build_item';
 import {Buildable, BuildableRequirement} from '@shared/models/buildable';
@@ -27,8 +27,8 @@ import {
   ZERO_METAL,
 } from '@shared/models/resource';
 import {Crawler, SolarSatellite} from '@shared/models/ships';
-import {hoursToMilliseconds, Milliseconds, ZERO} from '@shared/models/time';
-import {divide, max, neverHappens, substract, sum} from '@shared/utils/type_utils';
+import {hoursToMilliseconds, Milliseconds, NEVER, ZERO} from '@shared/models/time';
+import {ceil, divide, max, neverHappens, substract, sum} from '@shared/utils/type_utils';
 
 export function getBuildItemCost(buildItem: BuildItem): Resources {
   if (buildItem.type === 'building') {
@@ -61,7 +61,7 @@ export function getTimeToGetResources(
   const deuteriumHours = deuterium <= 0 ? 0 : deuterium / prod.deuterium;
 
   const prodHours = Math.max(metalHours, crystalHours, deuteriumHours);
-  return hoursToMilliseconds(prodHours);
+  return ceil(hoursToMilliseconds(prodHours));
 }
 
 export function getTimeBeforeBuildItemQueueable(
@@ -70,9 +70,11 @@ export function getTimeBeforeBuildItemQueueable(
   buildItem: BuildItem
 ): Milliseconds {
   const timeLeft = (baseDuration: Milliseconds, startTime: Milliseconds): Milliseconds => {
-    const left = substract(
-      sum(divide(baseDuration, account.universe.researchSpeed), startTime),
-      account.currentTime
+    const left = ceil(
+      substract(
+        sum(divide(baseDuration, account.universe.researchSpeed), startTime),
+        account.currentTime
+      )
     );
     if (left < ZERO) {
       throw new Error('Account has an in progress build that is finished');
@@ -134,6 +136,63 @@ export function getTimeBeforeBuildItemBuildable(
   return max(timeToGetResources, timeBeforeBuildItemQueueable);
 }
 
+function buildableRequirementToBuildItem(
+  planet: Planet,
+  requirement: BuildableRequirement
+): BuildItem {
+  if (requirement.entity.type === 'building') {
+    return {
+      type: 'building',
+      level: requirement.level,
+      buildable: requirement.entity,
+      planetId: planet.id,
+    };
+  } else if (requirement.entity.type === 'technology') {
+    return {
+      type: 'technology',
+      level: requirement.level,
+      buildable: requirement.entity,
+      planetId: planet.id,
+    };
+  } else {
+    neverHappens(requirement.entity, `Unknown entity type ${requirement.entity['type']}`);
+  }
+}
+
+function buildableToBuildItem(planet: Planet, buildable: Buildable): BuildItem {
+  if (buildable.type === 'building') {
+    return {
+      type: 'building',
+      level: 1,
+      buildable,
+      planetId: planet.id,
+    };
+  } else if (buildable.type === 'technology') {
+    return {
+      type: 'technology',
+      level: 1,
+      buildable,
+      planetId: planet.id,
+    };
+  } else if (buildable.type === 'ship') {
+    return {
+      type: 'ship',
+      quantity: 1,
+      buildable,
+      planetId: planet.id,
+    };
+  } else if (buildable.type === 'defense') {
+    return {
+      type: 'defense',
+      quantity: 1,
+      buildable,
+      planetId: planet.id,
+    };
+  } else {
+    neverHappens(buildable, `Unknown entity type ${buildable['type']}`);
+  }
+}
+
 export function buildItemsToMeetRequirementOnPlanet(
   account: Account,
   planet: Planet,
@@ -165,7 +224,11 @@ export function buildItemsToMeetRequirementOnPlanet(
     }
   }
 
-  if (currentLevel === 0 && !isBuildableAvailableOnPlanet(account, planet, entity).isAvailable) {
+  const availability = isBuildItemAvailable(
+    account,
+    buildableRequirementToBuildItem(planet, requirement)
+  );
+  if (currentLevel === 0 && !availability.isAvailable && availability.willBeAvailableAt === NEVER) {
     for (const entityRequirement of entity.requirements) {
       items.push(...buildItemsToMeetRequirementOnPlanet(account, planet, entityRequirement));
     }
@@ -179,7 +242,8 @@ export function buildItemsToUnlockBuildableOnPlanet(
   planet: Planet,
   buildable: Buildable
 ): BuildItem[] {
-  if (isBuildableAvailableOnPlanet(account, planet, buildable).isAvailable) {
+  const availability = isBuildItemAvailable(account, buildableToBuildItem(planet, buildable));
+  if (availability.isAvailable || availability.willBeAvailableAt !== NEVER) {
     return [];
   }
   const items: BuildItem[] = [];
@@ -206,14 +270,14 @@ export function buildItemCost(buildItem: BuildItem): Resources {
 }
 
 export function buildItemsCost(buildItems: BuildItem[]): Resources {
-  const metal: MetalAmount = ZERO_METAL;
-  const crystal: CrystalAmount = ZERO_CRYSTAL;
-  const deuterium: DeuteriumAmount = ZERO_DEUTERIUM;
+  let metal: MetalAmount = ZERO_METAL;
+  let crystal: CrystalAmount = ZERO_CRYSTAL;
+  let deuterium: DeuteriumAmount = ZERO_DEUTERIUM;
   for (const buildItem of buildItems) {
     const cost = buildItemCost(buildItem);
-    sum(metal, cost.metal);
-    sum(crystal, cost.crystal);
-    sum(deuterium, cost.deuterium);
+    metal = sum(metal, cost.metal);
+    crystal = sum(crystal, cost.crystal);
+    deuterium = sum(deuterium, cost.deuterium);
   }
   return {metal, crystal, deuterium};
 }

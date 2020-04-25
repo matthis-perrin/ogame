@@ -15,7 +15,7 @@ import {Ship, ShipFuelConsumption, ShipSpeed} from '@shared/models/ships';
 import {Technology} from '@shared/models/technology';
 import {hoursToMilliseconds, Milliseconds} from '@shared/models/time';
 import {Universe} from '@shared/models/universe';
-import {multiply, sum} from '@shared/utils/type_utils';
+import {floor, multiply, sum} from '@shared/utils/type_utils';
 
 export function getMaxCrawlerCount(
   metalMineLevel: number,
@@ -155,7 +155,7 @@ export function getTechnologyBuildTime(
 ): Milliseconds {
   const {metal, crystal} = technology.cost(level);
   const hours = ((metal as number) + (crystal as number)) / (1000 * (1 + researchLabLevel));
-  return hoursToMilliseconds(hours / universeResearchSpeed);
+  return floor(hoursToMilliseconds(hours / universeResearchSpeed));
 }
 
 export function getBuildingBuildTime(
@@ -170,7 +170,7 @@ export function getBuildingBuildTime(
   const hours =
     (lowLevelSpeedup * ((metal as number) + (crystal as number))) /
     (2500 * (1 + roboticsFactoryLevel) * Math.pow(2, naniteFactoryLevel));
-  return hoursToMilliseconds(hours / universeEconomySpeed);
+  return floor(hoursToMilliseconds(hours / universeEconomySpeed));
 }
 
 export function getShipsBuildTime(
@@ -184,7 +184,7 @@ export function getShipsBuildTime(
   const hours =
     ((metal as number) + (crystal as number)) /
     (2500 * (1 + shipyardLevel) * Math.pow(2, naniteFactoryLevel));
-  return hoursToMilliseconds((hours * quantity) / universeEconomySpeed);
+  return multiply(floor(hoursToMilliseconds(hours / universeEconomySpeed)), quantity);
 }
 
 export function getDefensesBuildTime(
@@ -198,7 +198,7 @@ export function getDefensesBuildTime(
   const hours =
     ((metal as number) + (crystal as number)) /
     (2500 * (1 + shipyardLevel) * Math.pow(2, naniteFactoryLevel));
-  return hoursToMilliseconds((hours * quantity) / universeEconomySpeed);
+  return multiply(floor(hoursToMilliseconds(hours / universeEconomySpeed)), quantity);
 }
 
 //

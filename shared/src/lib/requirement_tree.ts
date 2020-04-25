@@ -1,9 +1,10 @@
 import {buildableRequirementToString} from '@shared/lib/build_items';
 import {Account} from '@shared/models/account';
+import {BuildItem} from '@shared/models/build_item';
 import {Buildable, BuildableRequirement} from '@shared/models/buildable';
 import {Building} from '@shared/models/building';
-import {Planet} from '@shared/models/planet';
 import {Technology} from '@shared/models/technology';
+import {Milliseconds, NEVER, ZERO} from '@shared/models/time';
 import {neverHappens} from '@shared/utils/type_utils';
 
 interface RequirementTree {
@@ -101,29 +102,70 @@ export function removeRequirementFromTree(
   removeRequirementFromTreeNode(buildTree, requirement);
 }
 
-export function isBuildableAvailableOnPlanet(
+export function isBuildItemAvailable(
   account: Account,
-  planet: Planet,
-  buildable: Buildable
-): {isAvailable: false; reason: string} | {isAvailable: true} {
-  for (const requirement of buildable.requirements) {
+  buildItem: BuildItem
+): {isAvailable: boolean; reason: string; willBeAvailableAt: Milliseconds} {
+  let isAvailable = true;
+  let willBeAvailableAt: Milliseconds = ZERO;
+  let reason = '';
+
+  const requirementsWithPreviousLevelConstraint: BuildableRequirement[] = [
+    ...buildItem.buildable.requirements,
+  ];
+  if (buildItem.type === 'building' || buildItem.type === 'technology') {
+    if (buildItem.level > 1) {
+      requirementsWithPreviousLevelConstraint.push({
+        entity: buildItem.buildable,
+        level: buildItem.level - 1,
+      });
+    }
+  }
+
+  for (const requirement of requirementsWithPreviousLevelConstraint) {
+    const planet = account.planets.get(buildItem.planetId);
+    if (!planet) {
+      throw new Error(`No planet with id ${buildItem.planetId} on the account`);
+    }
     if (requirement.entity.type === 'building') {
       if ((planet.buildingLevels.get(requirement.entity) ?? 0) < requirement.level) {
-        return {
-          isAvailable: false,
-          reason: `${buildableRequirementToString(requirement)} required`,
-        };
+        if (
+          planet.inProgressBuilding &&
+          planet.inProgressBuilding.building === requirement.entity &&
+          planet.inProgressBuilding.level >= requirement.level
+        ) {
+          isAvailable = false;
+          if (willBeAvailableAt < planet.inProgressBuilding.endTime) {
+            willBeAvailableAt = planet.inProgressBuilding.endTime;
+            reason = `${buildableRequirementToString(requirement)} in progress`;
+          }
+        } else {
+          isAvailable = false;
+          willBeAvailableAt = NEVER;
+          reason = `${buildableRequirementToString(requirement)} required`;
+        }
       }
     } else if (requirement.entity.type === 'technology') {
       if ((account.technologyLevels.get(requirement.entity) ?? 0) < requirement.level) {
-        return {
-          isAvailable: false,
-          reason: `${buildableRequirementToString(requirement)} required`,
-        };
+        if (
+          account.inProgressTechnology &&
+          account.inProgressTechnology.technology === requirement.entity &&
+          account.inProgressTechnology.level >= requirement.level
+        ) {
+          isAvailable = false;
+          if (willBeAvailableAt < account.inProgressTechnology.endTime) {
+            willBeAvailableAt = account.inProgressTechnology.endTime;
+            reason = `${buildableRequirementToString(requirement)} in progress`;
+          }
+        } else {
+          isAvailable = false;
+          willBeAvailableAt = NEVER;
+          reason = `${buildableRequirementToString(requirement)} required`;
+        }
       }
     } else {
       neverHappens(requirement.entity, `Invalid requirement type "${requirement.entity['type']}"`);
     }
   }
-  return {isAvailable: true};
+  return {isAvailable, willBeAvailableAt, reason};
 }

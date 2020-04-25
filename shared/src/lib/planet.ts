@@ -185,7 +185,29 @@ export function getRecyclableStandardUnitOnPlanet(
   });
 }
 
-// TODO - Include "cachette"
+export function getRecyclableStandardUnitFromShips(
+  account: Account,
+  ships: {ship: Ship; quantity: number}[] = []
+): StandardUnitAmount {
+  let destructableShipResources = makeResources({});
+  for (const {ship, quantity} of ships) {
+    destructableShipResources = addResources(
+      destructableShipResources,
+      multiplyResources(ship.cost, quantity)
+    );
+  }
+  return toStandardUnits(account, {
+    metal: floor(
+      multiply(destructableShipResources.metal, account.universe.shipInDebrisFieldRatio)
+    ),
+    crystal: floor(
+      multiply(destructableShipResources.crystal, account.universe.shipInDebrisFieldRatio)
+    ),
+    deuterium: ZERO_DEUTERIUM,
+  });
+}
+
+// // TODO - Include "cachette"
 export function getMaxStealableStandardUnitOnPlanet(
   account: Account,
   planet: Planet

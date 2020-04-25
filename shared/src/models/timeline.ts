@@ -16,6 +16,7 @@ export interface TransitionnedAccount {
 export type TransitionType = 'wait' | 'build';
 
 interface TransitionBase {
+  id: number;
   type: TransitionType;
 }
 

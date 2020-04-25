@@ -36,9 +36,9 @@ export const EspionageProbe: Ship = {
   rapidFire: new Map<Unit, number>(),
   requirements: [],
   component: 'shipyard',
+  sprite: '63.15% 51.72%',
 };
 
-// TODO - Produce energy
 export const SolarSatellite: Ship = {
   id: 212,
   name: 'Satellite solaire',
@@ -55,6 +55,7 @@ export const SolarSatellite: Ship = {
   rapidFire: new Map<Unit, number>(),
   requirements: [],
   component: 'supplies',
+  sprite: '26.31% 0',
 };
 
 export const Crawler: Ship = {
@@ -73,6 +74,7 @@ export const Crawler: Ship = {
   rapidFire: new Map<Unit, number>(),
   requirements: [],
   component: 'shipyard',
+  sprite: '84.20% 51.72%',
 };
 
 export const SmallCargo: Ship = {
@@ -91,6 +93,7 @@ export const SmallCargo: Ship = {
   rapidFire: new Map<Unit, number>(),
   requirements: [],
   component: 'shipyard',
+  sprite: '42.1% 51.72%',
 };
 
 export const LargeCargo: Ship = {
@@ -109,6 +112,7 @@ export const LargeCargo: Ship = {
   rapidFire: new Map<Unit, number>(),
   requirements: [],
   component: 'shipyard',
+  sprite: '47.36% 51.72%',
 };
 
 // TODO - Can recycle 100% of debris fields
@@ -128,6 +132,7 @@ export const Recycler: Ship = {
   rapidFire: new Map<Unit, number>(),
   requirements: [],
   component: 'shipyard',
+  sprite: '57.89% 51.72%',
 };
 
 export const ColonyShip: Ship = {
@@ -146,6 +151,7 @@ export const ColonyShip: Ship = {
   rapidFire: new Map<Unit, number>(),
   requirements: [],
   component: 'shipyard',
+  sprite: '52.62% 51.72%',
 };
 
 export const LightFighter: Ship = {
@@ -164,6 +170,7 @@ export const LightFighter: Ship = {
   rapidFire: new Map<Unit, number>(),
   requirements: [],
   component: 'shipyard',
+  sprite: '0 51.72%',
 };
 
 export const Cruiser: Ship = {
@@ -182,6 +189,7 @@ export const Cruiser: Ship = {
   rapidFire: new Map<Unit, number>(),
   requirements: [],
   component: 'shipyard',
+  sprite: '10.53% 51.72%',
 };
 
 export const HeavyFighter: Ship = {
@@ -200,6 +208,7 @@ export const HeavyFighter: Ship = {
   rapidFire: new Map<Unit, number>(),
   requirements: [],
   component: 'shipyard',
+  sprite: '5.25% 51.72%',
 };
 
 export const Pathfinder: Ship = {
@@ -218,6 +227,7 @@ export const Pathfinder: Ship = {
   rapidFire: new Map<Unit, number>(),
   requirements: [],
   component: 'shipyard',
+  sprite: '78.94% 51.72%',
 };
 
 export const Battleship: Ship = {
@@ -236,6 +246,7 @@ export const Battleship: Ship = {
   rapidFire: new Map<Unit, number>(),
   requirements: [],
   component: 'shipyard',
+  sprite: '15.78% 51.72%',
 };
 
 export const BattleCruiser: Ship = {
@@ -254,6 +265,7 @@ export const BattleCruiser: Ship = {
   rapidFire: new Map<Unit, number>(),
   requirements: [],
   component: 'shipyard',
+  sprite: '21.05% 51.72%',
 };
 
 export const Destroyer: Ship = {
@@ -272,6 +284,7 @@ export const Destroyer: Ship = {
   rapidFire: new Map<Unit, number>(),
   requirements: [],
   component: 'shipyard',
+  sprite: '31.57% 51.72%',
 };
 
 export const Bomber: Ship = {
@@ -290,6 +303,7 @@ export const Bomber: Ship = {
   rapidFire: new Map<Unit, number>(),
   requirements: [],
   component: 'shipyard',
+  sprite: '26.31% 51.72%',
 };
 
 // TODO - Can recycle 25% of debris fields
@@ -309,6 +323,7 @@ export const Reaper: Ship = {
   rapidFire: new Map<Unit, number>(),
   requirements: [],
   component: 'shipyard',
+  sprite: '73.68% 51.72%',
 };
 
 export const CargoShip: Ship[] = [SmallCargo, LargeCargo];

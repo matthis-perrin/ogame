@@ -1,21 +1,17 @@
 import React, {FC} from 'react';
 import styled from 'styled-components';
 
+import {getBuildItemCost} from '@shared/lib/build_items';
 import {BuildItem} from '@shared/models/build_item';
 
 import {ResourcesView} from '@src/components/core/resources_view';
 import {Sprite} from '@src/components/core/sprite';
 
 export const BuildItemView: FC<{buildItem: BuildItem}> = ({buildItem}) => {
-  if (
-    buildItem.type === 'ship' ||
-    buildItem.type === 'defense' ||
-    buildItem.buildable.sprite === undefined
-  ) {
-    // eslint-disable-next-line no-console
-    console.log(buildItem);
-    throw new Error(`Not handled yet`);
-  }
+  const metricText =
+    buildItem.type === 'ship' || buildItem.type === 'defense'
+      ? `x ${buildItem.quantity}`
+      : `Niv. ${buildItem.level}`;
 
   return (
     <Wrapper>
@@ -29,9 +25,9 @@ export const BuildItemView: FC<{buildItem: BuildItem}> = ({buildItem}) => {
       <Right>
         <Title>
           <Name>{buildItem.buildable.name}</Name>
-          <Level>{`Niv. ${buildItem.level}`}</Level>
+          <Metric>{metricText}</Metric>
         </Title>
-        <ResourcesView resources={buildItem.buildable.cost(buildItem.level)} />
+        <ResourcesView resources={getBuildItemCost(buildItem)} />
       </Right>
 
       {/* <Separator />
@@ -68,7 +64,7 @@ const Title = styled.div`
 const Name = styled.div`
   margin-right: 12px;
 `;
-const Level = styled.div`
+const Metric = styled.div`
   font-size: 14px;
   color: #999;
   flex-shrink: 0;
