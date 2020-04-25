@@ -41,13 +41,9 @@ AllDefenses.forEach(buildIndex);
 AllShips.forEach(buildIndex);
 
 export function techShortName(techId: number): string {
-  const name = TechnologyIndex.get(techId)?.name;
+  const name = TechnologyIndex.get(techId)?.shortName;
   if (name === undefined) {
     return `TECHID_${techId}`;
-  }
-  // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-  if (techId === 111) {
-    return 'Protection des vaisseaux';
   }
   return name;
 }

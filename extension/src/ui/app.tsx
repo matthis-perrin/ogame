@@ -29,11 +29,11 @@ export const App: FC = () => {
               <ObjectivesC account={account} />
             </Middle>
             <Bottom>
-              <Constructions account={account} />
+              <Messages account={account} />
               <Separator />
               <Fleets account={account} />
               <Separator />
-              <Messages account={account} />
+              <Constructions account={account} />
             </Bottom>
           </div>
         )}

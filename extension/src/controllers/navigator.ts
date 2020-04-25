@@ -45,7 +45,7 @@ export function goToShips(planetId: PlanetId): void {
 
 export function goToGalaxy(planetCoords: PlanetCoords): void {
   const coords = getCoords(planetCoords);
-  window.location.href = `${document.location.origin}${document.location.pathname}?page=ingame&component=galaxy&galaxy=${coords.galaxy}&system=${coords.system}&position=${coords.position}`;
+  window.location.href = `${document.location.origin}${document.location.pathname}?page=ingame&component=galaxy&galaxy=${coords.galaxy}&system=${coords.solarSystem}&position=${coords.position}`;
 }
 
 export function goToMessages(planetId?: PlanetId): void {
@@ -64,9 +64,9 @@ export function sendLargeCargos(
   const coords = getCoords(planetCoords);
   window.location.href = `${document.location.origin}${
     document.location.pathname
-  }?page=ingame&component=fleetdispatch&galaxy=${coords.galaxy}&system=${coords.system}&position=${
-    coords.position
-  }&type=1&mission=${missionType}&am203=${amount}&cp=${from}${
+  }?page=ingame&component=fleetdispatch&galaxy=${coords.galaxy}&system=${
+    coords.solarSystem
+  }&position=${coords.position}&type=1&mission=${missionType}&am203=${amount}&cp=${from}${
     resources !== undefined
       ? `&metal=${Math.ceil(resources.metal)}&crystal=${Math.ceil(
           resources.crystal

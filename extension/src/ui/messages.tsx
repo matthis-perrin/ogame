@@ -76,7 +76,7 @@ export const Messages: FC<MessagesProps> = ({account}) => {
             <tr>
               <th colSpan={5}>
                 <Title onClick={() => goToMessages()} style={{cursor: 'pointer'}}>
-                  Rapports
+                  Rapports ({messages.length})
                 </Title>
               </th>
             </tr>

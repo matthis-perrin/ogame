@@ -3,7 +3,7 @@ import {MissionTypeEnum} from '@src/models/fleets';
 import {ResourceAmount} from '@src/models/resources';
 import {getAccount, setAccount} from '@src/stores/account';
 import {calcInFlightResources} from '@src/stores/account/inflight_resources';
-import {calcObjectives} from '@src/stores/account/objectives';
+import {updateObjectivesTransfers} from '@src/stores/account/objectives';
 import {calcPlanetSum} from '@src/stores/account/planet_sum';
 import {sum} from '@src/ui/utils';
 
@@ -92,8 +92,8 @@ export function applyProduction(): void {
   // Calculating new planet sum
   account.planetSum = calcPlanetSum(account.planetDetails);
 
-  // Calculating objectives
-  account.objectives = calcObjectives(account);
+  // Updating objectives start time
+  updateObjectivesTransfers(account);
 
   setAccount(account);
 }

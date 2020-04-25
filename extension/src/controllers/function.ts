@@ -11,7 +11,7 @@ export function runScript(scriptStr: string): void {
 export function sendProbes(planetCoords: PlanetCoords): void {
   const coords = getCoords(planetCoords);
   runScript(
-    `sendShipsWithPopup(6,${coords.galaxy},${coords.system},${coords.position},1,${PROBES_AMOUNT})`
+    `sendShipsWithPopup(6,${coords.galaxy},${coords.solarSystem},${coords.position},1,${PROBES_AMOUNT})`
   );
 }
 
