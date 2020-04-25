@@ -24,9 +24,6 @@ export const AccountTimelineView: FC<{accountTimeline: AccountTimeline}> = ({acc
         <AccountTime account={start}></AccountTime>
       </div>
       {transitions.map(({transition, transitionnedAccount}) => {
-        const transitionKey =
-          transition.type === 'wait' ? transition.duration : transition.buildItem.buildable.id;
-        const key = `${transitionnedAccount.currentTime}-${transitionKey}`;
         const WrapperClass =
           selectedAccount === transitionnedAccount
             ? SelectedTransitionWrapper
@@ -34,7 +31,7 @@ export const AccountTimelineView: FC<{accountTimeline: AccountTimeline}> = ({acc
         return (
           <WrapperClass
             onClick={() => setAppState({accountTimeline, selectedAccount: transitionnedAccount})}
-            key={key}
+            key={transition.id}
           >
             {transition.type === 'wait' ? (
               <WaitTransitionView transition={transition} />

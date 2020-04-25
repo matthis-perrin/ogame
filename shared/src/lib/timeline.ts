@@ -76,16 +76,9 @@ import {
   ZERO,
 } from '@shared/models/time';
 import {AccountTimeline, TransitionnedAccount} from '@shared/models/timeline';
-import {
-  ceil,
-  floor,
-  max,
-  min,
-  multiply,
-  neverHappens,
-  substract,
-  sum,
-} from '@shared/utils/type_utils';
+import {ceil, max, min, multiply, neverHappens, substract, sum} from '@shared/utils/type_utils';
+
+let transitionId = 0;
 
 export function createAccountTimeline(account: Account, buildItems: BuildItem[]): AccountTimeline {
   const start = Date.now();
@@ -113,7 +106,7 @@ export function createAccountTimeline(account: Account, buildItems: BuildItem[])
       // for (const transition of transitions) {
       //   console.log(transitionToString(transition.transition));
       // }
-      advanceAccountTowardBuildItem(currentAccount, buildItem);
+      // advanceAccountTowardBuildItem(currentAccount, buildItem);
       break;
     }
   }
@@ -213,7 +206,7 @@ function advanceAccountTowardBuildItem(
   if (waitTime.time === 0) {
     return [
       {
-        transition: {type: 'build', buildItem},
+        transition: {type: 'build', id: transitionId++, buildItem},
         transitionnedAccount: applyBuildItem(account, buildItem),
       },
     ];
@@ -221,7 +214,13 @@ function advanceAccountTowardBuildItem(
     const {newAccount, events, actualAdvanceTime} = advanceAccountInTime(account, waitTime.time);
     return [
       {
-        transition: {type: 'wait', duration: actualAdvanceTime, reason: waitTime.reason, events},
+        transition: {
+          type: 'wait',
+          id: transitionId++,
+          duration: actualAdvanceTime,
+          reason: waitTime.reason,
+          events,
+        },
         transitionnedAccount: newAccount,
       },
       ...advanceAccountTowardBuildItem(newAccount, buildItem),
@@ -413,29 +412,39 @@ function timeBeforeApplyingBuildItem(
   }
 
   const cost = buildItemCost(buildItem);
-  const {time} = timeForResourcesOnPlanet(account, planet, cost);
+  const timeForResources = timeForResourcesOnPlanet(account, planet, cost);
 
   const mergeWaitTime = (wait: {
     time: Milliseconds;
     reason: string;
   }): {time: Milliseconds; reason: string} => {
-    if (time === 0) {
-      return wait;
+    const times: Milliseconds[] = [];
+    const reasons: string[] = [];
+
+    if (availability.willBeAvailableAt !== ZERO) {
+      times.push(substract(availability.willBeAvailableAt, account.currentTime));
+      reasons.push(availability.reason);
     }
-    const timeForResourceReason = `Waiting for resources to get ${buildItemToString(
-      buildItem
-    )} (need ${resourcesToString(cost)}, should take ${timeToString(time)})`;
-    if (wait.time === 0) {
-      return {
-        time,
-        reason: timeForResourceReason,
-      };
+    if (timeForResources.time !== ZERO) {
+      times.push(timeForResources.time);
+      reasons.push(
+        `Waiting for resources to get ${buildItemToString(buildItem)} (need ${resourcesToString(
+          cost
+        )}, should take ${timeToString(timeForResources.time)})`
+      );
     }
-    const maxTime = max(time, wait.time, availability.willBeAvailableAt);
-    const allReasons = [wait.reason, availability.reason, timeForResourceReason];
+    if (wait.time !== 0) {
+      times.push(wait.time);
+      reasons.push(wait.reason);
+    }
+    if (times.length === 0) {
+      return {time: ZERO, reason: ''};
+    }
+
+    const maxTime = max(...times);
     return {
       time: maxTime,
-      reason: allReasons.join(' + '),
+      reason: reasons.join(' + '),
     };
   };
 
@@ -500,6 +509,7 @@ function buildItemsToTransitions(
       transitionnedAccount: newAccount,
       transition: {
         type: 'wait',
+        id: transitionId++,
         duration: actualAdvanceTime,
         reason: earliest.reason,
         events,
@@ -515,6 +525,7 @@ function buildItemsToTransitions(
     transitionnedAccount: currentAccount,
     transition: {
       type: 'build',
+      id: transitionId++,
       buildItem: earliest.buildItem,
     },
   });
