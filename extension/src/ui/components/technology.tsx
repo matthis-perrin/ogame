@@ -95,7 +95,7 @@ export const TechnologyC: FC<TechnologyProps> = ({
     missingAmount = required - target;
     if (missingAmount > 0) {
       className = 'red';
-    } else if (technology.target !== undefined) {
+    } else if (technology.target !== undefined && target === required) {
       className = 'orange';
     }
   }

@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import {COLOR_WHITE} from '@src/models/constants';
 import {useAccount} from '@src/stores/account';
 import {Aggregation} from '@src/ui/aggregation';
+import {BotOverlay} from '@src/ui/botoverlay';
 import {Separator} from '@src/ui/components/separator';
 import {Constructions} from '@src/ui/constructions';
 import {Empire} from '@src/ui/empire';
@@ -20,6 +21,7 @@ export const App: FC = () => {
           ''
         ) : (
           <div>
+            {account.bots.objectives !== undefined ? <BotOverlay /> : ''}
             <Top>
               <Aggregation account={account} />
             </Top>

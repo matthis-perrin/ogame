@@ -1,9 +1,7 @@
 import React, {FC, Fragment} from 'react';
 
-import {goToFleets} from '@src/controllers/navigator';
 import {Account} from '@src/models/account';
 import {Table, Title} from '@src/ui/common';
-import {InFlightResources} from '@src/ui/components/inflightresources';
 import {PlanetSum} from '@src/ui/components/planetsum';
 import {PlanetSumProd} from '@src/ui/components/planetsumprod';
 import {Research} from '@src/ui/components/research';
@@ -17,9 +15,6 @@ export const Aggregation: FC<AggregationProps> = ({account}) => (
     <Table>
       <thead>
         <tr>
-          <th>
-            <Title>Flottes</Title>
-          </th>
           <th colSpan={3}>
             <Title>Total</Title>
           </th>
@@ -30,9 +25,6 @@ export const Aggregation: FC<AggregationProps> = ({account}) => (
       </thead>
       <tbody>
         <tr>
-          <td onClick={() => goToFleets()} style={{cursor: 'pointer'}}>
-            <InFlightResources account={account} />
-          </td>
           <td>
             {account.planetSum === undefined ? (
               ''

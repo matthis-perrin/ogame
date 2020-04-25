@@ -43,6 +43,7 @@ export function addPlanet(
     },
     messages: {},
     objectives: currentAccount?.objectives,
+    bots: currentAccount?.bots ?? {objectives: undefined},
   };
 
   // Retrieve messages or replace with new ones

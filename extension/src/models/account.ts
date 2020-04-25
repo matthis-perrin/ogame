@@ -1,3 +1,4 @@
+import {BotTransfer} from '@src/bots/objectives';
 import {Fleet} from '@src/models/fleets';
 import {Message} from '@src/models/messages';
 import {Objectives} from '@src/models/objectives';
@@ -18,6 +19,9 @@ export interface Account {
   inFlightSum: ResourcesWithSum;
   messages: {[messageId: string]: Message};
   objectives: Objectives | undefined;
+  bots: {
+    objectives: BotTransfer | undefined;
+  };
 }
 
 export interface ResourcesWithServerTime extends BaseResources {

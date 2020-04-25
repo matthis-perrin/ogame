@@ -104,7 +104,7 @@ export function updateObjectives(account: Account): void {
       continue;
     }
     let resources: Resources;
-    if (smartTech.type === 'ship' || smartTech.type === 'defense') {
+    if (smartTech.type === 'ship' || smartTech.type === 'defense' || smartTech.type === 'stock') {
       resources = multiplyResources(smartTech.cost, technology.target - technology.value);
     } else {
       resources = smartTech.cost(technology.target);
@@ -335,7 +335,10 @@ export function addObjectives(planetId: PlanetId, newTechnology: Technology): vo
 
   // Handle uniqueness
   if (objectives.technologies.find(_ => _.techId === newTechnology.techId) !== undefined) {
-    return;
+    const smartTech = TechnologyIndex.get(newTechnology.techId);
+    if (smartTech === undefined || smartTech.type !== 'stock') {
+      return;
+    }
   }
   objectives.technologies.push(newTechnology);
   currentAccount.objectives = objectives;

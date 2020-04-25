@@ -38,3 +38,5 @@ export const Deuterium: Stock = {
   sprite: '',
   cost: makeResources({m: 0, c: 0, d: 1}),
 };
+
+export const AllStocks: Stock[] = [Metal, Crystal, Deuterium];

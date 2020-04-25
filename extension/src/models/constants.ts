@@ -38,7 +38,7 @@ localStorage.setItem(SESSION_ID_LOCAL_STORAGE_KEY, SESSION_ID);
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 export const INACTIVITY_TIME = 8; // 8h
 export const DEBRIS_PERCENTAGE = 0.3;
-export const UI_REFRESH_RATE = 1000;
+export const UI_REFRESH_RATE = 500;
 export const PROBES_AMOUNT = 10;
 
 // Class bonus

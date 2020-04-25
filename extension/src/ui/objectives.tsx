@@ -47,7 +47,7 @@ export const ObjectivesC: FC<ObjectivesProps> = ({account}) => {
                 const smartTech = TechnologyIndex.get(technology.techId);
                 return (
                   <HoverLine
-                    key={technology.techId}
+                    key={index}
                     onClick={() => {
                       if (account.objectives) {
                         goToTechnology(technology.techId, account.objectives.planetId);

@@ -1,25 +1,101 @@
 import {LargeCargo} from '@shared/models/ships';
 
+import {runScript} from '@src/controllers/function';
+import {sendLargeCargos} from '@src/controllers/navigator';
+import {MissionTypeEnum} from '@src/models/fleets';
 import {ResourceTransfer} from '@src/models/objectives';
+import {findPlanetCoords} from '@src/models/planets';
 import {getFretCapacity} from '@src/models/technologies';
-import {getAccount} from '@src/stores/account';
+import {getAccount, setAccount} from '@src/stores/account';
 
-const BOT_LOOP_TIME = 1000;
+export enum BotTransferStep {
+  GoToFleet,
+  ValidateShips,
+  ValidateCoords,
+  ValidateResources,
+  WaitingValidation,
+}
+
+export interface BotTransfer {
+  transfer: ResourceTransfer;
+  step: BotTransferStep;
+}
+
+const BOT_LOOP_TIME = 500;
 let interval: number | undefined;
-let currentTransfer: ResourceTransfer | undefined;
 
-function handleTransfer(transfer: ResourceTransfer): void {
-  console.log('handleTransfer', transfer.from, transfer.to);
+function handleTransfer(): void {
+  const account = getAccount();
+  if (account === undefined) {
+    return;
+  }
+  const bt = account.bots.objectives;
+  if (bt === undefined) {
+    return;
+  }
+
+  switch (bt.step) {
+    case BotTransferStep.GoToFleet:
+      bt.step = BotTransferStep.ValidateShips;
+      setAccount(account);
+      const fretGt = getFretCapacity(account.accountTechnologies, LargeCargo);
+      const requiredGt = Math.ceil(bt.transfer.resources.sum / fretGt);
+      sendLargeCargos(
+        bt.transfer.from,
+        findPlanetCoords(account.planetList, bt.transfer.to),
+        MissionTypeEnum.Deployment,
+        requiredGt,
+        bt.transfer.resources
+      );
+      break;
+    case BotTransferStep.ValidateShips:
+      bt.step = BotTransferStep.ValidateCoords;
+      setAccount(account);
+      runScript(`if($('#fleet1').is(':visible')){fleetDispatcher.trySubmitFleet1();}`);
+      break;
+    case BotTransferStep.ValidateCoords:
+      bt.step = BotTransferStep.ValidateResources;
+      setAccount(account);
+      runScript(`if($('#fleet2').is(':visible')){fleetDispatcher.trySubmitFleet2();}`);
+      break;
+    case BotTransferStep.ValidateResources:
+      bt.step = BotTransferStep.WaitingValidation;
+      setAccount(account);
+      runScript(
+        `fleetDispatcher.updateCargo();fleetDispatcher.refreshCargo();fleetDispatcher.trySubmitFleet3();`
+      );
+      break;
+    case BotTransferStep.WaitingValidation:
+      if (account.objectives !== undefined) {
+        for (const transfer of account.objectives.resourceTransfers) {
+          if (
+            transfer.from === bt.transfer.from &&
+            transfer.to === bt.transfer.to &&
+            transfer.isTransferring
+          ) {
+            account.bots.objectives = undefined;
+            setAccount(account);
+            return;
+          }
+        }
+      }
+      break;
+    default:
+  }
 }
 
 function loop(): void {
   const account = getAccount();
-  if (account === undefined || account.objectives === undefined) {
+  if (
+    account === undefined ||
+    account.objectives === undefined ||
+    account.objectives.startTime === undefined
+  ) {
     return;
   }
 
-  if (currentTransfer !== undefined) {
-    handleTransfer(currentTransfer);
+  if (account.bots.objectives !== undefined) {
+    handleTransfer();
     return;
   }
 
@@ -53,7 +129,8 @@ function loop(): void {
       continue;
     }
 
-    currentTransfer = transfer;
+    account.bots.objectives = {transfer, step: BotTransferStep.GoToFleet};
+    setAccount(account);
     return;
   }
 }

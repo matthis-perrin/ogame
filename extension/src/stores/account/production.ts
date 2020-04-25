@@ -32,6 +32,7 @@ export function applyProduction(): void {
     },
     messages: currentAccount.messages,
     objectives: currentAccount.objectives,
+    bots: currentAccount.bots,
   };
 
   // Using milliseconds to have below second UI refresh

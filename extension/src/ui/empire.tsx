@@ -33,6 +33,7 @@ import {
   SmallCargo,
   SolarSatellite,
 } from '@shared/models/ships';
+import {Crystal, Deuterium, Metal} from '@shared/models/stock';
 
 import {
   goToDefenses,
@@ -55,6 +56,7 @@ import {
 } from '@src/models/constants';
 import {ResourceAmount} from '@src/models/resources';
 import {getFretCapacity} from '@src/models/technologies';
+import {addObjectives} from '@src/stores/account/objectives';
 import {Table, Title} from '@src/ui/common';
 import {Energy} from '@src/ui/components/energy';
 import {Loot} from '@src/ui/components/loot';
@@ -144,24 +146,54 @@ export const Empire: FC<EmpireProps> = ({account}) => (
               <PlanetLine key={p.id} className={p.id === account.currentPlanetId ? 'active' : ''}>
                 <td>
                   <Line>
-                    <Resource
-                      name="M"
-                      amount={planet.resources.metal}
-                      storage={planet.storages.metal}
-                      production={planet.productions.metal}
-                    />
-                    <Resource
-                      name="C"
-                      amount={planet.resources.crystal}
-                      storage={planet.storages.crystal}
-                      production={planet.productions.crystal}
-                    />
-                    <Resource
-                      name="D"
-                      amount={planet.resources.deuterium}
-                      storage={planet.storages.deuterium}
-                      production={planet.productions.deuterium}
-                    />
+                    <Stock
+                      onClick={() => {
+                        addObjectives(p.id, {
+                          techId: Metal.id,
+                          value: 0,
+                          target: 1000000,
+                        });
+                      }}
+                    >
+                      <Resource
+                        name="M"
+                        amount={planet.resources.metal}
+                        storage={planet.storages.metal}
+                        production={planet.productions.metal}
+                      />
+                    </Stock>
+                    <Stock
+                      onClick={() => {
+                        addObjectives(p.id, {
+                          techId: Crystal.id,
+                          value: 0,
+                          target: 1000000,
+                        });
+                      }}
+                    >
+                      <Resource
+                        name="C"
+                        amount={planet.resources.crystal}
+                        storage={planet.storages.crystal}
+                        production={planet.productions.crystal}
+                      />
+                    </Stock>
+                    <Stock
+                      onClick={() => {
+                        addObjectives(p.id, {
+                          techId: Deuterium.id,
+                          value: 0,
+                          target: 1000000,
+                        });
+                      }}
+                    >
+                      <Resource
+                        name="D"
+                        amount={planet.resources.deuterium}
+                        storage={planet.storages.deuterium}
+                        production={planet.productions.deuterium}
+                      />
+                    </Stock>
                     <Resource
                       name="Σ"
                       amount={planet.resources.sum}
@@ -478,4 +510,11 @@ const PlanetLine = styled.tr`
 
 const Line = styled.div`
   height: 70px;
+`;
+
+const Stock = styled.div`
+  cursor: pointer;
+  &:hover {
+    text-decoration: underline;
+  }
 `;

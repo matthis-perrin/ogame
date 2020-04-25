@@ -3,6 +3,7 @@ import {Buildable} from '@shared/models/buildable';
 import {AllBuildings} from '@shared/models/building';
 import {AllDefenses} from '@shared/models/defense';
 import {AllShips, Ship} from '@shared/models/ships';
+import {AllStocks} from '@shared/models/stock';
 import {AllTechnologies, HyperspaceTechnology} from '@shared/models/technology';
 
 import {COLLECTOR_BONUS_FRET} from '@src/models/constants';
@@ -39,6 +40,7 @@ AllTechnologies.forEach(buildIndex);
 AllBuildings.forEach(buildIndex);
 AllDefenses.forEach(buildIndex);
 AllShips.forEach(buildIndex);
+AllStocks.forEach(buildIndex);
 
 export function techShortName(techId: number): string {
   const name = TechnologyIndex.get(techId)?.shortName;
