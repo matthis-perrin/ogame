@@ -7,10 +7,15 @@ import {
 } from '@shared/lib/account';
 import {
   buildItemCost,
+  buildItemsToUnlockBuildableOnPlanet,
   buildItemToString,
   getBuildItemCost,
   isEnergyConsumerBuildable,
 } from '@shared/lib/build_items';
+import {
+  getExtraDefensesToBuildOnPlanet,
+  getRequiredDefenseForStealableResources,
+} from '@shared/lib/defense';
 import {
   getCheapestEnergyBuildItemsForEnergyPerHour,
   getInProgressEnergyDeltaPerHour,
@@ -23,6 +28,7 @@ import {
 } from '@shared/lib/formula';
 import {
   finishPlanetInProgressBuilding,
+  getRecyclableStandardUnitOnPlanet,
   updatePlanetDefenses,
   updatePlanetInProgressBuilding,
   updatePlanetInProgressDefenses,
@@ -30,9 +36,12 @@ import {
   updatePlanetResources,
   updatePlanetShips,
 } from '@shared/lib/planet';
-import {getPlanetProductionPerHour} from '@shared/lib/production';
-import {isBuildableAvailableOnPlanet} from '@shared/lib/requirement_tree';
-import {fixFloatingPointAmount, resourcesToString} from '@shared/lib/resources';
+import {
+  getMaxAllowedStandardUnitOnPlanet,
+  getPlanetProductionPerHour,
+} from '@shared/lib/production';
+import {isBuildItemAvailable} from '@shared/lib/requirement_tree';
+import {resourcesToString, toStandardUnits} from '@shared/lib/resources';
 import {Account} from '@shared/models/account';
 import {BuildItem} from '@shared/models/build_item';
 import {
@@ -60,13 +69,23 @@ import {EnergyTechnology, PlasmaTechnology} from '@shared/models/technology';
 import {
   hoursToMilliseconds,
   Milliseconds,
+  millisecondsToHours,
   NEVER,
   ONE_HOUR,
-  ONE_MILLISECOND,
+  timeToString,
   ZERO,
 } from '@shared/models/time';
 import {AccountTimeline, TransitionnedAccount} from '@shared/models/timeline';
-import {ceil, max, multiply, neverHappens, substract, sum} from '@shared/utils/type_utils';
+import {
+  ceil,
+  floor,
+  max,
+  min,
+  multiply,
+  neverHappens,
+  substract,
+  sum,
+} from '@shared/utils/type_utils';
 
 export function createAccountTimeline(account: Account, buildItems: BuildItem[]): AccountTimeline {
   const start = Date.now();
@@ -75,9 +94,7 @@ export function createAccountTimeline(account: Account, buildItems: BuildItem[])
 
   for (const buildItem of buildItems) {
     try {
-      // console.log(`Handling build item ${buildItemToString(buildItem)}`);
       const newTransactions = advanceAccountTowardBuildItem(currentAccount, buildItem);
-      // console.log(newTransactions);
       transitions.push(...newTransactions);
       currentAccount = transitions[transitions.length - 1].transitionnedAccount;
     } catch (err) {
@@ -108,31 +125,62 @@ export function createAccountTimeline(account: Account, buildItems: BuildItem[])
   };
 }
 
-// function nextTransitionForBuildItems(account: Account, previousStep: TimelineStep | undefined, remainingBuildItems: BuildItem[]): AccountTransition {
-//   const nextItem = remainingBuildItems[0];
-//   if (nextItem === undefined) {
-//     throw new Error('Cannot create transition: no more build item');
-//   }
-// }
+function buildItemAlreadyApplied(account: Account, buildItem: BuildItem): boolean {
+  if (buildItem.type === 'ship' || buildItem.type === 'defense') {
+    return false;
+  }
+  if (buildItem.type === 'technology') {
+    if ((account.technologyLevels.get(buildItem.buildable) ?? 0) >= buildItem.level) {
+      return true;
+    }
+    if (
+      account.inProgressTechnology &&
+      account.inProgressTechnology.technology === buildItem.buildable &&
+      account.inProgressTechnology.level >= buildItem.level
+    ) {
+      return true;
+    }
+    return false;
+  }
+  if (buildItem.type === 'building') {
+    const planet = account.planets.get(buildItem.planetId);
+    if (!planet) {
+      throw new Error(`No planet with id ${buildItem.planetId} on the account`);
+    }
+    if ((planet.buildingLevels.get(buildItem.buildable) ?? 0) >= buildItem.level) {
+      return true;
+    }
+    if (
+      planet.inProgressBuilding &&
+      planet.inProgressBuilding.building === buildItem.buildable &&
+      planet.inProgressBuilding.level >= buildItem.level
+    ) {
+      return true;
+    }
+    return false;
+  }
+  neverHappens(buildItem, `Unknown build item type "${buildItem['type']}"`);
+}
 
 function advanceAccountTowardBuildItem(
   account: Account,
   buildItem: BuildItem
 ): TransitionnedAccount[] {
+  if (buildItemAlreadyApplied(account, buildItem)) {
+    return [];
+  }
+  const planet = account.planets.get(buildItem.planetId);
+  if (!planet) {
+    throw new Error(`No planet with id ${buildItem.planetId} on the account`);
+  }
+
+  // ENERGY
   const buildItemsFromEnergyCheck = requiredBuildItemsFromEnergyCheck(account);
   const isEnergyConsumingBuildItem = isEnergyConsumerBuildable(buildItem.buildable);
   const hasRequiredBuildItemFromEnergyCheck = buildItemsFromEnergyCheck.reduce(
     (res, item) => res || buildItem.planetId === item.planetId,
     false
   );
-
-  const planet = account.planets.get(buildItem.planetId);
-  if (!planet) {
-    throw new Error(`No planet with id ${buildItem.planetId} on the account`);
-  }
-
-  // const hasEnergyProducerBuildItemsForPlanet;
-
   if (buildItemsFromEnergyCheck.length > 0) {
     if (isEnergyConsumingBuildItem && hasRequiredBuildItemFromEnergyCheck) {
       const steps = buildItemsToTransitions(account, buildItemsFromEnergyCheck);
@@ -141,11 +189,25 @@ function advanceAccountTowardBuildItem(
         ...advanceAccountTowardBuildItem(steps[steps.length - 1].transitionnedAccount, buildItem),
       ];
     } else {
-      return buildItemsToTransitions(account, [...buildItemsFromEnergyCheck, buildItem]);
+      return buildItemsToTransitions(
+        account,
+        dedupBuildItems([...buildItemsFromEnergyCheck, buildItem])
+      );
     }
   }
 
-  // TODO - Ghost / Defense / Storage / Non useful tech checks
+  // TODO - Ghost
+
+  // DEFENSE
+  const buildItemsFromDefenseCheck = requiredBuildItemsFromDefenseCheck(account, buildItem);
+  if (buildItemsFromDefenseCheck.length > 0) {
+    return buildItemsToTransitions(
+      account,
+      dedupBuildItems([...buildItemsFromDefenseCheck, buildItem])
+    );
+  }
+
+  // TODO - Storage / Non useful tech checks
 
   const waitTime = timeBeforeApplyingBuildItem(account, buildItem);
   if (waitTime.time === 0) {
@@ -176,13 +238,68 @@ function requiredBuildItemsFromEnergyCheck(account: Account): BuildItem[] {
       energyConsumption,
       sum(energyProduction, getInProgressEnergyDeltaPerHour(account, planet, energyLevel))
     );
-    console.log(energyNeeded);
     if (energyNeeded > 0) {
       const buildItems = getCheapestEnergyBuildItemsForEnergyPerHour(account, planet, energyNeeded);
       requiredBuildItems.push(...buildItems);
     }
   }
   return requiredBuildItems;
+}
+
+function dedupBuildItems(buildItems: BuildItem[]): BuildItem[] {
+  const dedupedBuildItems: BuildItem[] = [];
+  const alreadyUsed = new Set<string>();
+  for (const buildItem of buildItems) {
+    if (buildItem.type === 'defense' || buildItem.type === 'ship') {
+      dedupedBuildItems.push(buildItem);
+    } else if (buildItem.buildable.type === 'building') {
+      const hash = `${buildItem.buildable.id}-${buildItem.level}-${buildItem.planetId}`;
+      if (!alreadyUsed.has(hash)) {
+        alreadyUsed.add(hash);
+        dedupedBuildItems.push(buildItem);
+      }
+    } else {
+      const hash = `${buildItem.buildable.id}-${buildItem.level}`;
+      if (!alreadyUsed.has(hash)) {
+        alreadyUsed.add(hash);
+        dedupedBuildItems.push(buildItem);
+      }
+    }
+  }
+
+  return dedupedBuildItems;
+}
+
+function requiredBuildItemsFromDefenseCheck(
+  account: Account,
+  nextBuildItem: BuildItem
+): BuildItem[] {
+  let requiredBuildItems: BuildItem[] = [];
+  for (const planet of account.planets.values()) {
+    const cost = buildItemCost(nextBuildItem);
+    const {resources} = timeForResourcesOnPlanet(account, planet, cost);
+    const stealableResources = sum(
+      getRecyclableStandardUnitOnPlanet(account, planet),
+      min(toStandardUnits(account, resources), getMaxAllowedStandardUnitOnPlanet(account, planet))
+    );
+    const defenseRequired = getRequiredDefenseForStealableResources(stealableResources);
+    const extraDefenseRequired = getExtraDefensesToBuildOnPlanet(planet, defenseRequired);
+    for (const {defense} of extraDefenseRequired) {
+      requiredBuildItems = [
+        ...buildItemsToUnlockBuildableOnPlanet(account, planet, defense),
+        ...requiredBuildItems,
+      ];
+    }
+    requiredBuildItems.push(
+      ...extraDefenseRequired.map<BuildItem>(({defense, quantity}) => ({
+        type: 'defense',
+        quantity,
+        buildable: defense,
+        planetId: planet.id,
+      }))
+    );
+  }
+  return dedupBuildItems(requiredBuildItems);
 }
 
 const APPLY_NOW = {time: ZERO, reason: ''};
@@ -254,21 +371,12 @@ function timeBeforeUnitsDoneOnPlanet(
   }
 }
 
-function timeBeforeApplyingBuildItem(
+function timeForResourcesOnPlanet(
   account: Account,
-  buildItem: BuildItem
-): {time: Milliseconds; reason: string} {
-  const planet = account.planets.get(buildItem.planetId);
-  if (!planet) {
-    throw new Error(`No planet with id ${buildItem.planetId} on the account`);
-  }
-
-  if (!isBuildableAvailableOnPlanet(account, planet, buildItem.buildable)) {
-    return {time: NEVER, reason: 'requirements not met'};
-  }
-
-  const cost = buildItemCost(buildItem);
-  const requiredResources = substractResources(cost, planet.resources);
+  planet: Planet,
+  target: Resources
+): {time: Milliseconds; resources: Resources} {
+  const requiredResources = substractResources(target, planet.resources);
   const {prod} = getPlanetProductionPerHour(account, planet);
   const timeForMetal =
     requiredResources.metal > 0 ? hoursToMilliseconds(requiredResources.metal / prod.metal) : ZERO;
@@ -280,29 +388,54 @@ function timeBeforeApplyingBuildItem(
     requiredResources.deuterium > 0
       ? hoursToMilliseconds(requiredResources.deuterium / prod.deuterium)
       : ZERO;
-  const timeForResources = fixFloatingPointAmount(
-    max(ZERO, timeForMetal, timeForCrystal, timeForDeuterium)
-  );
+  const timeForResources = ceil(max(ZERO, timeForMetal, timeForCrystal, timeForDeuterium));
+  return {
+    time: timeForResources,
+    resources: addResources(
+      planet.resources,
+      multiplyResources(prod, millisecondsToHours(timeForResources))
+    ),
+  };
+}
+
+function timeBeforeApplyingBuildItem(
+  account: Account,
+  buildItem: BuildItem
+): {time: Milliseconds; reason: string} {
+  const planet = account.planets.get(buildItem.planetId);
+  if (!planet) {
+    throw new Error(`No planet with id ${buildItem.planetId} on the account`);
+  }
+
+  const availability = isBuildItemAvailable(account, buildItem);
+  if (!availability.isAvailable && availability.willBeAvailableAt === NEVER) {
+    return {time: availability.willBeAvailableAt, reason: availability.reason};
+  }
+
+  const cost = buildItemCost(buildItem);
+  const {time} = timeForResourcesOnPlanet(account, planet, cost);
 
   const mergeWaitTime = (wait: {
     time: Milliseconds;
     reason: string;
   }): {time: Milliseconds; reason: string} => {
-    if (timeForResources === 0) {
+    if (time === 0) {
       return wait;
     }
     const timeForResourceReason = `Waiting for resources to get ${buildItemToString(
       buildItem
-    )} (need ${resourcesToString(requiredResources)})`;
+    )} (need ${resourcesToString(cost)}, should take ${timeToString(time)})`;
     if (wait.time === 0) {
       return {
-        time: timeForResources,
+        time,
         reason: timeForResourceReason,
       };
     }
+    const maxTime = max(time, wait.time, availability.willBeAvailableAt);
+    const allReasons = [wait.reason, availability.reason, timeForResourceReason];
     return {
-      time: max(timeForResources, wait.time),
-      reason: `${timeForResourceReason} + ${wait.reason}`,
+      time: maxTime,
+      reason: allReasons.join(' + '),
     };
   };
 
@@ -333,7 +466,7 @@ function timeBeforeApplyingBuildItem(
     return mergeWaitTime(timeBeforeShipyardOrNaniteDoneOnPlanet(account, planet));
   }
 
-  neverHappens(buildItem);
+  neverHappens(buildItem, `Unknown build item type "${buildItem['type']}"`);
 }
 
 function buildItemsToTransitions(
@@ -406,7 +539,7 @@ export function applyBuildItem(account: Account, buildItem: BuildItem): Account 
   let newPlanet = planet;
 
   // Requirements met check
-  const availability = isBuildableAvailableOnPlanet(newAccount, planet, buildItem.buildable);
+  const availability = isBuildItemAvailable(newAccount, buildItem);
   if (!availability.isAvailable) {
     throw new Error(
       `Requirements not met for ${buildItemToString(buildItem)} (${availability.reason})`
@@ -417,7 +550,6 @@ export function applyBuildItem(account: Account, buildItem: BuildItem): Account 
   const cost = buildItemCost(buildItem);
   const newPlanetResources = substractResources(newPlanet.resources, cost);
   if (hasNegativeAmount(newPlanetResources)) {
-    console.log(newPlanetResources);
     throw new Error(
       `Not enough resources for ${buildItemToString(buildItem)} (has ${resourcesToString(
         newPlanet.resources
@@ -488,13 +620,21 @@ export function applyBuildItem(account: Account, buildItem: BuildItem): Account 
       newAccount.universe.economySpeed
     );
     if (newPlanet.inProgressShips) {
+      const ships = newPlanet.inProgressShips.ships;
+      const newShips =
+        ships.length > 0 && ships[ships.length - 1].ship === buildItem.buildable
+          ? [
+              ...ships.slice(0, -1),
+              {
+                ship: buildItem.buildable,
+                quantity: ships[ships.length - 1].quantity + buildItem.quantity,
+              },
+            ]
+          : [...ships, {ship: buildItem.buildable, quantity: buildItem.quantity}];
       newPlanet = updatePlanetInProgressShips(newPlanet, {
         ...newPlanet.inProgressShips,
         endTime: sum(newPlanet.inProgressShips.endTime, duration),
-        ships: [
-          ...newPlanet.inProgressShips.ships,
-          {ship: buildItem.buildable, quantity: buildItem.quantity},
-        ],
+        ships: newShips,
       });
     } else {
       newPlanet = updatePlanetInProgressShips(newPlanet, {
@@ -515,13 +655,21 @@ export function applyBuildItem(account: Account, buildItem: BuildItem): Account 
       newAccount.universe.economySpeed
     );
     if (newPlanet.inProgressDefenses) {
+      const defenses = newPlanet.inProgressDefenses.defenses;
+      const newDefenses =
+        defenses.length > 0 && defenses[defenses.length - 1].defense === buildItem.buildable
+          ? [
+              ...defenses.slice(0, -1),
+              {
+                defense: buildItem.buildable,
+                quantity: defenses[defenses.length - 1].quantity + buildItem.quantity,
+              },
+            ]
+          : [...defenses, {defense: buildItem.buildable, quantity: buildItem.quantity}];
       newPlanet = updatePlanetInProgressDefenses(newPlanet, {
         ...newPlanet.inProgressDefenses,
         endTime: sum(newPlanet.inProgressDefenses.endTime, duration),
-        defenses: [
-          ...newPlanet.inProgressDefenses.defenses,
-          {defense: buildItem.buildable, quantity: buildItem.quantity},
-        ],
+        defenses: newDefenses,
       });
     } else {
       newPlanet = updatePlanetInProgressDefenses(newPlanet, {
@@ -530,7 +678,7 @@ export function applyBuildItem(account: Account, buildItem: BuildItem): Account 
         defenses: [{defense: buildItem.buildable, quantity: buildItem.quantity}],
       });
     }
-    return newAccount;
+    return updateAccountPlanet(newAccount, newPlanet);
   }
 
   neverHappens(buildItem, `Unknown build item type "${buildItem['type']}"`);
@@ -546,6 +694,9 @@ function advanceAccountInTime(
   actualAdvanceTime: Milliseconds;
 } {
   const newCurrentTime = sum(account.currentTime, time);
+  if (newCurrentTime > 1000 * 3600 * 24 * 365 * 3) {
+    throw 'Passed 3 years';
+  }
   let newAccount = account;
 
   // We need to advance the account step by step if there is something in progress that
@@ -663,17 +814,17 @@ function directlyAdvancePlanetInTime(
   const events: string[] = [];
 
   // Add the prod
-  const previousResourcesString = resourcesToString(newPlanet.resources);
+  const resourcesIncrease = multiplyResources(planetProdPerHour, additionalTime / ONE_HOUR);
   newPlanet = updatePlanetResources(
     newPlanet,
-    addResources(
-      newPlanet.resources,
-      multiplyResources(planetProdPerHour, additionalTime / ONE_HOUR)
-    )
+    addResources(newPlanet.resources, resourcesIncrease)
   );
-  const currentResourcesString = resourcesToString(newPlanet.resources);
   events.push(
-    `Increase resources on planet ${planet.id} from ${previousResourcesString} to ${currentResourcesString}`
+    `Increase resources on planet ${planet.id} by ${resourcesToString(
+      resourcesIncrease
+    )} (from ${resourcesToString(newPlanet.resources)} to ${resourcesToString(
+      newPlanet.resources
+    )})`
   );
 
   // Finish in progress building
@@ -698,6 +849,7 @@ function directlyAdvancePlanetInTime(
     for (const {defense, quantity} of newPlanet.inProgressDefenses.defenses) {
       if (done) {
         remainingDefensesToBuild.push({defense, quantity});
+        continue;
       }
       const defenseBuildTime = getDefensesBuildTime(
         defense,
@@ -712,21 +864,31 @@ function directlyAdvancePlanetInTime(
         timeCursor = timeAfterAllDefensesBuilt;
         planetDefenses.set(defense, (planetDefenses.get(defense) ?? 0) + quantity);
         events.push(
-          `Creating ${quantity} x ${defense.name} (0 left in queue) on planet ${planet.id}.`
+          `${quantity} x ${defense.name} created (0 left in queue) on planet ${planet.id}.`
         );
       } else {
-        const maxBuildableDefenses = Math.floor(
-          substract(newCurrentTime, timeCursor) / defenseBuildTime
+        const maxBuildableDefenses = Math.max(
+          0,
+          Math.floor(substract(newCurrentTime, timeCursor) / defenseBuildTime)
         );
         timeCursor = sum(timeCursor, multiply(defenseBuildTime, maxBuildableDefenses));
         newDefenseStart = timeCursor;
         planetDefenses.set(defense, (planetDefenses.get(defense) ?? 0) + maxBuildableDefenses);
         const remainingDefense = quantity - maxBuildableDefenses;
         events.push(
-          `Creating ${maxBuildableDefenses} x ${defense.name} (${remainingDefense} left in queue) on planet ${planet.id}.`
+          `${maxBuildableDefenses} x ${defense.name} created (${remainingDefense} left in queue) on planet ${planet.id}.`
         );
         if (remainingDefense > 0) {
-          remainingDefensesToBuild.push({defense, quantity: remainingDefense});
+          if (
+            remainingDefensesToBuild.length > 0 &&
+            remainingDefensesToBuild[remainingDefensesToBuild.length - 1].defense === defense
+          ) {
+            remainingDefensesToBuild[
+              remainingDefensesToBuild.length - 1
+            ].quantity += remainingDefense;
+          } else {
+            remainingDefensesToBuild.push({defense, quantity: remainingDefense});
+          }
         }
         done = true;
       }
@@ -765,20 +927,28 @@ function directlyAdvancePlanetInTime(
       if (timeAfterAllShipsBuilt <= newCurrentTime) {
         timeCursor = timeAfterAllShipsBuilt;
         planetShips.set(ship, (planetShips.get(ship) ?? 0) + quantity);
-        events.push(
-          `Creating ${quantity} x ${ship.name} (0 left in queue) on planet ${planet.id}.`
-        );
+        events.push(`${quantity} x ${ship.name} created (0 left in queue) on planet ${planet.id}.`);
       } else {
-        const maxBuildableShips = Math.floor(substract(newCurrentTime, timeCursor) / shipBuildTime);
+        const maxBuildableShips = Math.max(
+          0,
+          Math.floor(substract(newCurrentTime, timeCursor) / shipBuildTime)
+        );
         timeCursor = sum(timeCursor, multiply(shipBuildTime, maxBuildableShips));
         newShipStart = timeCursor;
         planetShips.set(ship, (planetShips.get(ship) ?? 0) + maxBuildableShips);
         const remainingShip = quantity - maxBuildableShips;
         events.push(
-          `Creating ${maxBuildableShips} x ${ship.name} (${remainingShip} left in queue) on planet ${planet.id}.`
+          `${maxBuildableShips} x ${ship.name} created (${remainingShip} left in queue) on planet ${planet.id}.`
         );
         if (remainingShip > 0) {
-          remainingShipsToBuild.push({ship, quantity: remainingShip});
+          if (
+            remainingShipsToBuild.length > 0 &&
+            remainingShipsToBuild[remainingShipsToBuild.length - 1].ship === ship
+          ) {
+            remainingShipsToBuild[remainingShipsToBuild.length - 1].quantity += remainingShip;
+          } else {
+            remainingShipsToBuild.push({ship, quantity: remainingShip});
+          }
         }
         done = true;
       }

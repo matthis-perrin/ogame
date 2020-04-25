@@ -162,41 +162,11 @@ export function getCheapestEnergyBuildItemsForEnergyPerHour(
   //   timeToBuildHalfOfTheSatellites
   // );
 
-  console.log('');
-  console.log('');
-  console.log(`------ ENERGY ${energy} CHECK ------`);
-  console.log('solarPlantLevel', solarPlantLevel);
-  console.log('nextLevelSolarPlantCost', nextLevelSolarPlantCost);
-  console.log('solarPlantEnergyIncrease', solarPlantEnergyIncrease);
-  console.log('solarPlantCostPerEnergy', solarPlantCostPerEnergy);
-  console.log('energyProductionPerSatellite', energyProductionPerSatellite);
-  console.log('requiredSatellitesCount', requiredSatellitesCount);
-  console.log('satelliteCountToCompareWithSolarPlant', satelliteCountToCompareWithSolarPlant);
-  console.log('recyclableStandardUnit', recyclableStandardUnit);
-  console.log('standardUnitProtectedByDefense', standardUnitProtectedByDefense);
-  console.log('defenseRequired', defenseRequired);
-  console.log('extraDefenseRequired', extraDefenseRequired);
-  console.log('extraSatelliteBuildItems', extraSatelliteBuildItems);
-  console.log('extraDefenseBuildItems', extraDefenseBuildItems);
-  console.log('buildItemsCost(extraDefenseBuildItems)', buildItemsCost(extraDefenseBuildItems));
-  console.log('totalSatelliteCost', totalSatelliteCost);
-  console.log('satelliteCostPerEnergy', satelliteCostPerEnergy);
-  console.log(
-    'toStandardUnits(account, solarPlantCostPerEnergy)',
-    toStandardUnits(account, solarPlantCostPerEnergy)
-  );
-  console.log(
-    'toStandardUnits(account, satelliteCostPerEnergy)',
-    toStandardUnits(account, satelliteCostPerEnergy)
-  );
-  console.log('--------------------------');
-
   // Choose the best (cheapest) one
   if (
     toStandardUnits(account, solarPlantCostPerEnergy) >
     toStandardUnits(account, satelliteCostPerEnergy)
   ) {
-    console.log(`========> CHOSE ${requiredSatellitesCount} SATELLITE <========`);
     return [
       ...extraSatelliteBuildItems,
       {
@@ -208,7 +178,6 @@ export function getCheapestEnergyBuildItemsForEnergyPerHour(
       ...extraDefenseBuildItems,
     ];
   } else {
-    console.log(`========> CHOSE SOLAR PLANT ${solarPlantLevel + 1} <========`);
     return [
       {type: 'building', buildable: SolarPlant, level: solarPlantLevel + 1, planetId: planet.id},
     ];

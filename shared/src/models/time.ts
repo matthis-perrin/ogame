@@ -14,6 +14,9 @@ export const NEVER = Infinity as Milliseconds;
 export function hoursToMilliseconds(hours: number): Milliseconds {
   return multiply(ONE_HOUR, hours);
 }
+export function millisecondsToHours(milliseconds: Milliseconds): number {
+  return milliseconds / ONE_HOUR;
+}
 
 export function timeToString(milliseconds: Milliseconds): string {
   let remaining = milliseconds;
