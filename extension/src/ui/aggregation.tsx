@@ -6,6 +6,7 @@ import {Table, Title} from '@src/ui/common';
 import {InFlightResources} from '@src/ui/components/inflightresources';
 import {PlanetSum} from '@src/ui/components/planetsum';
 import {PlanetSumProd} from '@src/ui/components/planetsumprod';
+import {Research} from '@src/ui/components/research';
 
 interface AggregationProps {
   account: Account;
@@ -21,6 +22,9 @@ export const Aggregation: FC<AggregationProps> = ({account}) => (
           </th>
           <th colSpan={3}>
             <Title>Total</Title>
+          </th>
+          <th>
+            <Title>Technologies</Title>
           </th>
         </tr>
       </thead>
@@ -49,6 +53,9 @@ export const Aggregation: FC<AggregationProps> = ({account}) => (
             ) : (
               <PlanetSumProd planetSum={account.planetSum} hours={24} />
             )}
+          </td>
+          <td>
+            <Research account={account} />
           </td>
         </tr>
       </tbody>

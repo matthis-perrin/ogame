@@ -8,7 +8,7 @@ import {Account} from '@src/models/account';
 import {COLOR_GREEN, COLOR_RED} from '@src/models/constants';
 import {MissionTypeEnum} from '@src/models/fleets';
 import {findPlanetCoords, findPlanetName} from '@src/models/planets';
-import {getFretCapacity, techShortName} from '@src/models/technologies';
+import {getFretCapacity, TechnologyIndex, techShortName} from '@src/models/technologies';
 import {updateObjectives} from '@src/stores/account/objectives';
 import {Table, Title} from '@src/ui/common';
 import {Resource} from '@src/ui/components/resource';
@@ -42,32 +42,39 @@ export const ObjectivesC: FC<ObjectivesProps> = ({account}) => {
               <tr>
                 <EmptyLine></EmptyLine>
               </tr>
-              {account.objectives.technologies.map((technology, index, origin) => (
-                <HoverLine
-                  key={technology.techId}
-                  onClick={() => {
-                    if (account.objectives) {
-                      goToTechnology(technology.techId, account.objectives.planetId);
-                    }
-                  }}
-                >
-                  <td>{techShortName(technology.techId)}</td>
-                  <td>{technology.target}</td>
-                  <td
-                    onClick={e => {
-                      e.stopPropagation();
-                      if (origin.length > 1) {
-                        origin.splice(index, 1);
-                        updateObjectives(account);
-                      } else {
-                        account.objectives = undefined;
+              {account.objectives.technologies.map((technology, index, origin) => {
+                const smartTech = TechnologyIndex.get(technology.techId);
+                return (
+                  <HoverLine
+                    key={technology.techId}
+                    onClick={() => {
+                      if (account.objectives) {
+                        goToTechnology(technology.techId, account.objectives.planetId);
                       }
                     }}
                   >
-                    Del
-                  </td>
-                </HoverLine>
-              ))}
+                    <td>{techShortName(technology.techId)}</td>
+                    <td>
+                      {smartTech?.type === 'ship' || smartTech?.type === 'defense'
+                        ? (technology.target ?? 0) - technology.value
+                        : technology.target ?? 0}
+                    </td>
+                    <td
+                      onClick={e => {
+                        e.stopPropagation();
+                        if (origin.length > 1) {
+                          origin.splice(index, 1);
+                          updateObjectives(account);
+                        } else {
+                          account.objectives = undefined;
+                        }
+                      }}
+                    >
+                      Del
+                    </td>
+                  </HoverLine>
+                );
+              })}
               <tr>
                 <EmptyLine></EmptyLine>
               </tr>
@@ -142,12 +149,14 @@ export const ObjectivesC: FC<ObjectivesProps> = ({account}) => {
                     ? planet.ships[LargeCargo.id].value
                     : 0;
                 }
-                const sendInSeconds = Math.max(
-                  0,
-                  (account.objectives?.startTime !== undefined
-                    ? account.objectives.startTime - nowSeconds
-                    : 0) + transfer.sendInSeconds
-                );
+                const sendInSeconds =
+                  Math.max(0, (account.objectives?.readyTimeSeconds.max ?? 0) - nowSeconds) +
+                  Math.max(
+                    0,
+                    (account.objectives?.startTime !== undefined
+                      ? account.objectives.startTime - nowSeconds
+                      : 0) + transfer.sendInSeconds
+                  );
                 return (
                   <HoverGT
                     key={`${transfer.from}_${transfer.to}`}

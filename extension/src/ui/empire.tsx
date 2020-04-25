@@ -120,7 +120,8 @@ export const Empire: FC<EmpireProps> = ({account}) => (
             const satelliteLoot = planet.technologies.hasOwnProperty(SolarSatellite.id)
               ? planet.technologies[SolarSatellite.id].value * DEBRIS_SAT * DEBRIS_PERCENTAGE
               : 0;
-            const totalLoot = inactivityLoot + satelliteLoot;
+            const baseResourcesLoot = 100000;
+            const totalLoot = inactivityLoot + satelliteLoot + baseResourcesLoot;
             const ptAmount = planet.ships.hasOwnProperty(SmallCargo.id)
               ? planet.ships[SmallCargo.id].value
               : 0;
@@ -447,6 +448,7 @@ export const Empire: FC<EmpireProps> = ({account}) => (
                 </td>
                 <td>
                   <Line>
+                    <Loot name="Base" amount={baseResourcesLoot} />
                     <Loot name="Prod" amount={inactivityLoot} />
                     <Loot name="Sats" amount={satelliteLoot} />
                     <Loot name="Total" amount={totalLoot} />

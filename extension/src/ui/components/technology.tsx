@@ -18,29 +18,62 @@ const SubTechnology: FC<{
   technology: Technology;
   missingAmount: number | undefined;
   planetId: PlanetId;
-}> = ({technology, missingAmount, planetId}) => (
-  <Fragment>
-    <Value
-      onClick={e => {
-        e.stopPropagation();
-        const smartTech = TechnologyIndex.get(technology.techId);
-        if (smartTech?.type !== 'building') {
-          return;
+}> = ({technology, missingAmount, planetId}) => {
+  const smartTech = TechnologyIndex.get(technology.techId);
+  return (
+    <Fragment>
+      <Value
+        onClick={e => {
+          if (smartTech?.type !== 'building' && smartTech?.type !== 'technology') {
+            return;
+          }
+          e.stopPropagation();
+          const currentValue =
+            technology.target !== undefined ? technology.target : technology.value;
+          addObjectives(planetId, {
+            techId: technology.techId,
+            value: currentValue,
+            target: currentValue + 1,
+          });
+        }}
+        className={
+          smartTech?.type === 'building' || smartTech?.type === 'technology' ? 'hoverable' : ''
         }
-        const currentValue = technology.target !== undefined ? technology.target : technology.value;
-        addObjectives(planetId, {
-          techId: technology.techId,
-          value: currentValue,
-          target: currentValue + 1,
-        });
-      }}
-    >
-      {technology.value}
-    </Value>
-    {technology.target !== undefined ? <span>+{technology.target - technology.value}</span> : ''}
-    {missingAmount === undefined || missingAmount <= 0 ? '' : <span> ({missingAmount})</span>}
-  </Fragment>
-);
+      >
+        {technology.value}
+      </Value>
+      {technology.target !== undefined ? <span>+{technology.target - technology.value}</span> : ''}
+
+      {missingAmount === undefined || missingAmount <= 0 ? (
+        ''
+      ) : (
+        <span>
+          {' '}
+          (
+          <Value
+            onClick={e => {
+              if (smartTech?.type !== 'ship' && smartTech?.type !== 'defense') {
+                return;
+              }
+              e.stopPropagation();
+              addObjectives(planetId, {
+                techId: technology.techId,
+                value: technology.value,
+                target: technology.value + missingAmount,
+              });
+            }}
+            className={
+              smartTech?.type === 'ship' || smartTech?.type === 'defense' ? 'hoverable' : ''
+            }
+          >
+            {missingAmount}
+          </Value>
+          )
+        </span>
+      )}
+    </Fragment>
+  );
+};
 
 export const TechnologyC: FC<TechnologyProps> = ({
   name,
@@ -95,8 +128,10 @@ const TechnologyContainer = styled.div`
 `;
 
 const Value = styled.span`
-  cursor: pointer;
-  &:hover {
-    text-decoration: underline;
+  &.hoverable {
+    cursor: pointer;
+    &:hover {
+      text-decoration: underline;
+    }
   }
 `;

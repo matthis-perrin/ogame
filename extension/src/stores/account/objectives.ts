@@ -1,6 +1,7 @@
 import {getDistance, getFlightDuration} from '@shared/lib/formula';
 import {getShipDrive} from '@shared/lib/ships';
 import {Class} from '@shared/models/account';
+import {multiplyResources, Resources} from '@shared/models/resource';
 import {LargeCargo} from '@shared/models/ships';
 import {CombustionDrive, HyperspaceDrive, ImpulseDrive} from '@shared/models/technology';
 import {Rosalind} from '@shared/models/universe';
@@ -101,11 +102,12 @@ export function updateObjectives(account: Account): void {
     if (smartTech === undefined || technology.target === undefined) {
       continue;
     }
-    // TODO: Handle all technologies
+    let resources: Resources;
     if (smartTech.type === 'ship' || smartTech.type === 'defense') {
-      continue;
+      resources = multiplyResources(smartTech.cost, technology.target - technology.value);
+    } else {
+      resources = smartTech.cost(technology.target);
     }
-    const resources = smartTech.cost(technology.target);
     objectives.neededResources.metal = sum([objectives.neededResources.metal, resources.metal]);
     objectives.neededResources.crystal = sum([
       objectives.neededResources.crystal,
@@ -253,40 +255,48 @@ export function updateObjectives(account: Account): void {
   });
   objectives.resourceTransfers = [];
   // We don't iterate on the last planet
+  let canChange = true;
   for (let i = 0; i < planetInfos.length - 1; i++) {
     const planetInfo = planetInfos[i];
-    const metalToSend = Math.max(
-      0,
-      (planetInfo.resources.get('metal')?.future ?? 0) - remainingMetalPerPlanet
+    const metalToSend = Math.ceil(
+      Math.max(0, (planetInfo.resources.get('metal')?.future ?? 0) - remainingMetalPerPlanet)
     );
-    const crystalToSend = Math.max(
-      0,
-      (planetInfo.resources.get('crystal')?.future ?? 0) - remainingCrystalPerPlanet
+    const crystalToSend = Math.ceil(
+      Math.max(0, (planetInfo.resources.get('crystal')?.future ?? 0) - remainingCrystalPerPlanet)
     );
-    const deuteriumToSend = Math.max(
-      0,
-      (planetInfo.resources.get('deuterium')?.future ?? 0) - remainingDeuteriumPerPlanet
+    const deuteriumToSend = Math.ceil(
+      Math.max(
+        0,
+        (planetInfo.resources.get('deuterium')?.future ?? 0) - remainingDeuteriumPerPlanet
+      )
     );
     const sumToSend = sum([metalToSend, crystalToSend, deuteriumToSend]);
-    if (sumToSend > 0) {
-      objectives.resourceTransfers.push({
-        from: planetInfo.planetId,
-        to: objectives.planetId,
-        sendInSeconds:
-          objectives.readyTimeSeconds.max -
-          nowSeconds +
-          longestTimeSeconds -
-          planetInfo.timeFromOriginSeconds,
-        resources: {
-          metal: metalToSend as ResourceAmount,
-          crystal: crystalToSend as ResourceAmount,
-          deuterium: deuteriumToSend as ResourceAmount,
-          sum: sum([metalToSend, crystalToSend, deuteriumToSend]),
-        },
-        timeFromOriginSeconds: planetInfo.timeFromOriginSeconds,
-        isTransferring: false,
-      });
+    if (
+      canChange &&
+      sumToSend === 0 &&
+      objectives.readyTimeSeconds.max === nowSeconds &&
+      i < planetInfos.length
+    ) {
+      longestTimeSeconds = planetInfos[i + 1].timeFromOriginSeconds;
+      continue;
     }
+    if (sumToSend === 0) {
+      continue;
+    }
+    canChange = false;
+    objectives.resourceTransfers.push({
+      from: planetInfo.planetId,
+      to: objectives.planetId,
+      sendInSeconds: longestTimeSeconds - planetInfo.timeFromOriginSeconds,
+      resources: {
+        metal: metalToSend as ResourceAmount,
+        crystal: crystalToSend as ResourceAmount,
+        deuterium: deuteriumToSend as ResourceAmount,
+        sum: sum([metalToSend, crystalToSend, deuteriumToSend]),
+      },
+      timeFromOriginSeconds: planetInfo.timeFromOriginSeconds,
+      isTransferring: false,
+    });
   }
 }
 
@@ -349,7 +359,10 @@ export function updateObjectivesTransfers(account: Account): void {
           const destinationCoords = findPlanetCoords(account.planetList, transfer.to);
           if (
             fleet.originCoords === originCoords &&
-            fleet.destinationCoords === destinationCoords
+            fleet.destinationCoords === destinationCoords &&
+            fleet.resources.metal === transfer.resources.metal &&
+            fleet.resources.crystal === transfer.resources.crystal &&
+            fleet.resources.deuterium === transfer.resources.deuterium
           ) {
             if (account.objectives.startTime === undefined) {
               account.objectives.startTime = fleet.arrivalTime - transfer.timeFromOriginSeconds;

@@ -25,8 +25,6 @@ export const App: FC = () => {
             </Top>
             <Middle>
               <Empire account={account} />
-              <Separator />
-              <ObjectivesC account={account} />
             </Middle>
             <Bottom>
               <Messages account={account} />
@@ -34,6 +32,8 @@ export const App: FC = () => {
               <Fleets account={account} />
               <Separator />
               <Constructions account={account} />
+              <Separator />
+              <ObjectivesC account={account} />
             </Bottom>
           </div>
         )}
