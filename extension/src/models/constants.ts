@@ -18,6 +18,7 @@ import {
   ComputerTechnology,
   EnergyTechnology,
   EspionageTechnology,
+  GravitonTechnology,
   HyperspaceDrive,
   HyperspaceTechnology,
   ImpulseDrive,
@@ -94,6 +95,7 @@ export const ACCOUNT_TECHNOLOGIES = [
   PlasmaTechnology.id,
   AstrophysicsTechnology.id,
   IntergalacticResearchNetworkTechnology.id,
+  GravitonTechnology.id,
 ];
 
 export const COLOR_WHITE = '#aaa';
