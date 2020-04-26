@@ -3,12 +3,13 @@ import styled from 'styled-components';
 
 import {LargeCargo} from '@shared/models/ships';
 
-import {goToTechnology, sendLargeCargos} from '@src/controllers/navigator';
+import {goToTechnology, goToUrl, sendLargeCargosUrl} from '@src/controllers/navigator';
 import {Account} from '@src/models/account';
 import {COLOR_GREEN, COLOR_RED} from '@src/models/constants';
 import {MissionTypeEnum} from '@src/models/fleets';
 import {findPlanetCoords, findPlanetName} from '@src/models/planets';
 import {getFretCapacity, TechnologyIndex, techShortName} from '@src/models/technologies';
+import {setAccount} from '@src/stores/account';
 import {updateObjectives} from '@src/stores/account/objectives';
 import {Table, Title} from '@src/ui/common';
 import {Resource} from '@src/ui/components/resource';
@@ -39,6 +40,16 @@ export const ObjectivesC: FC<ObjectivesProps> = ({account}) => {
               <tr>
                 <td>Planète</td>
                 <td>{findPlanetName(account.planetList, account.objectives.planetId)}</td>
+                <HoverTD
+                  onClick={() => {
+                    if (account.objectives !== undefined) {
+                      account.objectives.botEnabled = !account.objectives.botEnabled;
+                      setAccount(account);
+                    }
+                  }}
+                >
+                  Bot: {account.objectives.botEnabled ? 'ON' : 'OFF'}
+                </HoverTD>
               </tr>
               <tr>
                 <EmptyLine></EmptyLine>
@@ -165,13 +176,14 @@ export const ObjectivesC: FC<ObjectivesProps> = ({account}) => {
                       if (sendInSeconds !== 0 && !transfer.isTransferring) {
                         return;
                       }
-                      sendLargeCargos(
+                      const url = sendLargeCargosUrl(
                         transfer.from,
                         findPlanetCoords(account.planetList, transfer.to),
                         MissionTypeEnum.Deployment,
                         requiredGt,
                         transfer.resources
                       );
+                      goToUrl(url);
                     }}
                     className={
                       sendInSeconds === 0 && !transfer.isTransferring
@@ -216,6 +228,13 @@ const EmptyLine = styled.td`
 `;
 
 const HoverLine = styled.tr`
+  cursor: pointer;
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
+const HoverTD = styled.td`
   cursor: pointer;
   &:hover {
     text-decoration: underline;

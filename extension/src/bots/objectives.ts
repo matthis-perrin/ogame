@@ -1,7 +1,10 @@
+import $ from 'jquery';
+
 import {LargeCargo} from '@shared/models/ships';
 
 import {runScript} from '@src/controllers/function';
-import {sendLargeCargos} from '@src/controllers/navigator';
+import {goToUrl, sendLargeCargosUrl} from '@src/controllers/navigator';
+import {Account} from '@src/models/account';
 import {MissionTypeEnum} from '@src/models/fleets';
 import {ResourceTransfer} from '@src/models/objectives';
 import {findPlanetCoords} from '@src/models/planets';
@@ -24,6 +27,18 @@ export interface BotTransfer {
 const BOT_LOOP_TIME = 500;
 let interval: number | undefined;
 
+function getUrl(account: Account, bt: BotTransfer): string {
+  const fretGt = getFretCapacity(account.accountTechnologies, LargeCargo);
+  const requiredGt = Math.ceil(bt.transfer.resources.sum / fretGt);
+  return sendLargeCargosUrl(
+    bt.transfer.from,
+    findPlanetCoords(account.planetList, bt.transfer.to),
+    MissionTypeEnum.Deployment,
+    requiredGt,
+    bt.transfer.resources
+  );
+}
+
 function handleTransfer(): void {
   const account = getAccount();
   if (account === undefined) {
@@ -34,31 +49,38 @@ function handleTransfer(): void {
     return;
   }
 
+  const url = getUrl(account, bt);
+
   switch (bt.step) {
     case BotTransferStep.GoToFleet:
       bt.step = BotTransferStep.ValidateShips;
       setAccount(account);
-      const fretGt = getFretCapacity(account.accountTechnologies, LargeCargo);
-      const requiredGt = Math.ceil(bt.transfer.resources.sum / fretGt);
-      sendLargeCargos(
-        bt.transfer.from,
-        findPlanetCoords(account.planetList, bt.transfer.to),
-        MissionTypeEnum.Deployment,
-        requiredGt,
-        bt.transfer.resources
-      );
+      goToUrl(getUrl(account, bt));
       break;
     case BotTransferStep.ValidateShips:
+      if (
+        document.location.href !== url &&
+        !$('#fleet1').is(':visible') &&
+        $('input[name="transporterLarge"]').val() !== ''
+      ) {
+        return;
+      }
       bt.step = BotTransferStep.ValidateCoords;
       setAccount(account);
       runScript(`if($('#fleet1').is(':visible')){fleetDispatcher.trySubmitFleet1();}`);
       break;
     case BotTransferStep.ValidateCoords:
+      if (document.location.href !== url && !$('#fleet2').is(':visible')) {
+        return;
+      }
       bt.step = BotTransferStep.ValidateResources;
       setAccount(account);
       runScript(`if($('#fleet2').is(':visible')){fleetDispatcher.trySubmitFleet2();}`);
       break;
     case BotTransferStep.ValidateResources:
+      if (document.location.href !== url && !$('#fleet3').is(':visible')) {
+        return;
+      }
       bt.step = BotTransferStep.WaitingValidation;
       setAccount(account);
       runScript(
@@ -86,11 +108,7 @@ function handleTransfer(): void {
 
 function loop(): void {
   const account = getAccount();
-  if (
-    account === undefined ||
-    account.objectives === undefined ||
-    account.objectives.startTime === undefined
-  ) {
+  if (account === undefined || account.objectives === undefined || !account.objectives.botEnabled) {
     return;
   }
 

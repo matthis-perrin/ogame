@@ -326,6 +326,7 @@ export function addObjectives(planetId: PlanetId, newTechnology: Technology): vo
         max: 0,
       },
       startTime: undefined,
+      botEnabled: false,
     };
   }
 

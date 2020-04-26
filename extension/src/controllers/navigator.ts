@@ -54,15 +54,15 @@ export function goToMessages(planetId?: PlanetId): void {
   }`;
 }
 
-export function sendLargeCargos(
+export function sendLargeCargosUrl(
   from: PlanetId,
   planetCoords: PlanetCoords,
   missionType: MissionTypeEnum,
   amount: number,
   resources?: BaseResources
-): void {
+): string {
   const coords = getCoords(planetCoords);
-  window.location.href = `${document.location.origin}${
+  const url = `${document.location.origin}${
     document.location.pathname
   }?page=ingame&component=fleetdispatch&galaxy=${coords.galaxy}&system=${
     coords.solarSystem
@@ -73,4 +73,9 @@ export function sendLargeCargos(
         )}&deuterium=${Math.ceil(resources.deuterium)}`
       : ''
   }`;
+  return url;
+}
+
+export function goToUrl(url: string): void {
+  window.location.href = url;
 }

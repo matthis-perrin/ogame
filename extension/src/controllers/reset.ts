@@ -41,7 +41,7 @@ export function handleResourcesToSend(): void {
 }
 
 export function resetUI(): void {
-  $('body').css({background: 'black', display: 'flex'});
+  $('body').css({background: '#111', display: 'flex'});
   $('body > #chatbarcomponent > #chatBar').css({bottom: '0px'});
   $('#pageContent,body > .contentBoxBody').css({marginLeft: '0px', top: '0px'});
   $('html > body #planetList > div > a').each((_, element) => {

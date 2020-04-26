@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import {LargeCargo} from '@shared/models/ships';
 
 import {deleteMessage, sendProbes} from '@src/controllers/function';
-import {goToMessages, sendLargeCargos} from '@src/controllers/navigator';
+import {goToMessages, goToUrl, sendLargeCargosUrl} from '@src/controllers/navigator';
 import {Account} from '@src/models/account';
 import {COLOR_ORANGE, COLOR_RED} from '@src/models/constants';
 import {MissionTypeEnum} from '@src/models/fleets';
@@ -110,12 +110,13 @@ export const Messages: FC<MessagesProps> = ({account}) => {
                     <Hover
                       onClick={() => {
                         const fretGt = getFretCapacity(account.accountTechnologies, LargeCargo);
-                        sendLargeCargos(
+                        const url = sendLargeCargosUrl(
                           account.currentPlanetId,
                           message.planetCoords,
                           MissionTypeEnum.Attacking,
                           Math.ceil(sum([message.resources.sum, lootMargin]) / fretGt)
                         );
+                        goToUrl(url);
                       }}
                       className={attackingFleets.has(message.planetCoords) ? 'orange' : ''}
                     >

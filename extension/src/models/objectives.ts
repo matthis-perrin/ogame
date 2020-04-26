@@ -23,4 +23,5 @@ export interface Objectives {
   };
   resourceTransfers: ResourceTransfer[];
   startTime: number | undefined;
+  botEnabled: boolean;
 }
