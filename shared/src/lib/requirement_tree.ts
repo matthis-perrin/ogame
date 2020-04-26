@@ -102,6 +102,85 @@ export function removeRequirementFromTree(
   removeRequirementFromTreeNode(buildTree, requirement);
 }
 
+export function canBeNextBuildItemAppliedOnAccount(
+  account: Account,
+  buildItem: BuildItem
+): boolean {
+  if (buildItem.type === 'technology') {
+    const technoLevel = account.technologyLevels.get(buildItem.buildable) ?? 0;
+    const inProgressTechnoLevel =
+      account.inProgressTechnology &&
+      account.inProgressTechnology.technology === buildItem.buildable
+        ? account.inProgressTechnology.level
+        : 0;
+
+    // For techno with level > 1, all we need is the previous level done (or in progress)
+    if (buildItem.level > 1) {
+      return technoLevel === buildItem.level - 1 || inProgressTechnoLevel === buildItem.level - 1;
+    }
+    // Otherwise, we need the techno never done (and not in progress)
+    else {
+      if (technoLevel > 0 || inProgressTechnoLevel > 0) {
+        return false;
+      }
+    }
+  }
+
+  const planet = account.planets.get(buildItem.planetId);
+  if (!planet) {
+    throw new Error(`No planet with id ${buildItem.planetId} on the account`);
+  }
+
+  if (buildItem.type === 'building') {
+    const buildingLevel = planet.buildingLevels.get(buildItem.buildable) ?? 0;
+    const inProgressBuildingLevel =
+      planet.inProgressBuilding && planet.inProgressBuilding.building === buildItem.buildable
+        ? planet.inProgressBuilding.level
+        : 0;
+
+    // For building with level > 1, all we need is the previous level done (or in progress)
+    if (buildItem.level > 1) {
+      return (
+        buildingLevel === buildItem.level - 1 || inProgressBuildingLevel === buildItem.level - 1
+      );
+    }
+    // Otherwise, we need the building never done (and not in progress)
+    else {
+      if (buildingLevel > 0 || inProgressBuildingLevel > 0) {
+        return false;
+      }
+    }
+  }
+
+  // Basic check done, we not verify the buildable requirements
+  for (const requirement of buildItem.buildable.requirements) {
+    if (requirement.entity.type === 'building') {
+      if ((planet.buildingLevels.get(requirement.entity) ?? 0) < requirement.level) {
+        if (
+          !planet.inProgressBuilding ||
+          planet.inProgressBuilding.building !== requirement.entity ||
+          planet.inProgressBuilding.level < requirement.level
+        ) {
+          return false;
+        }
+      }
+    } else if (requirement.entity.type === 'technology') {
+      if ((account.technologyLevels.get(requirement.entity) ?? 0) < requirement.level) {
+        if (
+          !account.inProgressTechnology ||
+          account.inProgressTechnology.technology !== requirement.entity ||
+          account.inProgressTechnology.level < requirement.level
+        ) {
+          return false;
+        }
+      }
+    } else {
+      neverHappens(requirement.entity, `Invalid requirement type "${requirement.entity['type']}"`);
+    }
+  }
+  return true;
+}
+
 export function isBuildItemAvailable(
   account: Account,
   buildItem: BuildItem

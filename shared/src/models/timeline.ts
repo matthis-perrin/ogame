@@ -3,9 +3,13 @@ import {BuildItem} from '@shared/models/build_item';
 import {Milliseconds} from '@shared/models/time';
 
 export interface AccountTimeline {
-  computationTime: number;
   start: Account;
-  end: Account;
+  currentAccount: Account;
+  buildItemTimelines: BuildItemTimeline[];
+}
+
+export interface BuildItemTimeline {
+  buildItem: BuildItem;
   transitions: TransitionnedAccount[];
 }
 

@@ -74,27 +74,31 @@ import {
   timeToString,
   ZERO,
 } from '@shared/models/time';
-import {AccountTimeline, TransitionnedAccount} from '@shared/models/timeline';
+import {AccountTimeline, BuildItemTimeline, TransitionnedAccount} from '@shared/models/timeline';
 import {ceil, max, min, multiply, neverHappens, substract, sum} from '@shared/utils/type_utils';
 
-function getAccountTimelineMaker(
-  mode: 'perf' | 'debug'
-): (account: Account, buildItems: BuildItem[]) => AccountTimeline {
+interface AccountTimelineLib {
+  createAccountTimeline(account: Account, buildItems: BuildItem[]): AccountTimeline;
+  advanceAccountTowardBuildItem(account: Account, buildItem: BuildItem): TransitionnedAccount[];
+}
+
+function getAccountTimelineLib(mode: 'perf' | 'debug'): AccountTimelineLib {
   let transitionId = 0;
   const isPerf = mode === 'perf';
   const isDebug = mode === 'debug';
   const noReason = '';
 
   function createAccountTimeline(account: Account, buildItems: BuildItem[]): AccountTimeline {
-    const start = Date.now();
-    const transitions: TransitionnedAccount[] = [];
+    const buildItemTimelines: BuildItemTimeline[] = [];
     let currentAccount = account;
 
     for (const buildItem of buildItems) {
       // try {
-      const newTransactions = advanceAccountTowardBuildItem(currentAccount, buildItem);
-      transitions.push(...newTransactions);
-      currentAccount = transitions[transitions.length - 1].transitionnedAccount;
+      const transitions = advanceAccountTowardBuildItem(currentAccount, buildItem);
+      if (transitions.length > 0) {
+        currentAccount = transitions[transitions.length - 1].transitionnedAccount;
+      }
+      buildItemTimelines.push({buildItem, transitions});
       // } catch (err) {
       //   console.log(`Error creating the account timeline while applying item`, buildItem);
       //   console.log(`Cost for item: ${resourcesToString(getBuildItemCost(buildItem))}`);
@@ -117,10 +121,9 @@ function getAccountTimelineMaker(
     }
 
     return {
-      computationTime: Date.now() - start,
       start: account,
-      end: currentAccount,
-      transitions,
+      buildItemTimelines,
+      currentAccount,
     };
   }
 
@@ -1045,8 +1048,8 @@ function getAccountTimelineMaker(
     return {newPlanet, newEvents: events};
   }
 
-  return createAccountTimeline;
+  return {createAccountTimeline, advanceAccountTowardBuildItem};
 }
 
-export const createAccountTimelineInPerfMode = getAccountTimelineMaker('perf');
-export const createAccountTimelineInDebugMode = getAccountTimelineMaker('debug');
+export const accountTimelineLibInPerfMode = getAccountTimelineLib('perf');
+export const accountTimelineLibInDebugMode = getAccountTimelineLib('debug');
