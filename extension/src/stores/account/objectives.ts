@@ -12,6 +12,7 @@ import {findPlanetCoords, findPlanetName, getCoords, PlanetId} from '@src/models
 import {ResourceAmount} from '@src/models/resources';
 import {Technology, TechnologyIndex} from '@src/models/technologies';
 import {getAccount, setAccount} from '@src/stores/account';
+import {calcInFlightResources} from '@src/stores/account/inflight_resources';
 import {sum} from '@src/ui/utils';
 
 type ResourceType = 'metal' | 'crystal' | 'deuterium';
@@ -20,6 +21,7 @@ interface ResourceInfo {
   amount: number;
   production: number;
   future: number;
+  inflight: number;
 }
 
 interface PlanetInfo {
@@ -43,7 +45,8 @@ function timeBeforeSendingSeconds(
     }
     resourceSum +=
       (longestTimeSeconds - planetInfo.timeFromOriginSeconds) * resourceInfo.production +
-      resourceInfo.amount;
+      resourceInfo.amount +
+      resourceInfo.inflight;
     productionSum += resourceInfo.production;
   }
   return Math.max(0, Math.ceil((targetAmount - resourceSum) / productionSum));
@@ -138,6 +141,9 @@ export function updateObjectives(account: Account): void {
     Class.Collector
   );
 
+  // Calculating inflight resources
+  const [inFlightResources] = calcInFlightResources(account.planetList, account.fleets);
+
   // Calculating resource transfers
   const planetInfos: PlanetInfo[] = [];
   let longestTimeSeconds = 0;
@@ -158,16 +164,25 @@ export function updateObjectives(account: Account): void {
           amount: planetDetail.resources.metal,
           production: planetDetail.productions.metal,
           future: 0,
+          inflight: inFlightResources.hasOwnProperty(planet.coords)
+            ? inFlightResources[planet.coords].metal
+            : 0,
         });
         resources.set('crystal', {
           amount: planetDetail.resources.crystal,
           production: planetDetail.productions.crystal,
           future: 0,
+          inflight: inFlightResources.hasOwnProperty(planet.coords)
+            ? inFlightResources[planet.coords].crystal
+            : 0,
         });
         resources.set('deuterium', {
           amount: planetDetail.resources.deuterium,
           production: planetDetail.productions.deuterium,
           future: 0,
+          inflight: inFlightResources.hasOwnProperty(planet.coords)
+            ? inFlightResources[planet.coords].deuterium
+            : 0,
         });
       }
       planetInfos.push({
