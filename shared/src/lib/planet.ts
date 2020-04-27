@@ -40,7 +40,7 @@ export function createPlanet(
   counter++;
   return {
     id: `P${counter}` as PlanetId,
-    resources: makeResources({}),
+    resources: makeResources({m: 500, c: 500}),
     metadata: {
       coordinates,
       fields,

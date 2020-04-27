@@ -69,7 +69,7 @@ export const EspionageTechnology = makeTechnology(
   '42.1% 68.96%',
   makeResources({m: 200, c: 1000, d: 200}),
   2,
-  false // Automatically added whe the cost is lower than a percentage of the previous build item
+  false // TODO - Automatically added whe the cost is lower than a percentage of the previous build item
 );
 
 export const WeaponTechnology = makeTechnology(
@@ -79,7 +79,7 @@ export const WeaponTechnology = makeTechnology(
   '73.68% 68.96%',
   makeResources({m: 800, c: 200, d: 0}),
   2,
-  true // Impacts how much defense needs to be built
+  false // TODO - Integrate combat techno in defense calculation.
 );
 
 export const ShieldingTechnology = makeTechnology(
@@ -89,7 +89,7 @@ export const ShieldingTechnology = makeTechnology(
   '78.94% 68.96%',
   makeResources({m: 200, c: 600, d: 0}),
   2,
-  true // Impacts how much defense needs to be built
+  false // TODO - Integrate combat techno in defense calculation.
 );
 
 export const ArmourTechnology = makeTechnology(
@@ -99,7 +99,7 @@ export const ArmourTechnology = makeTechnology(
   '68.42% 68.96%',
   makeResources({m: 1000, c: 0, d: 0}),
   2,
-  true // Impacts how much defense needs to be built
+  false // TODO - Integrate combat techno in defense calculation.
 );
 
 export const HyperspaceTechnology = makeTechnology(
@@ -190,7 +190,7 @@ export const AstrophysicsTechnology = makeTechnology(
   '52.62% 68.96%',
   makeResources({m: 4000, c: 8000, d: 4000}),
   1.75,
-  true // TODO - Multi planets not handled yet
+  false // TODO - Multi planets not handled yet
 );
 
 export const GravitonTechnology = makeTechnology(

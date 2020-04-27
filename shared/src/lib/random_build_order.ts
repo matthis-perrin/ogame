@@ -1,5 +1,3 @@
-import {uniqBy} from 'lodash-es';
-
 import {updateAccountPlanet, updateAccountTechnology} from '@shared/lib/account';
 import {buildableRequirementToString, buildItemCost} from '@shared/lib/build_items';
 import {
@@ -19,7 +17,6 @@ import {BuildItem} from '@shared/models/build_item';
 import {BuildableRequirement} from '@shared/models/buildable';
 import {CrystalMine, DeuteriumSynthesizer, MetalMine} from '@shared/models/building';
 import {Planet, PlanetId} from '@shared/models/planet';
-import {rand} from '@shared/utils/rand';
 
 export function generateBuildOrder(
   target: BuildItem,
@@ -83,6 +80,19 @@ function buildRequirementToBuildItem(
     level: requirement.level,
     planetId,
   };
+}
+
+function uniqBy<T>(arr: T[], hash: (val: T) => string): T[] {
+  const hashSet = new Set<string>();
+  const uniqArr: T[] = [];
+  for (const val of arr) {
+    const hashValue = hash(val);
+    if (!hashSet.has(hashValue)) {
+      hashSet.add(hashValue);
+      uniqArr.push(val);
+    }
+  }
+  return uniqArr;
 }
 
 export function randomWeightedNextBuildableRequirement(

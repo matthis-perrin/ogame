@@ -80,6 +80,7 @@ import {ceil, max, min, multiply, neverHappens, substract, sum} from '@shared/ut
 interface AccountTimelineLib {
   createAccountTimeline(account: Account, buildItems: BuildItem[]): AccountTimeline;
   advanceAccountTowardBuildItem(account: Account, buildItem: BuildItem): TransitionnedAccount[];
+  finishAllInProgress(account: Account): TransitionnedAccount[];
 }
 
 function getAccountTimelineLib(mode: 'perf' | 'debug'): AccountTimelineLib {
@@ -120,6 +121,11 @@ function getAccountTimelineLib(mode: 'perf' | 'debug'): AccountTimelineLib {
       // }
     }
 
+    // Finish all in progress
+    buildItemTimelines[buildItemTimelines.length - 1].transitions.push(
+      ...finishAllInProgress(account)
+    );
+
     return {
       start: account,
       buildItemTimelines,
@@ -127,7 +133,6 @@ function getAccountTimelineLib(mode: 'perf' | 'debug'): AccountTimelineLib {
     };
   }
 
-  // NO CHANGE
   function buildItemAlreadyApplied(account: Account, buildItem: BuildItem): boolean {
     if (buildItem.type === 'ship' || buildItem.type === 'defense' || buildItem.type === 'stock') {
       return false;
@@ -165,7 +170,43 @@ function getAccountTimelineLib(mode: 'perf' | 'debug'): AccountTimelineLib {
     neverHappens(buildItem, `Unknown build item type "${buildItem['type']}"`);
   }
 
-  // NO CHANGE
+  function finishAllInProgress(account: Account): TransitionnedAccount[] {
+    let maxEndTime = ZERO;
+    if (account.inProgressTechnology && account.inProgressTechnology.endTime > maxEndTime) {
+      maxEndTime = account.inProgressTechnology.endTime;
+    }
+    for (const planet of Array.from(account.planets.values())) {
+      if (planet.inProgressBuilding && planet.inProgressBuilding.endTime > maxEndTime) {
+        maxEndTime = planet.inProgressBuilding.endTime;
+      }
+      if (planet.inProgressShips && planet.inProgressShips.endTime > maxEndTime) {
+        maxEndTime = planet.inProgressShips.endTime;
+      }
+      if (planet.inProgressDefenses && planet.inProgressDefenses.endTime > maxEndTime) {
+        maxEndTime = planet.inProgressDefenses.endTime;
+      }
+    }
+    if (maxEndTime === ZERO) {
+      return [];
+    }
+    const {newAccount, events, actualAdvanceTime} = advanceAccountInTime(account, maxEndTime);
+    return [
+      {
+        transition: isPerf
+          ? undefined
+          : {
+              type: 'wait',
+              id: transitionId++,
+              duration: actualAdvanceTime,
+              reason: 'Finishing all in progress',
+              events,
+            },
+        transitionnedAccount: newAccount,
+      },
+      ...finishAllInProgress(newAccount),
+    ];
+  }
+
   function advanceAccountTowardBuildItem(
     account: Account,
     buildItem: BuildItem
@@ -241,7 +282,6 @@ function getAccountTimelineLib(mode: 'perf' | 'debug'): AccountTimelineLib {
     }
   }
 
-  // NO CHANGE
   function requiredBuildItemsFromEnergyCheck(account: Account): BuildItem[] {
     const requiredBuildItems: BuildItem[] = [];
     const energyLevel = account.technologyLevels.get(EnergyTechnology) ?? 0;
@@ -263,7 +303,6 @@ function getAccountTimelineLib(mode: 'perf' | 'debug'): AccountTimelineLib {
     return requiredBuildItems;
   }
 
-  // NO CHANGE
   function dedupBuildItems(buildItems: BuildItem[]): BuildItem[] {
     const dedupedBuildItems: BuildItem[] = [];
     const alreadyUsed = new Set<string>();
@@ -288,7 +327,6 @@ function getAccountTimelineLib(mode: 'perf' | 'debug'): AccountTimelineLib {
     return dedupedBuildItems;
   }
 
-  // NO CHANGE
   function requiredBuildItemsFromDefenseCheck(
     account: Account,
     nextBuildItem: BuildItem
@@ -323,7 +361,6 @@ function getAccountTimelineLib(mode: 'perf' | 'debug'): AccountTimelineLib {
 
   const APPLY_NOW = {time: ZERO, reason: noReason};
 
-  // NO CHANGE
   function timeBeforeBuildingTechnologyRelatedItem(
     account: Account
   ): {time: Milliseconds; reason: string} {
@@ -348,7 +385,6 @@ function getAccountTimelineLib(mode: 'perf' | 'debug'): AccountTimelineLib {
     return APPLY_NOW;
   }
 
-  // NO CHANGE
   function timeBeforeShipyardOrNaniteDoneOnPlanet(
     account: Account,
     planet: Planet
@@ -368,7 +404,6 @@ function getAccountTimelineLib(mode: 'perf' | 'debug'): AccountTimelineLib {
     return APPLY_NOW;
   }
 
-  // NO CHANGE
   function timeBeforeUnitsDoneOnPlanet(
     account: Account,
     planet: Planet
@@ -397,7 +432,6 @@ function getAccountTimelineLib(mode: 'perf' | 'debug'): AccountTimelineLib {
     }
   }
 
-  // NO CHANGE
   function timeForResourcesOnPlanet(
     account: Account,
     planet: Planet,
@@ -427,7 +461,6 @@ function getAccountTimelineLib(mode: 'perf' | 'debug'): AccountTimelineLib {
     };
   }
 
-  // NO CHANGE
   function timeBeforeApplyingBuildItem(
     account: Account,
     buildItem: BuildItem
@@ -522,7 +555,6 @@ function getAccountTimelineLib(mode: 'perf' | 'debug'): AccountTimelineLib {
     neverHappens(buildItem, `Unknown build item type "${buildItem['type']}"`);
   }
 
-  // NO CHANGE
   function buildItemsToTransitions(
     account: Account,
     buildItems: BuildItem[]
@@ -588,7 +620,6 @@ function getAccountTimelineLib(mode: 'perf' | 'debug'): AccountTimelineLib {
     ];
   }
 
-  // NO CHANGE
   function applyBuildItem(account: Account, buildItem: BuildItem): Account {
     let newAccount = account;
 
@@ -749,7 +780,6 @@ function getAccountTimelineLib(mode: 'perf' | 'debug'): AccountTimelineLib {
     neverHappens(buildItem, `Unknown build item type "${buildItem['type']}"`);
   }
 
-  // NO CHANGE
   function advanceAccountInTime(
     account: Account,
     time: Milliseconds
@@ -870,7 +900,6 @@ function getAccountTimelineLib(mode: 'perf' | 'debug'): AccountTimelineLib {
 
   // Do not use directly! This function does not perform any check regarding the prod rate changing
   // over time.
-  // NO CHANGE
   function directlyAdvancePlanetInTime(
     planet: Planet,
     planetProdPerHour: Resources,
@@ -1057,7 +1086,7 @@ function getAccountTimelineLib(mode: 'perf' | 'debug'): AccountTimelineLib {
     return {newPlanet, newEvents: events};
   }
 
-  return {createAccountTimeline, advanceAccountTowardBuildItem};
+  return {createAccountTimeline, advanceAccountTowardBuildItem, finishAllInProgress};
 }
 
 export const accountTimelineLibInPerfMode = getAccountTimelineLib('perf');

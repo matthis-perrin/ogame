@@ -11,6 +11,10 @@ import {
 export interface Building extends BuildableBase {
   readonly type: 'building';
   cost(level: number): Resources;
+  // Indicates if the building can be added to a build order.
+  // Setting this to false means that the building is either useless or will be automatically
+  // created when needed in the timeline.
+  readonly isBuildOrderBuilding: boolean;
 }
 
 function makeBuilding(
@@ -20,6 +24,7 @@ function makeBuilding(
   sprite: string,
   baseCost: Resources,
   component: string,
+  isBuildOrderBuilding: boolean,
   costExponential = 2
 ): Building {
   return {
@@ -37,6 +42,7 @@ function makeBuilding(
     }),
     requirements: [],
     component,
+    isBuildOrderBuilding,
   };
 }
 
@@ -55,6 +61,7 @@ export const MetalMine = makeBuilding(
   '0 0',
   makeResources({m: 60, c: 15, d: 0}),
   'supplies',
+  true, // Increases prod
   1.5
 );
 
@@ -65,6 +72,7 @@ export const MetalStorage = makeBuilding(
   '31.57% 0',
   makeResources({m: 1000, c: 0, d: 0}),
   'supplies',
+  false, // TODO - Automatically injected in the timeline
   2
 );
 
@@ -75,6 +83,7 @@ export const CrystalMine = makeBuilding(
   '5.25% 0',
   makeResources({m: 48, c: 24, d: 0}),
   'supplies',
+  true, // Increases prod
   1.6
 );
 
@@ -85,6 +94,7 @@ export const CrystalStorage = makeBuilding(
   '6.84% 0',
   makeResources({m: 1000, c: 500, d: 0}),
   'supplies',
+  false, // TODO - Automatically injected in the timeline
   2
 );
 
@@ -95,6 +105,7 @@ export const DeuteriumSynthesizer = makeBuilding(
   '0.52% 0',
   makeResources({m: 225, c: 75, d: 0}),
   'supplies',
+  true, // Increases prod
   1.5
 );
 
@@ -105,6 +116,7 @@ export const DeuteriumTank = makeBuilding(
   '2.1% 0',
   makeResources({m: 1000, c: 1000, d: 0}),
   'supplies',
+  false, // TODO - Automatically injected in the timeline
   2
 );
 
@@ -115,6 +127,7 @@ export const SolarPlant = makeBuilding(
   '15.78% 0',
   makeResources({m: 75, c: 30, d: 0}),
   'supplies',
+  false, // Automatically injected in the timeline
   1.5
 );
 
@@ -125,6 +138,7 @@ export const FusionReactor = makeBuilding(
   '21.05% 0',
   makeResources({m: 900, c: 360, d: 180}),
   'supplies',
+  false, // TODO - Automatically injected in the timeline
   1.8
 );
 
@@ -135,6 +149,7 @@ export const ResearchLab = makeBuilding(
   '0.52% 17.24%',
   makeResources({m: 200, c: 400, d: 200}),
   'facilities',
+  true, // Faster research time
   2
 );
 
@@ -145,6 +160,7 @@ export const RoboticsFactory = makeBuilding(
   '0 17.24%',
   makeResources({m: 400, c: 120, d: 200}),
   'facilities',
+  true, // Faster building, ships and defenses creation time
   2
 );
 
@@ -155,6 +171,7 @@ export const Shipyard = makeBuilding(
   '5.25% 17.24%',
   makeResources({m: 400, c: 200, d: 100}),
   'facilities',
+  true, // Faster ships and defenses creation time
   1.8
 );
 
@@ -165,6 +182,7 @@ export const NaniteFactory = makeBuilding(
   '26.31% 17.24%',
   makeResources({m: 1000000, c: 500000, d: 100000}),
   'facilities',
+  true, // Faster building, ships and defenses creation time
   2
 );
 
@@ -175,6 +193,7 @@ export const MissileSilo = makeBuilding(
   '21.05% 17.24%',
   makeResources({m: 20000, c: 20000, d: 1000}),
   'facilities',
+  false, // TODO - Not handled in defenses yet
   2
 );
 

@@ -1,22 +1,30 @@
-import {crossover} from '@shared/algogen/crossover';
+import {Chromosome} from '@shared/algogen/chromosome';
+import {mutationByInsert} from '@shared/algogen/mutation';
+import {generateInitialPopulation, nextGeneration} from '@shared/algogen/population';
 import {createNewAccount} from '@shared/lib/account';
 import {buildItemToString} from '@shared/lib/build_items';
+import {
+  generateBuildOrder,
+  randomWeightedNextBuildableRequirement,
+} from '@shared/lib/random_build_order';
 import {accountTimelineLibInPerfMode} from '@shared/lib/timeline';
 import {BuildItem} from '@shared/models/build_item';
 import {setupRapidFire, setupRequirements} from '@shared/models/dependencies';
 import {SmallCargo} from '@shared/models/ships';
+import {timeToString} from '@shared/models/time';
 import {Rosalind} from '@shared/models/universe';
-
-import {generateBuildOrder, randomWeightedNextBuildableRequirement} from '@src/lib/timeline';
 
 const {createAccountTimeline} = accountTimelineLibInPerfMode;
 
 setupRapidFire();
 setupRequirements();
 
-function printBuildOrder(buildOrder: BuildItem[]): void {
-  for (let i = 0; i < buildOrder.length; i++) {
-    const buildItem = buildOrder[i];
+function printChromosome(chromosome: Chromosome): void {
+  console.log(
+    `=== Time: ${timeToString(chromosome.accountTimeline.currentAccount.currentTime)} ===`
+  );
+  for (let i = 0; i < chromosome.buildOrder.length; i++) {
+    const buildItem = chromosome.buildOrder[i];
     console.log(i, buildItemToString(buildItem));
   }
 }
@@ -30,32 +38,19 @@ const smallCargoTarget: BuildItem = {
   quantity: 1,
 };
 
-const buildOrder1 = generateBuildOrder(
-  smallCargoTarget,
-  account,
-  randomWeightedNextBuildableRequirement
-);
-const buildOrder2 = generateBuildOrder(
-  smallCargoTarget,
-  account,
-  randomWeightedNextBuildableRequirement
-);
-const parent1 = {
-  buildOrder: buildOrder1,
-  accountTimeline: createAccountTimeline(account, buildOrder1),
-};
-const parent2 = {
-  buildOrder: buildOrder2,
-  accountTimeline: createAccountTimeline(account, buildOrder2),
-};
-
-console.log('-- Parents --');
-printBuildOrder(buildOrder1);
-printBuildOrder(buildOrder2);
-
-const children = crossover(parent1, parent2);
-
-console.log('-- Children --');
-for (const child of children) {
-  printBuildOrder(child.buildOrder);
+let latestPopulation = generateInitialPopulation(account, smallCargoTarget, 100);
+for (let i = 0; i < 30; i++) {
+  console.log(
+    `=== Time: ${timeToString(
+      latestPopulation.topChromosomes[0].accountTimeline.currentAccount.currentTime
+    )} ===`
+  );
+  // if (i % 10 === 0) {
+  //   printChromosome(latestPopulation.topChromosomes[0]);
+  // }
+  latestPopulation = nextGeneration(latestPopulation);
 }
+console.log(latestPopulation);
+printChromosome(latestPopulation.topChromosomes[0]);
+console.log('----');
+mutationByInsert(latestPopulation.topChromosomes[0]);

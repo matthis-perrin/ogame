@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom';
 
 import {createNewAccount} from '@shared/lib/account';
 import {buildableRequirementToString, buildItemToString} from '@shared/lib/build_items';
+import {randomWeightedBuildOrderWithOnlyMines} from '@shared/lib/random_build_order';
 import {
   computeRequirementTree,
   getRequirementTreeLeaves,
@@ -25,9 +26,8 @@ import {AccountTimeline} from '@shared/models/timeline';
 import {Rosalind} from '@shared/models/universe';
 import {min, neverHappens, removeUndefined} from '@shared/utils/type_utils';
 
-import {App} from '@src/components/app';
+import {App} from '@src/lib/app';
 import {setAppState} from '@src/lib/store';
-import {randomWeightedBuildOrderWithOnlyMines} from '@src/lib/timeline';
 
 setupRapidFire();
 setupRequirements();
