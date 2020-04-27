@@ -6,7 +6,6 @@ import {LargeCargo} from '@shared/models/ships';
 import {CombustionDrive, HyperspaceDrive, ImpulseDrive} from '@shared/models/technology';
 import {Rosalind} from '@shared/models/universe';
 
-import {startObjectivesBot} from '@src/bots/objectives';
 import {Account} from '@src/models/account';
 import {MissionTypeEnum} from '@src/models/fleets';
 import {findPlanetCoords, findPlanetName, getCoords, PlanetId} from '@src/models/planets';
@@ -378,5 +377,4 @@ export function updateObjectivesTransfers(account: Account): void {
       }
     }
   }
-  startObjectivesBot();
 }

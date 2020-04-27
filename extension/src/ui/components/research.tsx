@@ -7,13 +7,9 @@ import {
   ComputerTechnology,
   EnergyTechnology,
   EspionageTechnology,
-  GravitonTechnology,
   HyperspaceDrive,
   HyperspaceTechnology,
   ImpulseDrive,
-  IntergalacticResearchNetworkTechnology,
-  IonTechnology,
-  LaserTechnology,
   PlasmaTechnology,
   ShieldingTechnology,
   WeaponTechnology,
@@ -46,29 +42,29 @@ export const Research: FC<ResearchProps> = ({account}) => {
                   planetId={planetId}
                 />
                 <TechnologyC
-                  name={LaserTechnology.shortName}
+                  name={PlasmaTechnology.shortName}
                   technologies={account.accountTechnologies}
-                  techId={LaserTechnology.id}
+                  techId={PlasmaTechnology.id}
                   planetId={planetId}
                 />
                 <TechnologyC
-                  name={IonTechnology.shortName}
+                  name={ComputerTechnology.shortName}
                   technologies={account.accountTechnologies}
-                  techId={IonTechnology.id}
+                  techId={ComputerTechnology.id}
                   planetId={planetId}
                 />
                 <TechnologyC
-                  name={HyperspaceTechnology.shortName}
+                  name={AstrophysicsTechnology.shortName}
                   technologies={account.accountTechnologies}
-                  techId={HyperspaceTechnology.id}
+                  techId={AstrophysicsTechnology.id}
                   planetId={planetId}
                 />
               </td>
               <td>
                 <TechnologyC
-                  name={PlasmaTechnology.shortName}
+                  name={HyperspaceTechnology.shortName}
                   technologies={account.accountTechnologies}
-                  techId={PlasmaTechnology.id}
+                  techId={HyperspaceTechnology.id}
                   planetId={planetId}
                 />
                 <TechnologyC
@@ -95,32 +91,6 @@ export const Research: FC<ResearchProps> = ({account}) => {
                   name={EspionageTechnology.shortName}
                   technologies={account.accountTechnologies}
                   techId={EspionageTechnology.id}
-                  planetId={planetId}
-                />
-                <TechnologyC
-                  name={ComputerTechnology.shortName}
-                  technologies={account.accountTechnologies}
-                  techId={ComputerTechnology.id}
-                  planetId={planetId}
-                />
-                <TechnologyC
-                  name={AstrophysicsTechnology.shortName}
-                  technologies={account.accountTechnologies}
-                  techId={AstrophysicsTechnology.id}
-                  planetId={planetId}
-                />
-                <TechnologyC
-                  name={IntergalacticResearchNetworkTechnology.shortName}
-                  technologies={account.accountTechnologies}
-                  techId={IntergalacticResearchNetworkTechnology.id}
-                  planetId={planetId}
-                />
-              </td>
-              <td>
-                <TechnologyC
-                  name={GravitonTechnology.shortName}
-                  technologies={account.accountTechnologies}
-                  techId={GravitonTechnology.id}
                   planetId={planetId}
                 />
                 <TechnologyC

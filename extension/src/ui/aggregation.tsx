@@ -2,6 +2,7 @@ import React, {FC, Fragment} from 'react';
 
 import {Account} from '@src/models/account';
 import {Table, Title} from '@src/ui/common';
+import {Bots} from '@src/ui/components/bots';
 import {PlanetSum} from '@src/ui/components/planetsum';
 import {PlanetSumProd} from '@src/ui/components/planetsumprod';
 import {Research} from '@src/ui/components/research';
@@ -20,6 +21,9 @@ export const Aggregation: FC<AggregationProps> = ({account}) => (
           </th>
           <th>
             <Title>Technologies</Title>
+          </th>
+          <th>
+            <Title>Bots</Title>
           </th>
         </tr>
       </thead>
@@ -48,6 +52,9 @@ export const Aggregation: FC<AggregationProps> = ({account}) => (
           </td>
           <td>
             <Research account={account} />
+          </td>
+          <td>
+            <Bots account={account} />
           </td>
         </tr>
       </tbody>

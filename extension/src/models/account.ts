@@ -1,3 +1,4 @@
+import {BotProbes} from '@src/bots/espionage';
 import {BotTransfer} from '@src/bots/objectives';
 import {Fleet} from '@src/models/fleets';
 import {Message} from '@src/models/messages';
@@ -21,6 +22,7 @@ export interface Account {
   objectives: Objectives | undefined;
   bots: {
     objectives: BotTransfer | undefined;
+    espionage: BotProbes | undefined;
   };
 }
 

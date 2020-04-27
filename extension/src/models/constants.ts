@@ -41,6 +41,7 @@ export const INACTIVITY_TIME = 8; // 8h
 export const DEBRIS_PERCENTAGE = 0.3;
 export const UI_REFRESH_RATE = 500;
 export const PROBES_AMOUNT = 10;
+export const NUMBER_OF_SS = 500;
 
 // Class bonus
 export const COLLECTOR_BONUS_FRET = 0.25;

@@ -11,7 +11,7 @@ import {findPlanetCoords, findPlanetName} from '@src/models/planets';
 import {getFretCapacity, TechnologyIndex, techShortName} from '@src/models/technologies';
 import {setAccount} from '@src/stores/account';
 import {updateObjectives} from '@src/stores/account/objectives';
-import {Table, Title} from '@src/ui/common';
+import {HoverTD, Table, Title} from '@src/ui/common';
 import {Resource} from '@src/ui/components/resource';
 import {time} from '@src/ui/utils';
 
@@ -228,13 +228,6 @@ const EmptyLine = styled.td`
 `;
 
 const HoverLine = styled.tr`
-  cursor: pointer;
-  &:hover {
-    text-decoration: underline;
-  }
-`;
-
-const HoverTD = styled.td`
   cursor: pointer;
   &:hover {
     text-decoration: underline;

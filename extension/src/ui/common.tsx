@@ -16,3 +16,17 @@ export const Table = styled.table`
     }
   }
 `;
+
+export const HoverTD = styled.td`
+  cursor: pointer;
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
+export const Stock = styled.div`
+  cursor: pointer;
+  &:hover {
+    text-decoration: underline;
+  }
+`;

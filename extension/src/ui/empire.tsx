@@ -57,7 +57,7 @@ import {
 import {ResourceAmount} from '@src/models/resources';
 import {getFretCapacity} from '@src/models/technologies';
 import {addObjectives} from '@src/stores/account/objectives';
-import {Table, Title} from '@src/ui/common';
+import {Stock, Table, Title} from '@src/ui/common';
 import {Energy} from '@src/ui/components/energy';
 import {Loot} from '@src/ui/components/loot';
 import {Production} from '@src/ui/components/production';
@@ -282,7 +282,7 @@ export const Empire: FC<EmpireProps> = ({account}) => (
                     <Energy name="E" amount={planet.resources.energy} />
                   </Line>
                 </td>
-                <td onClick={() => goToFactories(planet.planetId)} style={{cursor: 'pointer'}}>
+                <td onClick={() => goToMines(planet.planetId)} style={{cursor: 'pointer'}}>
                   <Line>
                     <TechnologyC
                       name="M"
@@ -317,17 +317,25 @@ export const Empire: FC<EmpireProps> = ({account}) => (
                           : undefined
                       }
                     />
-                    <TechnologyC
-                      name="Silo"
-                      technologies={planet.technologies}
-                      techId={MissileSilo.id}
-                      planetId={planet.planetId}
-                      required={
-                        account.maxTechnologies.hasOwnProperty(MissileSilo.id)
-                          ? account.maxTechnologies[MissileSilo.id]
-                          : undefined
-                      }
-                    />
+                    <div
+                      onClick={e => {
+                        e.stopPropagation();
+                        goToFactories(planet.planetId);
+                      }}
+                      style={{cursor: 'pointer'}}
+                    >
+                      <TechnologyC
+                        name="Silo"
+                        technologies={planet.technologies}
+                        techId={MissileSilo.id}
+                        planetId={planet.planetId}
+                        required={
+                          account.maxTechnologies.hasOwnProperty(MissileSilo.id)
+                            ? account.maxTechnologies[MissileSilo.id]
+                            : undefined
+                        }
+                      />
+                    </div>
                   </Line>
                 </td>
                 <td onClick={() => goToFactories(planet.planetId)} style={{cursor: 'pointer'}}>
@@ -510,11 +518,4 @@ const PlanetLine = styled.tr`
 
 const Line = styled.div`
   height: 70px;
-`;
-
-const Stock = styled.div`
-  cursor: pointer;
-  &:hover {
-    text-decoration: underline;
-  }
 `;

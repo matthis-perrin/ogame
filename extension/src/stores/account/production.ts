@@ -1,3 +1,5 @@
+import {startEspionageBot} from '@src/bots/espionage';
+import {startObjectivesBot} from '@src/bots/objectives';
 import {Account} from '@src/models/account';
 import {MissionTypeEnum} from '@src/models/fleets';
 import {ResourceAmount} from '@src/models/resources';
@@ -95,6 +97,10 @@ export function applyProduction(): void {
 
   // Updating objectives start time
   updateObjectivesTransfers(account);
+
+  // Start bots
+  startObjectivesBot();
+  startEspionageBot();
 
   setAccount(account);
 }

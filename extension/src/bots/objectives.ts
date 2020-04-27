@@ -39,11 +39,7 @@ function getUrl(account: Account, bt: BotTransfer): string {
   );
 }
 
-function handleTransfer(): void {
-  const account = getAccount();
-  if (account === undefined) {
-    return;
-  }
+function handleTransfer(account: Account): void {
   const bt = account.bots.objectives;
   if (bt === undefined) {
     return;
@@ -58,10 +54,12 @@ function handleTransfer(): void {
       goToUrl(getUrl(account, bt));
       break;
     case BotTransferStep.ValidateShips:
+      const inputVal = $('input[name="transporterLarge"]').val();
       if (
-        document.location.href !== url &&
-        !$('#fleet1').is(':visible') &&
-        $('input[name="transporterLarge"]').val() !== ''
+        document.location.href !== url ||
+        !$('#fleet1').is(':visible') ||
+        inputVal === undefined ||
+        inputVal === ''
       ) {
         return;
       }
@@ -70,7 +68,7 @@ function handleTransfer(): void {
       runScript(`if($('#fleet1').is(':visible')){fleetDispatcher.trySubmitFleet1();}`);
       break;
     case BotTransferStep.ValidateCoords:
-      if (document.location.href !== url && !$('#fleet2').is(':visible')) {
+      if (document.location.href !== url || !$('#fleet2').is(':visible')) {
         return;
       }
       bt.step = BotTransferStep.ValidateResources;
@@ -78,7 +76,7 @@ function handleTransfer(): void {
       runScript(`if($('#fleet2').is(':visible')){fleetDispatcher.trySubmitFleet2();}`);
       break;
     case BotTransferStep.ValidateResources:
-      if (document.location.href !== url && !$('#fleet3').is(':visible')) {
+      if (document.location.href !== url || !$('#fleet3').is(':visible')) {
         return;
       }
       bt.step = BotTransferStep.WaitingValidation;
@@ -113,7 +111,7 @@ function loop(): void {
   }
 
   if (account.bots.objectives !== undefined) {
-    handleTransfer();
+    handleTransfer(account);
     return;
   }
 
