@@ -144,8 +144,8 @@ export function randomWeightedBuildOrderWithOnlyMines(
   target: BuildItem,
   account: Account
 ): BuildItem[] {
-  return generateBuildOrder(target, account, (account, planetId, nextEssentialBuilds) => {
-    const planet = account.planets.get(planetId);
+  return generateBuildOrder(target, account, (accountArg, planetId, nextEssentialBuilds) => {
+    const planet = accountArg.planets.get(planetId);
     if (!planet) {
       throw new Error('Planet not found');
     }
@@ -165,7 +165,7 @@ export function randomWeightedBuildOrderWithOnlyMines(
     let totalScore = 0;
     const availableItemsAndScore: [BuildableRequirement, number][] = availableItems.map(item => {
       const score =
-        1 / toStandardUnits(account, buildItemCost(buildRequirementToBuildItem(item, planetId)));
+        1 / toStandardUnits(accountArg, buildItemCost(buildRequirementToBuildItem(item, planetId)));
       totalScore += score;
       return [item, score];
     });

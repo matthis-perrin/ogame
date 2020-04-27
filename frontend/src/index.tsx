@@ -1,20 +1,14 @@
+/* eslint-disable no-console */
 import {Chromosome} from '@shared/algogen/chromosome';
 import {mutationByInsert, mutationByRemove} from '@shared/algogen/mutation';
 import {generateInitialPopulation, nextGeneration} from '@shared/algogen/population';
 import {createNewAccount} from '@shared/lib/account';
 import {buildItemToString} from '@shared/lib/build_items';
-import {
-  generateBuildOrder,
-  randomWeightedNextBuildableRequirement,
-} from '@shared/lib/random_build_order';
-import {accountTimelineLibInPerfMode} from '@shared/lib/timeline';
 import {BuildItem} from '@shared/models/build_item';
 import {setupRapidFire, setupRequirements} from '@shared/models/dependencies';
 import {SmallCargo} from '@shared/models/ships';
 import {timeToString} from '@shared/models/time';
 import {Rosalind} from '@shared/models/universe';
-
-const {createAccountTimeline} = accountTimelineLibInPerfMode;
 
 setupRapidFire();
 setupRequirements();

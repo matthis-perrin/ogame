@@ -77,6 +77,9 @@ import {
 import {AccountTimeline, BuildItemTimeline, TransitionnedAccount} from '@shared/models/timeline';
 import {ceil, max, min, multiply, neverHappens, substract, sum} from '@shared/utils/type_utils';
 
+// eslint-disable-next-line @typescript-eslint/no-magic-numbers
+const MAX_TIMELINE_TIME = 1000 * 3600 * 24 * 365 * 3;
+
 interface AccountTimelineLib {
   createAccountTimeline(account: Account, buildItems: BuildItem[]): AccountTimeline;
   advanceAccountTowardBuildItem(account: Account, buildItem: BuildItem): TransitionnedAccount[];
@@ -790,7 +793,7 @@ function getAccountTimelineLib(mode: 'perf' | 'debug'): AccountTimelineLib {
     actualAdvanceTime: Milliseconds;
   } {
     const newCurrentTime = sum(account.currentTime, time);
-    if (newCurrentTime > 1000 * 3600 * 24 * 365 * 3) {
+    if (newCurrentTime > MAX_TIMELINE_TIME) {
       throw new Error('Passed 3 years');
     }
     let newAccount = account;

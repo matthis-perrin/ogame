@@ -1,10 +1,8 @@
 import {Chromosome, getLastAccount, sliceChromosome} from '@shared/algogen/chromosome';
-import {buildItemsAreEqual, buildItemToString} from '@shared/lib/build_items';
+import {buildItemsAreEqual} from '@shared/lib/build_items';
 import {canBeNextBuildItemAppliedOnAccount} from '@shared/lib/requirement_tree';
 import {accountTimelineLibInPerfMode} from '@shared/lib/timeline';
-import {Account} from '@shared/models/account';
 import {BuildItem} from '@shared/models/build_item';
-import {BuildItemTimeline} from '@shared/models/timeline';
 import {rand} from '@shared/utils/rand';
 
 const {advanceAccountTowardBuildItem, finishAllInProgress} = accountTimelineLibInPerfMode;
@@ -106,19 +104,19 @@ export function crossover(parent1: Chromosome, parent2: Chromosome): Chromosome[
     }
   }
 
-  for (const child of aliveChildren) {
-    if (child.buildOrder[child.buildOrder.length - 1].type !== 'ship') {
-      console.log('Parent 1');
-      console.log(parent1.buildOrder.map(bo => buildItemToString(bo)));
-      console.log('Parent 2');
-      console.log(parent2.buildOrder.map(bo => buildItemToString(bo)));
-      console.log('Child 1');
-      console.log(child1.buildOrder.map(bo => buildItemToString(bo)));
-      console.log('Child 2');
-      console.log(child2.buildOrder.map(bo => buildItemToString(bo)));
-      debugger;
-    }
-  }
+  // for (const child of aliveChildren) {
+  //   if (child.buildOrder[child.buildOrder.length - 1].type !== 'ship') {
+  //     console.log('Parent 1');
+  //     console.log(parent1.buildOrder.map(bo => buildItemToString(bo)));
+  //     console.log('Parent 2');
+  //     console.log(parent2.buildOrder.map(bo => buildItemToString(bo)));
+  //     console.log('Child 1');
+  //     console.log(child1.buildOrder.map(bo => buildItemToString(bo)));
+  //     console.log('Child 2');
+  //     console.log(child2.buildOrder.map(bo => buildItemToString(bo)));
+  //     debugger;
+  //   }
+  // }
 
   return aliveChildren;
 }

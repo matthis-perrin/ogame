@@ -148,6 +148,7 @@ export function canBeNextBuildItemAppliedOnAccount(
           planet.inProgressBuilding.level < requirement.level
         ) {
           if (buildItem.type === 'ship') {
+            // eslint-disable-next-line no-debugger
             debugger;
           }
           return false;
@@ -161,6 +162,7 @@ export function canBeNextBuildItemAppliedOnAccount(
           account.inProgressTechnology.level < requirement.level
         ) {
           if (buildItem.type === 'ship') {
+            // eslint-disable-next-line no-debugger
             debugger;
           }
           return false;
