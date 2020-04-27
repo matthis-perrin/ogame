@@ -240,3 +240,20 @@ export function isBuildItemAvailable(
   }
   return {isAvailable, willBeAvailableAt, reason};
 }
+
+export function flattenedRequirements(buildable: Buildable): BuildableRequirement[] {
+  const requirementMap = new Map<Technology | Building, number>();
+  for (const requirement of buildable.requirements) {
+    requirementMap.set(
+      requirement.entity,
+      Math.max(requirementMap.get(requirement.entity) ?? 0, requirement.level)
+    );
+    for (const subRequirements of flattenedRequirements(requirement.entity)) {
+      requirementMap.set(
+        subRequirements.entity,
+        Math.max(requirementMap.get(subRequirements.entity) ?? 0, subRequirements.level)
+      );
+    }
+  }
+  return Array.from(requirementMap.entries()).map(([entity, level]) => ({entity, level}));
+}

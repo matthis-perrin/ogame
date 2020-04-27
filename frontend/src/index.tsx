@@ -1,5 +1,5 @@
 import {Chromosome} from '@shared/algogen/chromosome';
-import {mutationByInsert} from '@shared/algogen/mutation';
+import {mutationByInsert, mutationByRemove} from '@shared/algogen/mutation';
 import {generateInitialPopulation, nextGeneration} from '@shared/algogen/population';
 import {createNewAccount} from '@shared/lib/account';
 import {buildItemToString} from '@shared/lib/build_items';
@@ -38,8 +38,8 @@ const smallCargoTarget: BuildItem = {
   quantity: 1,
 };
 
-let latestPopulation = generateInitialPopulation(account, smallCargoTarget, 100);
-for (let i = 0; i < 30; i++) {
+let latestPopulation = generateInitialPopulation(account, smallCargoTarget, 10);
+for (let i = 0; i < 2; i++) {
   console.log(
     `=== Time: ${timeToString(
       latestPopulation.topChromosomes[0].accountTimeline.currentAccount.currentTime
@@ -52,5 +52,7 @@ for (let i = 0; i < 30; i++) {
 }
 console.log(latestPopulation);
 printChromosome(latestPopulation.topChromosomes[0]);
-console.log('----');
-mutationByInsert(latestPopulation.topChromosomes[0]);
+console.log('mutationByInsert');
+console.log(mutationByInsert(latestPopulation.topChromosomes[0]));
+console.log('mutationByRemove');
+console.log(mutationByRemove(latestPopulation.topChromosomes[0]));
