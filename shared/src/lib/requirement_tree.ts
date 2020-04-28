@@ -1,3 +1,4 @@
+import {getLastAccount} from '@shared/algogen/chromosome';
 import {buildableRequirementToString} from '@shared/lib/build_items';
 import {Account} from '@shared/models/account';
 import {BuildItem} from '@shared/models/build_item';
@@ -5,6 +6,7 @@ import {Buildable, BuildableRequirement} from '@shared/models/buildable';
 import {Building} from '@shared/models/building';
 import {Technology} from '@shared/models/technology';
 import {Milliseconds, NEVER, ZERO} from '@shared/models/time';
+import {AccountTimeline} from '@shared/models/timeline';
 import {neverHappens} from '@shared/utils/type_utils';
 
 export interface RequirementTree {
@@ -102,10 +104,14 @@ export function removeRequirementFromTree(
   removeRequirementFromTreeNode(buildTree, requirement);
 }
 
-export function canBeNextBuildItemAppliedOnAccount(
-  account: Account,
+export function canBeNextBuildItemAppliedOnAccountTimeline(
+  accountTimeline: AccountTimeline,
   buildItem: BuildItem
 ): boolean {
+  const account =
+    accountTimeline.buildItemTimelines.length > 0
+      ? getLastAccount(accountTimeline.buildItemTimelines)
+      : accountTimeline.start;
   if (buildItem.type === 'technology') {
     const technoLevel = account.technologyLevels.get(buildItem.buildable) ?? 0;
     const inProgressTechnoLevel =

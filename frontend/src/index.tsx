@@ -1,7 +1,10 @@
 /* eslint-disable no-console */
 import {Chromosome} from '@shared/algogen/chromosome';
-import {mutationByInsert, mutationByRemove, mutationBySwap} from '@shared/algogen/mutation';
-import {generateInitialPopulation, nextGeneration} from '@shared/algogen/population';
+import {
+  generateInitialPopulation,
+  GeneticOptions,
+  nextGeneration,
+} from '@shared/algogen/population';
 import {createNewAccount} from '@shared/lib/account';
 import {buildItemToString} from '@shared/lib/build_items';
 import {BuildItem} from '@shared/models/build_item';
@@ -32,23 +35,33 @@ const smallCargoTarget: BuildItem = {
   quantity: 1,
 };
 
-let latestPopulation = generateInitialPopulation(account, smallCargoTarget, 10);
-for (let i = 0; i < 2; i++) {
-  console.log(
-    `=== Time: ${timeToString(
-      latestPopulation.topChromosomes[0].accountTimeline.currentAccount.currentTime
-    )} ===`
-  );
+const options: GeneticOptions = {
+  populationSize: 1000,
+  topChromosomeCount: 10,
+  swapMutationRate: 0.2,
+  insertMutationRate: 0.2,
+  deleteMutationRate: 0.2,
+};
+
+const generationCount = 30;
+
+const start = Date.now();
+let latestPopulation = generateInitialPopulation(account, smallCargoTarget, options);
+const postInitial = Date.now();
+console.log('generateInitialPopulation', `${(postInitial - start).toLocaleString()} ms`);
+for (let i = 0; i < generationCount; i++) {
   // if (i % 10 === 0) {
   //   printChromosome(latestPopulation.topChromosomes[0]);
   // }
-  latestPopulation = nextGeneration(latestPopulation);
+  const genStart = Date.now();
+  latestPopulation = nextGeneration(latestPopulation, options);
+  console.log(
+    'nextGeneration',
+    `${(Date.now() - genStart).toLocaleString()} ms`,
+    'Best',
+    timeToString(latestPopulation.topChromosomes[0].accountTimeline.currentAccount.currentTime)
+  );
 }
 console.log(latestPopulation);
 printChromosome(latestPopulation.topChromosomes[0]);
-console.log('mutationByInsert');
-console.log(mutationByInsert(latestPopulation.topChromosomes[0]));
-console.log('mutationByRemove');
-console.log(mutationByRemove(latestPopulation.topChromosomes[0]));
-console.log('mutationBySwap');
-console.log(mutationBySwap(latestPopulation.topChromosomes[0]));
+console.log('Total', `${(Date.now() - start).toLocaleString()} ms`);

@@ -2,9 +2,14 @@ import {Account} from '@shared/models/account';
 import {BuildItem} from '@shared/models/build_item';
 import {AccountTimeline, BuildItemTimeline} from '@shared/models/timeline';
 
+export interface ChromosomeSource {
+  ancestors: Chromosome[];
+  reason: string;
+}
+
 export interface Chromosome {
   buildOrder: BuildItem[];
-  parents: Chromosome[];
+  source: ChromosomeSource;
   accountTimeline: AccountTimeline;
 }
 
@@ -31,19 +36,17 @@ export function getAccountAtBuildOrderIndex(timeline: AccountTimeline, index: nu
 
 export function sliceChromosome(
   chromosome: Chromosome,
-  parents: Chromosome[],
+  source: ChromosomeSource,
   index: number
 ): Chromosome {
   const {buildOrder, accountTimeline} = chromosome;
   const {start, buildItemTimelines} = accountTimeline;
   const newBuildItemTimelines = buildItemTimelines.slice(0, index);
+  const currentAccount =
+    newBuildItemTimelines.length === 0 ? start : getLastAccount(newBuildItemTimelines);
   return {
     buildOrder: buildOrder.slice(0, index),
-    parents,
-    accountTimeline: {
-      start,
-      currentAccount: getLastAccount(newBuildItemTimelines),
-      buildItemTimelines: newBuildItemTimelines,
-    },
+    source,
+    accountTimeline: {start, currentAccount, buildItemTimelines: newBuildItemTimelines},
   };
 }

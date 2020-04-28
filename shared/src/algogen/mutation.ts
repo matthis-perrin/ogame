@@ -4,8 +4,9 @@ import {
   getLastAccount,
   sliceChromosome,
 } from '@shared/algogen/chromosome';
+import {buildItemToString} from '@shared/lib/build_items';
 import {
-  canBeNextBuildItemAppliedOnAccount,
+  canBeNextBuildItemAppliedOnAccountTimeline,
   flattenedRequirements,
   isBuildItemAvailable,
 } from '@shared/lib/requirement_tree';
@@ -20,44 +21,58 @@ import {rand} from '@shared/utils/rand';
 const {advanceAccountTowardBuildItem, finishAllInProgress} = accountTimelineLibInPerfMode;
 
 function getInsertableBuildItem(chromosome: Chromosome): BuildItem[] {
-  const account = chromosome.accountTimeline.currentAccount;
   const usefulTechno = AllTechnologies.filter(t => t.isUseful);
   const usefulBuildings = AllBuildings.filter(t => t.isBuildOrderBuilding);
+  const highestLevelItemsByPlanet = new Map<PlanetId, Map<Technology | Building, number>>();
 
-  const buildItems: BuildItem[] = [];
-
-  if (account.inProgressTechnology) {
-    throw new Error(`Technology still in progress on account for this chromosome`);
+  for (const buildItem of chromosome.buildOrder) {
+    let highestLevelItems = highestLevelItemsByPlanet.get(buildItem.planetId);
+    if (!highestLevelItems) {
+      highestLevelItems = new Map<Technology | Building, number>();
+      highestLevelItemsByPlanet.set(buildItem.planetId, highestLevelItems);
+    }
+    if (buildItem.type === 'technology' || buildItem.type === 'building') {
+      highestLevelItems.set(
+        buildItem.buildable,
+        Math.max(highestLevelItems.get(buildItem.buildable) ?? 0, buildItem.level)
+      );
+    }
   }
 
+  const account = chromosome.accountTimeline.currentAccount;
+  const possibleInsertableItems: BuildItem[] = [];
   for (const planet of Array.from(account.planets.values())) {
     usefulTechno.forEach(techno => {
-      const item: BuildItem = {
+      possibleInsertableItems.push({
         type: 'technology',
         buildable: techno,
-        level: (account.technologyLevels.get(techno) ?? 0) + 1,
+        level: (highestLevelItemsByPlanet.get(planet.id)?.get(techno) ?? 0) + 1,
         planetId: planet.id,
-      };
-      if (isBuildItemAvailable(account, item).isAvailable) {
-        buildItems.push(item);
-      }
+      });
     });
-
     usefulBuildings.forEach(building => {
-      const item: BuildItem = {
+      possibleInsertableItems.push({
         type: 'building',
         buildable: building,
-        level: (planet.buildingLevels.get(building) ?? 0) + 1,
+        level: (highestLevelItemsByPlanet.get(planet.id)?.get(building) ?? 0) + 1,
         planetId: planet.id,
-      };
-      if (isBuildItemAvailable(account, item).isAvailable) {
-        buildItems.push(item);
-      }
+      });
     });
   }
 
   // TODO - Good place to also add Crawler creation (or even production factor adjustements?)
-  return buildItems;
+
+  return possibleInsertableItems.filter(item => {
+    for (const requirement of item.buildable.requirements) {
+      if (
+        (highestLevelItemsByPlanet.get(item.planetId)?.get(requirement.entity) ?? 0) <
+        requirement.level
+      ) {
+        return false;
+      }
+    }
+    return true;
+  });
 }
 
 function getRemovableIndexes(chromosome: Chromosome): number[] {
@@ -199,38 +214,54 @@ export function mutationByInsert(chromosome: Chromosome): Chromosome {
   // Get a random item to inset
   const insertables = getInsertableBuildItem(chromosome);
   const toInsert = insertables[rand(0, insertables.length - 1)];
+  const toInsertRequirements = flattenedRequirements(toInsert.buildable);
 
   // Figure out the first index it can be inserted at
-  let firstIndexToInsert = 0;
-  const initialAvailability = isBuildItemAvailable(chromosome.accountTimeline.start, toInsert);
-  if (!(initialAvailability.isAvailable || initialAvailability.willBeAvailableAt !== NEVER)) {
-    for (let i = 0; i < chromosome.accountTimeline.buildItemTimelines.length - 1; i++) {
-      const availabilityAtIndex = isBuildItemAvailable(
-        getAccountAtBuildOrderIndex(chromosome.accountTimeline, i),
-        toInsert
+  const highestLevelItemsByPlanet = new Map<PlanetId, Map<Technology | Building, number>>();
+  let firstIndexToInsert = chromosome.accountTimeline.buildItemTimelines.length - 1;
+  for (let index = 0; index < chromosome.buildOrder.length; index++) {
+    const buildItem = chromosome.buildOrder[index];
+    let highestLevelItems = highestLevelItemsByPlanet.get(buildItem.planetId);
+    if (!highestLevelItems) {
+      highestLevelItems = new Map<Technology | Building, number>();
+      highestLevelItemsByPlanet.set(buildItem.planetId, highestLevelItems);
+    }
+    if (buildItem.type === 'technology' || buildItem.type === 'building') {
+      highestLevelItems.set(
+        buildItem.buildable,
+        Math.max(highestLevelItems.get(buildItem.buildable) ?? 0, buildItem.level)
       );
-      if (availabilityAtIndex.isAvailable || availabilityAtIndex.willBeAvailableAt !== NEVER) {
-        firstIndexToInsert = i + 1;
-        break;
+    }
+
+    if (
+      (toInsert.type === 'building' || toInsert.type === 'technology') &&
+      (highestLevelItems.get(toInsert.buildable) ?? 0) !== toInsert.level - 1
+    ) {
+      continue;
+    }
+    for (const requirement of toInsertRequirements) {
+      if ((highestLevelItems.get(requirement.entity) ?? 0) < requirement.level) {
+        continue;
       }
     }
+    firstIndexToInsert = index + 1;
+    break;
   }
 
   // Choose an index to insert at random
   const indexToInsert = rand(
     firstIndexToInsert,
-    chromosome.accountTimeline.buildItemTimelines.length
+    chromosome.accountTimeline.buildItemTimelines.length - 1
   );
 
   // Rebuild a new chromosome with the build item at the index
-  const mutatedChromosome = sliceChromosome(chromosome, [chromosome], indexToInsert);
+  const mutatedChromosome = sliceChromosome(
+    chromosome,
+    {ancestors: [chromosome], reason: `mutation by insert (at index ${indexToInsert})`},
+    indexToInsert
+  );
   for (const buildItem of [toInsert, ...chromosome.buildOrder.slice(indexToInsert)]) {
-    if (
-      canBeNextBuildItemAppliedOnAccount(
-        getLastAccount(mutatedChromosome.accountTimeline.buildItemTimelines),
-        buildItem
-      )
-    ) {
+    if (canBeNextBuildItemAppliedOnAccountTimeline(mutatedChromosome.accountTimeline, buildItem)) {
       // OK since we sliced the chromosome, which creates new `buildOrder` and `buildItemTimelines` references
       mutatedChromosome.buildOrder.push(buildItem);
       mutatedChromosome.accountTimeline.buildItemTimelines.push({
@@ -241,6 +272,13 @@ export function mutationByInsert(chromosome: Chromosome): Chromosome {
         ),
       });
     } else {
+      // eslint-disable-next-line no-debugger
+      console.log('insertables', insertables);
+      console.log('toInsert', buildItemToString(toInsert));
+      console.log('failed at', buildItemToString(buildItem));
+      console.log('started with', chromosome);
+      console.log('mutated so far', mutatedChromosome);
+      debugger;
       throw new Error(`Should never happen`);
     }
   }
@@ -262,14 +300,13 @@ export function mutationByRemove(chromosome: Chromosome): Chromosome {
   const indexToRemove = removableIndexes[rand(0, removableIndexes.length - 1)];
 
   // Rebuild a new chromosome without the build item at the index
-  const mutatedChromosome = sliceChromosome(chromosome, [chromosome], indexToRemove);
+  const mutatedChromosome = sliceChromosome(
+    chromosome,
+    {ancestors: [chromosome], reason: `mutation by remove (at index ${indexToRemove})`},
+    indexToRemove
+  );
   for (const buildItem of chromosome.buildOrder.slice(indexToRemove + 1)) {
-    if (
-      canBeNextBuildItemAppliedOnAccount(
-        getLastAccount(mutatedChromosome.accountTimeline.buildItemTimelines),
-        buildItem
-      )
-    ) {
+    if (canBeNextBuildItemAppliedOnAccountTimeline(mutatedChromosome.accountTimeline, buildItem)) {
       // OK since we sliced the chromosome, which creates new `buildOrder` and `buildItemTimelines` references
       mutatedChromosome.buildOrder.push(buildItem);
       mutatedChromosome.accountTimeline.buildItemTimelines.push({
@@ -280,6 +317,13 @@ export function mutationByRemove(chromosome: Chromosome): Chromosome {
         ),
       });
     } else {
+      // eslint-disable-next-line no-debugger
+      console.log('removableIndexes', removableIndexes);
+      console.log('indexToRemove', indexToRemove);
+      console.log('failed at', buildItemToString(buildItem));
+      console.log('started with', chromosome);
+      console.log('mutated so far', mutatedChromosome);
+      debugger;
       throw new Error(`Should never happen`);
     }
   }
@@ -300,45 +344,60 @@ export function mutationBySwap(chromosome: Chromosome): Chromosome {
   //   Not allowed to swap the last since it's the target
   const firstSwapIndex = rand(0, chromosome.buildOrder.length - 2);
   const swapableIndexes = getIndexesSwapableWith(chromosome, firstSwapIndex);
+  if (swapableIndexes.length === 0) {
+    return mutationBySwap(chromosome);
+  }
   const secondSwapIndex = swapableIndexes[rand(0, swapableIndexes.length - 1)];
 
   const smallestSwapIndex = Math.min(firstSwapIndex, secondSwapIndex);
   const largestSwapIndex = Math.max(firstSwapIndex, secondSwapIndex);
 
   // Rebuild a new chromosome with the build items swaped
-  const mutatedChromosome = sliceChromosome(chromosome, [chromosome], smallestSwapIndex);
+  const mutatedChromosome = sliceChromosome(
+    chromosome,
+    {
+      ancestors: [chromosome],
+      reason: `mutation by swap (index ${smallestSwapIndex} and ${largestSwapIndex})`,
+    },
+    smallestSwapIndex
+  );
+  const accountTimeline = mutatedChromosome.accountTimeline;
   const remainingBuildItems = chromosome.buildOrder.slice(smallestSwapIndex);
   const temp = remainingBuildItems[0];
   remainingBuildItems[0] = remainingBuildItems[largestSwapIndex - smallestSwapIndex];
   remainingBuildItems[largestSwapIndex - smallestSwapIndex] = temp;
   for (const buildItem of remainingBuildItems) {
-    if (
-      canBeNextBuildItemAppliedOnAccount(
-        getLastAccount(mutatedChromosome.accountTimeline.buildItemTimelines),
-        buildItem
-      )
-    ) {
+    if (canBeNextBuildItemAppliedOnAccountTimeline(mutatedChromosome.accountTimeline, buildItem)) {
       // OK since we sliced the chromosome, which creates new `buildOrder` and `buildItemTimelines` references
       mutatedChromosome.buildOrder.push(buildItem);
-      mutatedChromosome.accountTimeline.buildItemTimelines.push({
+      const account =
+        accountTimeline.buildItemTimelines.length > 0
+          ? getLastAccount(accountTimeline.buildItemTimelines)
+          : mutatedChromosome.accountTimeline.start;
+      accountTimeline.buildItemTimelines.push({
         buildItem,
-        transitions: advanceAccountTowardBuildItem(
-          getLastAccount(mutatedChromosome.accountTimeline.buildItemTimelines),
-          buildItem
-        ),
+        transitions: advanceAccountTowardBuildItem(account, buildItem),
       });
     } else {
+      // eslint-disable-next-line no-debugger
+      console.log('firstSwapIndex', firstSwapIndex);
+      console.log('swapableIndexes', swapableIndexes);
+      console.log('secondSwapIndex', secondSwapIndex);
+      console.log('failed at', buildItemToString(buildItem));
+      console.log('started with', chromosome);
+      console.log('mutated so far', mutatedChromosome);
+      debugger;
       throw new Error(`Should never happen`);
     }
   }
   mutatedChromosome.accountTimeline.currentAccount = getLastAccount(
-    mutatedChromosome.accountTimeline.buildItemTimelines
+    accountTimeline.buildItemTimelines
   );
-  mutatedChromosome.accountTimeline.buildItemTimelines[
-    mutatedChromosome.accountTimeline.buildItemTimelines.length - 1
+  accountTimeline.buildItemTimelines[
+    accountTimeline.buildItemTimelines.length - 1
   ].transitions.push(...finishAllInProgress(mutatedChromosome.accountTimeline.currentAccount));
   mutatedChromosome.accountTimeline.currentAccount = getLastAccount(
-    mutatedChromosome.accountTimeline.buildItemTimelines
+    accountTimeline.buildItemTimelines
   );
 
   return mutatedChromosome;

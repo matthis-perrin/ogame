@@ -1,5 +1,6 @@
 import {Chromosome} from '@shared/algogen/chromosome';
 import {crossover} from '@shared/algogen/crossover';
+import {mutationByInsert, mutationByRemove, mutationBySwap} from '@shared/algogen/mutation';
 import {
   generateBuildOrder,
   randomWeightedNextBuildableRequirement,
@@ -10,8 +11,14 @@ import {BuildItem} from '@shared/models/build_item';
 
 const {createAccountTimeline} = accountTimelineLibInPerfMode;
 
-// Keep an history of the top `TOP_CHROMOSOME_COUNT` best chromosomes
-const TOP_CHROMOSOME_COUNT = 10;
+export interface GeneticOptions {
+  // Keep an history of the top `TOP_CHROMOSOME_COUNT` best chromosomes
+  topChromosomeCount: number;
+  populationSize: number;
+  swapMutationRate: number;
+  insertMutationRate: number;
+  deleteMutationRate: number;
+}
 
 interface Population {
   generation: number;
@@ -19,17 +26,17 @@ interface Population {
   chromosomes: Chromosome[];
 }
 
-function getTopChromosomes(chromosomes: Chromosome[]): Chromosome[] {
+function getTopChromosomes(chromosomes: Chromosome[], topChromosomeCount: number): Chromosome[] {
   return chromosomes
     .sort(
       (c1, c2) =>
         c1.accountTimeline.currentAccount.currentTime -
         c2.accountTimeline.currentAccount.currentTime
     )
-    .slice(0, TOP_CHROMOSOME_COUNT);
+    .slice(0, topChromosomeCount);
 }
 
-export function nextGeneration(population: Population): Population {
+export function nextGeneration(population: Population, options: GeneticOptions): Population {
   let minCurrentTime = Infinity;
   let maxCurrentTime = 0;
 
@@ -55,6 +62,12 @@ export function nextGeneration(population: Population): Population {
     });
   }
 
+  console.log('===== FITNESSES =====');
+  console.log(
+    chromosomesWithFitness.sort((c1, c2) => c2.fitness - c1.fitness).map(({fitness}) => fitness)
+  );
+  console.log('=====================');
+
   function selectChromosome(banned?: Chromosome): Chromosome {
     const r = Math.random() * fitnessSum;
     let current = 0;
@@ -77,28 +90,54 @@ export function nextGeneration(population: Population): Population {
     const children = crossover(parent1, parent2);
     newChromosomes.push(...children);
   }
+  const newTopChromosomes = getTopChromosomes(
+    population.topChromosomes.concat(newChromosomes),
+    options.topChromosomeCount
+  );
 
-  const newTopChromosomes = getTopChromosomes(population.topChromosomes.concat(newChromosomes));
+  // Mutation phase
+  const mutatedChromosome = newChromosomes.map(c => {
+    let mutated = c;
+    try {
+      if (Math.random() < options.swapMutationRate) {
+        mutated = mutationBySwap(c);
+      }
+      if (Math.random() < options.insertMutationRate) {
+        mutated = mutationByInsert(c);
+      }
+      if (Math.random() < options.deleteMutationRate) {
+        mutated = mutationByRemove(c);
+      }
+    } catch {
+      // If a mutation creates a chromosome that dies, we'll just return the chromosome
+      // before the mutation
+    }
+    return mutated;
+  });
+  const topChromosomesAfterMutations = getTopChromosomes(
+    newTopChromosomes.concat(mutatedChromosome),
+    options.topChromosomeCount
+  );
 
   return {
     generation: population.generation + 1,
-    topChromosomes: newTopChromosomes,
-    chromosomes: newChromosomes,
+    topChromosomes: topChromosomesAfterMutations,
+    chromosomes: mutatedChromosome,
   };
 }
 
 export function generateInitialPopulation(
   account: Account,
   target: BuildItem,
-  size: number
+  options: GeneticOptions
 ): Population {
   const chromosomes: Chromosome[] = [];
-  while (chromosomes.length < size) {
+  while (chromosomes.length < options.populationSize) {
     const buildOrder = generateBuildOrder(target, account, randomWeightedNextBuildableRequirement);
     try {
       const chromosome = {
         buildOrder,
-        parents: ([] as unknown) as [Chromosome, Chromosome],
+        source: {ancestors: [], reason: 'initial population'},
         accountTimeline: createAccountTimeline(account, buildOrder),
       };
       chromosomes.push(chromosome);
@@ -107,6 +146,6 @@ export function generateInitialPopulation(
     }
   }
 
-  const topChromosomes = getTopChromosomes(chromosomes);
+  const topChromosomes = getTopChromosomes(chromosomes, options.topChromosomeCount);
   return {generation: 0, chromosomes, topChromosomes};
 }

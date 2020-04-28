@@ -1,6 +1,11 @@
-import {Chromosome, getLastAccount, sliceChromosome} from '@shared/algogen/chromosome';
+import {
+  Chromosome,
+  ChromosomeSource,
+  getLastAccount,
+  sliceChromosome,
+} from '@shared/algogen/chromosome';
 import {buildItemsAreEqual} from '@shared/lib/build_items';
-import {canBeNextBuildItemAppliedOnAccount} from '@shared/lib/requirement_tree';
+import {canBeNextBuildItemAppliedOnAccountTimeline} from '@shared/lib/requirement_tree';
 import {accountTimelineLibInPerfMode} from '@shared/lib/timeline';
 import {BuildItem} from '@shared/models/build_item';
 import {rand} from '@shared/utils/rand';
@@ -18,15 +23,16 @@ function alreadyInBuildOrder(buildOrder: BuildItem[], buildItem: BuildItem): boo
 
 export function crossover(parent1: Chromosome, parent2: Chromosome): Chromosome[] {
   const crossPoint = rand(1, Math.min(parent1.buildOrder.length, parent2.buildOrder.length) - 2);
+  const source: ChromosomeSource = {
+    ancestors: [parent1, parent2],
+    reason: 'crossover',
+  };
 
-  const child1: Chromosome = sliceChromosome(parent1, [parent1, parent2], crossPoint);
+  const child1: Chromosome = sliceChromosome(parent1, source, crossPoint);
   let child1Died = false;
   for (const buildItem of parent2.buildOrder) {
     if (
-      canBeNextBuildItemAppliedOnAccount(
-        getLastAccount(child1.accountTimeline.buildItemTimelines),
-        buildItem
-      ) &&
+      canBeNextBuildItemAppliedOnAccountTimeline(child1.accountTimeline, buildItem) &&
       !alreadyInBuildOrder(child1.buildOrder, buildItem)
     ) {
       // OK since we sliced the chromosome, which creates new `buildOrder` and `buildItemTimelines` references
@@ -47,14 +53,11 @@ export function crossover(parent1: Chromosome, parent2: Chromosome): Chromosome[
   }
   child1.accountTimeline.currentAccount = getLastAccount(child1.accountTimeline.buildItemTimelines);
 
-  const child2 = sliceChromosome(parent2, [parent1, parent2], crossPoint);
+  const child2 = sliceChromosome(parent2, source, crossPoint);
   let child2Died = false;
   for (const buildItem of parent1.buildOrder) {
     if (
-      canBeNextBuildItemAppliedOnAccount(
-        getLastAccount(child2.accountTimeline.buildItemTimelines),
-        buildItem
-      ) &&
+      canBeNextBuildItemAppliedOnAccountTimeline(child2.accountTimeline, buildItem) &&
       !alreadyInBuildOrder(child2.buildOrder, buildItem)
     ) {
       // OK since we sliced the chromosome, which creates new `buildOrder` and `buildItemTimelines` references
