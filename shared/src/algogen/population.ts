@@ -20,6 +20,8 @@ export interface GeneticOptions {
   topChromosomeCount: number;
   // How many chromosomes in the population
   populationSize: number;
+  // How many of the top chromosomes are always kept in the population
+  elitismCount: number;
   // Insert new random chromosome to the generation before computing the next one
   newRandomPerGeneration: number;
   // Probability for a child chromosome to go through a mutation by swap after a crossover
@@ -106,7 +108,7 @@ export function nextGeneration(population: Population, options: GeneticOptions):
   }
 
   const newChromosomes: Chromosome[] = [];
-  while (newChromosomes.length < population.chromosomes.length) {
+  while (newChromosomes.length < options.populationSize - options.elitismCount) {
     const parent1 = selectChromosome();
     const parent2 = selectChromosome(parent1);
     const children = crossover(parent1, parent2);
@@ -144,7 +146,10 @@ export function nextGeneration(population: Population, options: GeneticOptions):
   return {
     generation: population.generation + 1,
     topChromosomes: topChromosomesAfterMutations,
-    chromosomes: mutatedChromosome,
+    chromosomes: [
+      ...mutatedChromosome,
+      ...topChromosomesAfterMutations.slice(0, options.elitismCount),
+    ],
   };
 }
 

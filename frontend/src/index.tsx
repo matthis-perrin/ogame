@@ -40,6 +40,7 @@ const options: GeneticOptions = {
   target: smallCargoTarget,
   newRandomPerGeneration: 10,
   populationSize: 100,
+  elitismCount: 3,
   topChromosomeCount: 10,
   swapMutationRate: 0.2,
   insertMutationRate: 0.2,
