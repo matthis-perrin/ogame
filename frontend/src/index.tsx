@@ -36,7 +36,10 @@ const smallCargoTarget: BuildItem = {
 };
 
 const options: GeneticOptions = {
-  populationSize: 1000,
+  startAccount: account,
+  target: smallCargoTarget,
+  newRandomPerGeneration: 10,
+  populationSize: 100,
   topChromosomeCount: 10,
   swapMutationRate: 0.2,
   insertMutationRate: 0.2,
@@ -46,7 +49,7 @@ const options: GeneticOptions = {
 const generationCount = 30;
 
 const start = Date.now();
-let latestPopulation = generateInitialPopulation(account, smallCargoTarget, options);
+let latestPopulation = generateInitialPopulation(options);
 const postInitial = Date.now();
 console.log('generateInitialPopulation', `${(postInitial - start).toLocaleString()} ms`);
 for (let i = 0; i < generationCount; i++) {

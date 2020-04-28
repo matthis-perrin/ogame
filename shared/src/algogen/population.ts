@@ -12,11 +12,21 @@ import {BuildItem} from '@shared/models/build_item';
 const {createAccountTimeline} = accountTimelineLibInPerfMode;
 
 export interface GeneticOptions {
+  // The account we start with (starting point before applying build order items)
+  startAccount: Account;
+  // The target buildable we want at the end of the build order
+  target: BuildItem;
   // Keep an history of the top `TOP_CHROMOSOME_COUNT` best chromosomes
   topChromosomeCount: number;
+  // How many chromosomes in the population
   populationSize: number;
+  // Insert new random chromosome to the generation before computing the next one
+  newRandomPerGeneration: number;
+  // Probability for a child chromosome to go through a mutation by swap after a crossover
   swapMutationRate: number;
+  // Probability for a child chromosome to go through a mutation by insertion after a crossover
   insertMutationRate: number;
+  // Probability for a child chromosome to go through a mutation by deletion after a crossover
   deleteMutationRate: number;
 }
 
@@ -40,6 +50,24 @@ export function nextGeneration(population: Population, options: GeneticOptions):
   let minCurrentTime = Infinity;
   let maxCurrentTime = 0;
 
+  for (let index = 0; index < options.newRandomPerGeneration; index++) {
+    const buildOrder = generateBuildOrder(
+      options.target,
+      options.startAccount,
+      randomWeightedNextBuildableRequirement
+    );
+    try {
+      const chromosome = {
+        buildOrder,
+        source: {ancestors: [], reason: 'initial population'},
+        accountTimeline: createAccountTimeline(options.startAccount, buildOrder),
+      };
+      population.chromosomes.push(chromosome);
+    } catch {
+      // we're cool with it
+    }
+  }
+
   for (const chromosome of population.chromosomes) {
     const time = chromosome.accountTimeline.currentAccount.currentTime;
     if (time < minCurrentTime) {
@@ -61,12 +89,6 @@ export function nextGeneration(population: Population, options: GeneticOptions):
       fitness,
     });
   }
-
-  console.log('===== FITNESSES =====');
-  console.log(
-    chromosomesWithFitness.sort((c1, c2) => c2.fitness - c1.fitness).map(({fitness}) => fitness)
-  );
-  console.log('=====================');
 
   function selectChromosome(banned?: Chromosome): Chromosome {
     const r = Math.random() * fitnessSum;
@@ -126,19 +148,19 @@ export function nextGeneration(population: Population, options: GeneticOptions):
   };
 }
 
-export function generateInitialPopulation(
-  account: Account,
-  target: BuildItem,
-  options: GeneticOptions
-): Population {
+export function generateInitialPopulation(options: GeneticOptions): Population {
   const chromosomes: Chromosome[] = [];
   while (chromosomes.length < options.populationSize) {
-    const buildOrder = generateBuildOrder(target, account, randomWeightedNextBuildableRequirement);
+    const buildOrder = generateBuildOrder(
+      options.target,
+      options.startAccount,
+      randomWeightedNextBuildableRequirement
+    );
     try {
       const chromosome = {
         buildOrder,
         source: {ancestors: [], reason: 'initial population'},
-        accountTimeline: createAccountTimeline(account, buildOrder),
+        accountTimeline: createAccountTimeline(options.startAccount, buildOrder),
       };
       chromosomes.push(chromosome);
     } catch {
