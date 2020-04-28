@@ -116,13 +116,7 @@ export function canBeNextBuildItemAppliedOnAccount(
 
     // For techno with level > 1, all we need is the previous level done (or in progress)
     if (buildItem.level > 1) {
-      return technoLevel === buildItem.level - 1 || inProgressTechnoLevel === buildItem.level - 1;
-    }
-    // Otherwise, we need the techno never done (and not in progress)
-    else {
-      if (technoLevel > 0 || inProgressTechnoLevel > 0) {
-        return false;
-      }
+      return technoLevel >= buildItem.level - 1 || inProgressTechnoLevel >= buildItem.level - 1;
     }
   }
 
@@ -140,15 +134,7 @@ export function canBeNextBuildItemAppliedOnAccount(
 
     // For building with level > 1, all we need is the previous level done (or in progress)
     if (buildItem.level > 1) {
-      return (
-        buildingLevel === buildItem.level - 1 || inProgressBuildingLevel === buildItem.level - 1
-      );
-    }
-    // Otherwise, we need the building never done (and not in progress)
-    else {
-      if (buildingLevel > 0 || inProgressBuildingLevel > 0) {
-        return false;
-      }
+      return buildingLevel >= buildItem.level - 1 || inProgressBuildingLevel >= buildItem.level - 1;
     }
   }
 
@@ -161,6 +147,10 @@ export function canBeNextBuildItemAppliedOnAccount(
           planet.inProgressBuilding.building !== requirement.entity ||
           planet.inProgressBuilding.level < requirement.level
         ) {
+          if (buildItem.type === 'ship') {
+            // eslint-disable-next-line no-debugger
+            debugger;
+          }
           return false;
         }
       }
@@ -171,6 +161,10 @@ export function canBeNextBuildItemAppliedOnAccount(
           account.inProgressTechnology.technology !== requirement.entity ||
           account.inProgressTechnology.level < requirement.level
         ) {
+          if (buildItem.type === 'ship') {
+            // eslint-disable-next-line no-debugger
+            debugger;
+          }
           return false;
         }
       }
@@ -247,4 +241,21 @@ export function isBuildItemAvailable(
     }
   }
   return {isAvailable, willBeAvailableAt, reason};
+}
+
+export function flattenedRequirements(buildable: Buildable): BuildableRequirement[] {
+  const requirementMap = new Map<Technology | Building, number>();
+  for (const requirement of buildable.requirements) {
+    requirementMap.set(
+      requirement.entity,
+      Math.max(requirementMap.get(requirement.entity) ?? 0, requirement.level)
+    );
+    for (const subRequirements of flattenedRequirements(requirement.entity)) {
+      requirementMap.set(
+        subRequirements.entity,
+        Math.max(requirementMap.get(subRequirements.entity) ?? 0, subRequirements.level)
+      );
+    }
+  }
+  return Array.from(requirementMap.entries()).map(([entity, level]) => ({entity, level}));
 }

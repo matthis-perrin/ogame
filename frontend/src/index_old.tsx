@@ -1,36 +1,36 @@
-import {uniqBy} from 'lodash-es';
-import React from 'react';
-import ReactDOM from 'react-dom';
+// import {uniqBy} from 'lodash-es';
+// import React from 'react';
+// import ReactDOM from 'react-dom';
 
-import {createNewAccount} from '@shared/lib/account';
-import {buildableRequirementToString, buildItemToString} from '@shared/lib/build_items';
-import {
-  computeRequirementTree,
-  getRequirementTreeLeaves,
-  isBuildItemAvailable,
-} from '@shared/lib/requirement_tree';
-import {
-  createAccountTimelineInDebugMode,
-  createAccountTimelineInPerfMode,
-} from '@shared/lib/timeline';
-import {Account} from '@shared/models/account';
-import {BuildItem} from '@shared/models/build_item';
-import {BuildableRequirement} from '@shared/models/buildable';
-import {CrystalMine, DeuteriumSynthesizer, MetalMine} from '@shared/models/building';
-import {setupRapidFire, setupRequirements} from '@shared/models/dependencies';
-import {Planet, PlanetId} from '@shared/models/planet';
-import {Destroyer, SmallCargo} from '@shared/models/ships';
-import {Milliseconds, NEVER, timeToString} from '@shared/models/time';
-import {AccountTimeline} from '@shared/models/timeline';
-import {Rosalind} from '@shared/models/universe';
-import {min, neverHappens, removeUndefined} from '@shared/utils/type_utils';
+// import {createNewAccount} from '@shared/lib/account';
+// import {buildableRequirementToString, buildItemToString} from '@shared/lib/build_items';
+// import {randomWeightedBuildOrderWithOnlyMines} from '@shared/lib/random_build_order';
+// import {
+//   computeRequirementTree,
+//   getRequirementTreeLeaves,
+//   isBuildItemAvailable,
+// } from '@shared/lib/requirement_tree';
+// import {
+//   createAccountTimelineInDebugMode,
+//   createAccountTimelineInPerfMode,
+// } from '@shared/lib/timeline';
+// import {Account} from '@shared/models/account';
+// import {BuildItem} from '@shared/models/build_item';
+// import {BuildableRequirement} from '@shared/models/buildable';
+// import {CrystalMine, DeuteriumSynthesizer, MetalMine} from '@shared/models/building';
+// import {setupRapidFire, setupRequirements} from '@shared/models/dependencies';
+// import {Planet, PlanetId} from '@shared/models/planet';
+// import {Destroyer, SmallCargo} from '@shared/models/ships';
+// import {Milliseconds, NEVER, timeToString} from '@shared/models/time';
+// import {AccountTimeline} from '@shared/models/timeline';
+// import {Rosalind} from '@shared/models/universe';
+// import {min, neverHappens, removeUndefined} from '@shared/utils/type_utils';
 
-import {App} from '@src/components/app';
-import {setAppState} from '@src/lib/store';
-import {randomWeightedBuildOrderWithOnlyMines} from '@src/lib/timeline';
+// import {App} from '@src/lib/app';
+// import {setAppState} from '@src/lib/store';
 
-setupRapidFire();
-setupRequirements();
+// setupRapidFire();
+// setupRequirements();
 
 // setTimeout(() => {
 //   const account = createNewAccount(Rosalind);
@@ -343,3 +343,5 @@ setupRequirements();
 // }
 
 // start();
+
+export const fixThis = true;

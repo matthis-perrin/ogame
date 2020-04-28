@@ -321,3 +321,25 @@ export function isEnergyProducerBuildable(buildable: Buildable): boolean {
     (buildable.type === 'ship' && buildable === SolarSatellite)
   );
 }
+
+export function buildItemsAreEqual(buildItem1: BuildItem, buildItem2: BuildItem): boolean {
+  if (
+    buildItem1.planetId !== buildItem2.planetId ||
+    buildItem1.buildable !== buildItem2.buildable
+  ) {
+    return false;
+  }
+  if (
+    (buildItem1.type === 'building' && buildItem2.type === 'building') ||
+    (buildItem1.type === 'technology' && buildItem2.type === 'technology')
+  ) {
+    return buildItem1.level === buildItem2.level;
+  }
+  if (
+    (buildItem1.type === 'ship' && buildItem2.type === 'ship') ||
+    (buildItem1.type === 'defense' && buildItem2.type === 'defense')
+  ) {
+    return buildItem1.quantity === buildItem2.quantity;
+  }
+  return false;
+}

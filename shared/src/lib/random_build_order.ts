@@ -1,5 +1,3 @@
-import {uniqBy} from 'lodash-es';
-
 import {updateAccountPlanet, updateAccountTechnology} from '@shared/lib/account';
 import {buildableRequirementToString, buildItemCost} from '@shared/lib/build_items';
 import {
@@ -19,7 +17,6 @@ import {BuildItem} from '@shared/models/build_item';
 import {BuildableRequirement} from '@shared/models/buildable';
 import {CrystalMine, DeuteriumSynthesizer, MetalMine} from '@shared/models/building';
 import {Planet, PlanetId} from '@shared/models/planet';
-import {rand} from '@shared/utils/rand';
 
 export function generateBuildOrder(
   target: BuildItem,
@@ -85,6 +82,19 @@ function buildRequirementToBuildItem(
   };
 }
 
+function uniqBy<T>(arr: T[], hash: (val: T) => string): T[] {
+  const hashSet = new Set<string>();
+  const uniqArr: T[] = [];
+  for (const val of arr) {
+    const hashValue = hash(val);
+    if (!hashSet.has(hashValue)) {
+      hashSet.add(hashValue);
+      uniqArr.push(val);
+    }
+  }
+  return uniqArr;
+}
+
 export function randomWeightedNextBuildableRequirement(
   account: Account,
   planetId: PlanetId,
@@ -134,8 +144,8 @@ export function randomWeightedBuildOrderWithOnlyMines(
   target: BuildItem,
   account: Account
 ): BuildItem[] {
-  return generateBuildOrder(target, account, (account, planetId, nextEssentialBuilds) => {
-    const planet = account.planets.get(planetId);
+  return generateBuildOrder(target, account, (accountArg, planetId, nextEssentialBuilds) => {
+    const planet = accountArg.planets.get(planetId);
     if (!planet) {
       throw new Error('Planet not found');
     }
@@ -155,7 +165,7 @@ export function randomWeightedBuildOrderWithOnlyMines(
     let totalScore = 0;
     const availableItemsAndScore: [BuildableRequirement, number][] = availableItems.map(item => {
       const score =
-        1 / toStandardUnits(account, buildItemCost(buildRequirementToBuildItem(item, planetId)));
+        1 / toStandardUnits(accountArg, buildItemCost(buildRequirementToBuildItem(item, planetId)));
       totalScore += score;
       return [item, score];
     });
