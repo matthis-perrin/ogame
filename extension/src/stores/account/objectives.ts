@@ -232,6 +232,7 @@ export function updateObjectives(account: Account): void {
     for (const resourceInfo of planetInfo.resources.values()) {
       resourceInfo.future =
         resourceInfo.amount +
+        resourceInfo.inflight +
         resourceInfo.production *
           (objectives.readyTimeSeconds.max -
             nowSeconds +

@@ -5,11 +5,11 @@ import {
   AstrophysicsTechnology,
   CombustionDrive,
   ComputerTechnology,
-  EnergyTechnology,
   EspionageTechnology,
   HyperspaceDrive,
   HyperspaceTechnology,
   ImpulseDrive,
+  IntergalacticResearchNetworkTechnology,
   PlasmaTechnology,
   ShieldingTechnology,
   WeaponTechnology,
@@ -36,9 +36,9 @@ export const Research: FC<ResearchProps> = ({account}) => {
             <tr>
               <td>
                 <TechnologyC
-                  name={EnergyTechnology.shortName}
+                  name={IntergalacticResearchNetworkTechnology.shortName}
                   technologies={account.accountTechnologies}
-                  techId={EnergyTechnology.id}
+                  techId={IntergalacticResearchNetworkTechnology.id}
                   planetId={planetId}
                 />
                 <TechnologyC

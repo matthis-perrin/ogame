@@ -1,6 +1,7 @@
 import {BotProbes} from '@src/bots/espionage';
 import {BotTransfer} from '@src/bots/objectives';
 import {Fleet} from '@src/models/fleets';
+import {Ghost} from '@src/models/ghost';
 import {Message} from '@src/models/messages';
 import {Objectives} from '@src/models/objectives';
 import {Planet, PlanetId} from '@src/models/planets';
@@ -24,6 +25,7 @@ export interface Account {
     objectives: BotTransfer | undefined;
     espionage: BotProbes | undefined;
   };
+  ghosts: {[planetId: string]: Ghost};
 }
 
 export interface ResourcesWithServerTime extends BaseResources {

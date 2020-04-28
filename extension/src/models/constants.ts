@@ -100,6 +100,7 @@ export const ACCOUNT_TECHNOLOGIES = [
 ];
 
 export const COLOR_WHITE = '#aaa';
+export const COLOR_WHITEDARK = '#555';
 export const COLOR_GREEN = '#9c0';
 export const COLOR_RED = '#d43635';
 export const COLOR_ORANGE = '#d29d00';

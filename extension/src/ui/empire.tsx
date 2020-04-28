@@ -26,6 +26,7 @@ import {
   SmallShieldDome,
 } from '@shared/models/defense';
 import {
+  Bomber,
   ColonyShip,
   EspionageProbe,
   LargeCargo,
@@ -59,6 +60,7 @@ import {getFretCapacity} from '@src/models/technologies';
 import {addObjectives} from '@src/stores/account/objectives';
 import {Stock, Table, Title} from '@src/ui/common';
 import {Energy} from '@src/ui/components/energy';
+import {GhostC} from '@src/ui/components/ghost';
 import {Loot} from '@src/ui/components/loot';
 import {Production} from '@src/ui/components/production';
 import {Resource} from '@src/ui/components/resource';
@@ -95,7 +97,7 @@ export const Empire: FC<EmpireProps> = ({account}) => (
           <th colSpan={2}>
             <Title>Défense</Title>
           </th>
-          <th>
+          <th colSpan={2}>
             <Title>Flotte</Title>
           </th>
           <th>
@@ -103,6 +105,9 @@ export const Empire: FC<EmpireProps> = ({account}) => (
           </th>
           <th>
             <Title>Loot</Title>
+          </th>
+          <th>
+            <Title>Ghost</Title>
           </th>
         </tr>
       </thead>
@@ -122,8 +127,7 @@ export const Empire: FC<EmpireProps> = ({account}) => (
             const satelliteLoot = planet.technologies.hasOwnProperty(SolarSatellite.id)
               ? planet.technologies[SolarSatellite.id].value * DEBRIS_SAT * DEBRIS_PERCENTAGE
               : 0;
-            const baseResourcesLoot = 100000;
-            const totalLoot = inactivityLoot + satelliteLoot + baseResourcesLoot;
+            const totalLoot = inactivityLoot + satelliteLoot;
             const ptAmount = planet.ships.hasOwnProperty(SmallCargo.id)
               ? planet.ships[SmallCargo.id].value
               : 0;
@@ -459,21 +463,31 @@ export const Empire: FC<EmpireProps> = ({account}) => (
                       required={requiredGt}
                     />
                     <TechnologyC
+                      name="ESP"
+                      technologies={planet.ships}
+                      techId={EspionageProbe.id}
+                      planetId={planet.planetId}
+                    />
+                  </Line>
+                </td>
+                <td onClick={() => goToShips(planet.planetId)} style={{cursor: 'pointer'}}>
+                  <Line>
+                    <TechnologyC
                       name="REC"
                       technologies={planet.ships}
                       techId={Recycler.id}
                       planetId={planet.planetId}
                     />
                     <TechnologyC
-                      name="COLO"
+                      name="BOM"
                       technologies={planet.ships}
-                      techId={ColonyShip.id}
+                      techId={Bomber.id}
                       planetId={planet.planetId}
                     />
                     <TechnologyC
-                      name="ESP"
+                      name="COL"
                       technologies={planet.ships}
-                      techId={EspionageProbe.id}
+                      techId={ColonyShip.id}
                       planetId={planet.planetId}
                     />
                   </Line>
@@ -488,10 +502,14 @@ export const Empire: FC<EmpireProps> = ({account}) => (
                 </td>
                 <td>
                   <Line>
-                    <Loot name="Base" amount={baseResourcesLoot} />
                     <Loot name="Prod" amount={inactivityLoot} />
                     <Loot name="Sats" amount={satelliteLoot} />
                     <Loot name="Total" amount={totalLoot} />
+                  </Line>
+                </td>
+                <td>
+                  <Line>
+                    <GhostC ghosts={account.ghosts} planetId={planet.planetId} account={account} />
                   </Line>
                 </td>
               </PlanetLine>

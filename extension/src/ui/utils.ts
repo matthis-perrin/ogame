@@ -39,3 +39,7 @@ export function time(totalSeconds: number): string {
   const seconds = totalSeconds - hours * 3600 - minutes * 60;
   return `${padTime(hours)}:${padTime(minutes)}:${padTime(seconds)}`;
 }
+
+export function thousands(value: number): string {
+  return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}

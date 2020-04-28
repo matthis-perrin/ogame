@@ -4,6 +4,7 @@ import {Account} from '@src/models/account';
 import {MissionTypeEnum} from '@src/models/fleets';
 import {ResourceAmount} from '@src/models/resources';
 import {getAccount, setAccount} from '@src/stores/account';
+import {updateGhosts} from '@src/stores/account/ghost';
 import {calcInFlightResources} from '@src/stores/account/inflight_resources';
 import {updateObjectivesTransfers} from '@src/stores/account/objectives';
 import {calcPlanetSum} from '@src/stores/account/planet_sum';
@@ -35,6 +36,7 @@ export function applyProduction(): void {
     messages: currentAccount.messages,
     objectives: currentAccount.objectives,
     bots: currentAccount.bots,
+    ghosts: currentAccount.ghosts,
   };
 
   // Using milliseconds to have below second UI refresh
@@ -97,6 +99,9 @@ export function applyProduction(): void {
 
   // Updating objectives start time
   updateObjectivesTransfers(account);
+
+  // Update ghosts
+  updateGhosts(account);
 
   // Start bots
   startObjectivesBot();
