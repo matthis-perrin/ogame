@@ -35,6 +35,7 @@ export const GhostC: FC<GhostProps> = ({ghosts, planetId, account}) => {
           </div>
           {ghost.speeds.map(ghostSpeed => (
             <Speed
+              key={ghostSpeed.name}
               className={
                 ghostSpeed.timeSeconds > minSeconds && ghostSpeed.timeSeconds < maxSeconds
                   ? 'active'

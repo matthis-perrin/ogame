@@ -65,7 +65,7 @@ export function addPlanet(
       const fleet = oldFleets[fleetId];
       if (nowSeconds >= fleet.arrivalTime) {
         const destPlanetId = findPlanetId(planetList, fleet.destinationName);
-        // Auto-removing returning attacking/transporting fleets when on fleet page of destination planet
+        // Auto-removing returning attacking/transporting/expedition fleets when on fleet page of destination planet
         if (
           (fleet.missionType === MissionTypeEnum.Attacking ||
             fleet.missionType === MissionTypeEnum.Transport ||
