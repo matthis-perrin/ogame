@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import {Chromosome} from '@shared/algogen/chromosome';
-import {mutationByInsert, mutationByRemove} from '@shared/algogen/mutation';
+import {mutationByInsert, mutationByRemove, mutationBySwap} from '@shared/algogen/mutation';
 import {generateInitialPopulation, nextGeneration} from '@shared/algogen/population';
 import {createNewAccount} from '@shared/lib/account';
 import {buildItemToString} from '@shared/lib/build_items';
@@ -50,3 +50,5 @@ console.log('mutationByInsert');
 console.log(mutationByInsert(latestPopulation.topChromosomes[0]));
 console.log('mutationByRemove');
 console.log(mutationByRemove(latestPopulation.topChromosomes[0]));
+console.log('mutationBySwap');
+console.log(mutationBySwap(latestPopulation.topChromosomes[0]));
