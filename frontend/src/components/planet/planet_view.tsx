@@ -1,4 +1,4 @@
-import React, {FC} from 'react';
+import React from 'react';
 import styled from 'styled-components';
 
 import {getPlanetProductionPerHour} from '@shared/lib/production';
@@ -10,9 +10,14 @@ import {arrayJoin} from '@shared/utils/array_utils';
 import {substract} from '@shared/utils/type_utils';
 
 import {BuildItemLine} from '@src/components/core/build_item_line';
+import {CustomDiv} from '@src/components/core/props';
 import {ResourcesView} from '@src/components/core/resources_view';
 
-export const PlanetView: FC<{account: Account; planet: Planet}> = ({account, planet}) => {
+export const PlanetView: CustomDiv<{account: Account; planet: Planet}> = ({
+  account,
+  planet,
+  ...props
+}) => {
   const {id} = planet;
   const {energyConsumption, energyProduction} = getPlanetProductionPerHour(account, planet);
   const lineSeparator = (prefix: string) => (index: number) => (
@@ -20,7 +25,7 @@ export const PlanetView: FC<{account: Account; planet: Planet}> = ({account, pla
   );
 
   return (
-    <Wrapper>
+    <Wrapper {...props}>
       <Header>
         <Title>{`Planète ${id}`}</Title>
         <ResourcesView
@@ -139,6 +144,7 @@ const Wrapper = styled.div`
   flex-direction: column;
   background-color: #0d1014;
   padding: 16px;
+  width: 400px;
 `;
 
 const Header = styled.div`

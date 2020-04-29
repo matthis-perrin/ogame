@@ -100,6 +100,10 @@ const Title = styled.div`
 
 const Name = styled.div`
   margin-right: 12px;
+  flex-grow: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 const Metric = styled.div`
   font-size: 13px;
@@ -107,13 +111,15 @@ const Metric = styled.div`
   border-radius: 4px;
   color: white;
   padding: 2px 8px;
+  flex-shrink: 0;
 `;
 
 const Right = styled.div`
-  flex-grow: 0;
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  overflow-x: hidden;
 `;
 
 const SubTitle = styled.div`

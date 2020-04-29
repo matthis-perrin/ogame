@@ -17,7 +17,7 @@ setupRequirements();
 const accountTimeline = naiveAccountTimeline({
   type: 'technology',
   buildable: AstrophysicsTechnology,
-  level: 9,
+  level: 13,
 });
 
 setAppState({accountTimeline, selectedAccount: accountTimeline.start});
