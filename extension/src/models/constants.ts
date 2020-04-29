@@ -37,7 +37,7 @@ export const SESSION_ID_LOCAL_STORAGE_KEY = 'titanraccoonid';
 localStorage.setItem(SESSION_ID_LOCAL_STORAGE_KEY, SESSION_ID);
 
 /* eslint-disable @typescript-eslint/no-magic-numbers */
-export const INACTIVITY_TIME = 6.5; // 6h30m
+export const INACTIVITY_TIME = 7.75; // 7h45
 export const DEBRIS_PERCENTAGE = 0.3;
 export const UI_REFRESH_RATE = 500;
 export const PROBES_AMOUNT = 10;

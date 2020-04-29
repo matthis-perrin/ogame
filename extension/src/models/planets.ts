@@ -1,7 +1,4 @@
-import {ResearchLab} from '@shared/models/building';
 import {Coordinates} from '@shared/models/coordinates';
-
-import {Account} from '@src/models/account';
 
 export type PlanetId = string & {_: 'PlanetId'};
 export type PlanetName = string & {_: 'PlanetName'};
@@ -40,22 +37,4 @@ export function getCoords(planetCoords: PlanetCoords): Coordinates {
     };
   }
   return {galaxy: 1, solarSystem: 1, position: 1};
-}
-
-export function findResearchPlanet(account: Account): PlanetId | undefined {
-  let researchPlanetId: PlanetId | undefined;
-  let maxLevel = 0;
-  for (const planetId in account.planetDetails) {
-    if (account.planetDetails.hasOwnProperty(planetId)) {
-      const planetDetail = account.planetDetails[planetId];
-      if (planetDetail.technologies.hasOwnProperty(ResearchLab.id)) {
-        const tech = planetDetail.technologies[ResearchLab.id];
-        if (tech.value > 0 && (researchPlanetId === undefined || tech.value > maxLevel)) {
-          researchPlanetId = planetId as PlanetId;
-          maxLevel = tech.value;
-        }
-      }
-    }
-  }
-  return researchPlanetId;
 }

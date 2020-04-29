@@ -10,13 +10,11 @@ import {parseTechnologies} from '@src/parsers/technologies';
 import {addPlanet} from '@src/stores/account/planet';
 import {applyProduction} from '@src/stores/account/production';
 
-/* eslint-disable no-console */
 export function parseUI(): void {
   const resources = parseResources();
   if (resources === undefined) {
     return;
   }
-  console.log('Resources parsed');
 
   const metas = parseMeta();
   const id = metas.find(_ => _.name === 'ogame-planet-id')?.content;
@@ -26,13 +24,11 @@ export function parseUI(): void {
   }
   const planetId = id.toString() as PlanetId;
   const serverTimeSeconds = parseFloat(timestamp);
-  console.log(`Meta parsed ${metas.length}`);
 
   const planets = parsePlanets();
   if (planets.length === 0) {
     return;
   }
-  console.log(`Planets parsed ${planets.length}`);
 
   let technologies: Technology[] = [];
   let ships: Technology[] | undefined;
@@ -52,23 +48,14 @@ export function parseUI(): void {
   }
   if (shouldParseTechnologies) {
     technologies = parseTechnologies();
-    console.log(`Technologies parsed ${technologies.length}`);
   } else if (shouldParseShips) {
     ships = parseTechnologies();
-    console.log(`Ships parsed ${ships.length}`);
   }
 
   const fleets = parseFleets();
-  console.log(`Fleets parsed ${fleets.length}`);
 
   parseMessages()
     .then(messages => {
-      if (messages !== undefined) {
-        console.log(`Messages parsed ${messages.length}`);
-      }
-
-      console.log('OK');
-
       addPlanet(
         serverTimeSeconds,
         planets,
@@ -82,7 +69,6 @@ export function parseUI(): void {
 
       setInterval(applyProduction, UI_REFRESH_RATE);
     })
-    .catch(err => {
-      console.error(err);
-    });
+    // eslint-disable-next-line no-console
+    .catch(console.error);
 }

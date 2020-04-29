@@ -40,6 +40,7 @@ export const ObjectivesC: FC<ObjectivesProps> = ({account}) => {
               <tr>
                 <td>Planète</td>
                 <td>{findPlanetName(account.planetList, account.objectives.planetId)}</td>
+                <HoverTD onClick={() => updateObjectives(account)}>Refresh</HoverTD>
                 <HoverTD
                   onClick={() => {
                     if (account.objectives !== undefined) {

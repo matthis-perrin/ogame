@@ -22,6 +22,7 @@ interface ResourceInfo {
   production: number;
   future: number;
   inflight: number;
+  inFlightArrivesInSeconds: number;
 }
 
 interface PlanetInfo {
@@ -38,6 +39,7 @@ function timeBeforeSendingSeconds(
 ): number {
   let resourceSum = 0;
   let productionSum = 0;
+  let maxArrivalTime = 0;
   for (const planetInfo of planetInfos) {
     const resourceInfo = planetInfo.resources.get(resourceType);
     if (resourceInfo === undefined) {
@@ -48,8 +50,11 @@ function timeBeforeSendingSeconds(
       resourceInfo.amount +
       resourceInfo.inflight;
     productionSum += resourceInfo.production;
+    if (resourceInfo.inFlightArrivesInSeconds > maxArrivalTime) {
+      maxArrivalTime = resourceInfo.inFlightArrivesInSeconds;
+    }
   }
-  return Math.max(0, Math.ceil((targetAmount - resourceSum) / productionSum));
+  return Math.max(maxArrivalTime, Math.ceil((targetAmount - resourceSum) / productionSum));
 }
 
 function remainingResourcePerPlanet(
@@ -158,31 +163,38 @@ export function updateObjectives(account: Account): void {
         );
       }
       const resources: Map<ResourceType, ResourceInfo> = new Map();
+      const inFlight = inFlightResources.hasOwnProperty(planet.coords)
+        ? inFlightResources[planet.coords]
+        : {
+            metal: 0 as ResourceAmount,
+            crystal: 0 as ResourceAmount,
+            deuterium: 0 as ResourceAmount,
+            sum: 0 as ResourceAmount,
+            arrivalTimeSeconds: 0,
+          };
+      const inFlightArrivesInSeconds = Math.max(0, inFlight.arrivalTimeSeconds - nowSeconds);
       if (account.planetDetails.hasOwnProperty(planet.id)) {
         const planetDetail = account.planetDetails[planet.id];
         resources.set('metal', {
           amount: planetDetail.resources.metal,
           production: planetDetail.productions.metal,
           future: 0,
-          inflight: inFlightResources.hasOwnProperty(planet.coords)
-            ? inFlightResources[planet.coords].metal
-            : 0,
+          inflight: inFlight.metal,
+          inFlightArrivesInSeconds,
         });
         resources.set('crystal', {
           amount: planetDetail.resources.crystal,
           production: planetDetail.productions.crystal,
           future: 0,
-          inflight: inFlightResources.hasOwnProperty(planet.coords)
-            ? inFlightResources[planet.coords].crystal
-            : 0,
+          inflight: inFlight.crystal,
+          inFlightArrivesInSeconds,
         });
         resources.set('deuterium', {
           amount: planetDetail.resources.deuterium,
           production: planetDetail.productions.deuterium,
           future: 0,
-          inflight: inFlightResources.hasOwnProperty(planet.coords)
-            ? inFlightResources[planet.coords].deuterium
-            : 0,
+          inflight: inFlight.deuterium,
+          inFlightArrivesInSeconds,
         });
       }
       planetInfos.push({
@@ -350,12 +362,28 @@ export function addObjectives(planetId: PlanetId, newTechnology: Technology): vo
   }
 
   // Handle uniqueness
-  if (objectives.technologies.find(_ => _.techId === newTechnology.techId) !== undefined) {
-    const smartTech = TechnologyIndex.get(newTechnology.techId);
-    if (smartTech === undefined || smartTech.type !== 'stock') {
-      return;
+  const smartTech = TechnologyIndex.get(newTechnology.techId);
+  if (smartTech === undefined || smartTech.type !== 'stock') {
+    let alreadyInList = objectives.technologies.find(
+      _ =>
+        _.techId === newTechnology.techId &&
+        _.value === newTechnology.value &&
+        _.target === newTechnology.target
+    );
+    while (alreadyInList !== undefined) {
+      newTechnology.value = alreadyInList.value + 1;
+      if (alreadyInList.target !== undefined) {
+        newTechnology.target = alreadyInList.target + 1;
+      }
+      alreadyInList = objectives.technologies.find(
+        _ =>
+          _.techId === newTechnology.techId &&
+          _.value === newTechnology.value &&
+          _.target === newTechnology.target
+      );
     }
   }
+
   objectives.technologies.push(newTechnology);
   currentAccount.objectives = objectives;
   updateObjectives(currentAccount);

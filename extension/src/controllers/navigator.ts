@@ -1,4 +1,5 @@
 import {MissionTypeEnum} from '@src/models/fleets';
+import {SpeedModifier} from '@src/models/ghost';
 import {getCoords, PlanetCoords, PlanetId} from '@src/models/planets';
 import {BaseResources} from '@src/models/resources';
 import {TechnologyIndex} from '@src/models/technologies';
@@ -73,6 +74,21 @@ export function sendLargeCargosUrl(
         )}&deuterium=${Math.ceil(resources.deuterium)}`
       : ''
   }`;
+  return url;
+}
+
+export function sendGhostUrl(
+  from: PlanetId,
+  planetCoords: PlanetCoords,
+  slowTechId: number,
+  speedModifier: SpeedModifier
+): string {
+  const coords = getCoords(planetCoords);
+  const url =
+    `${document.location.origin}${document.location.pathname}?page=ingame&component=fleetdispatch` +
+    `&galaxy=${coords.galaxy}&system=${coords.solarSystem}&position=${coords.position}&type=1` +
+    `&mission=${MissionTypeEnum.Deployment}&am203=999999&am${slowTechId}=999999&cp=${from}` +
+    `&metal=999999999&crystal=999999999&deuterium=999999999&speed=${speedModifier * 10}`;
   return url;
 }
 
