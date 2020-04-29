@@ -19,7 +19,6 @@ const accountTimeline = naiveAccountTimeline({
   buildable: AstrophysicsTechnology,
   level: 9,
 });
-console.log(accountTimeline);
 
 setAppState({accountTimeline, selectedAccount: accountTimeline.start});
 

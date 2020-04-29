@@ -2,7 +2,6 @@ import {Chromosome} from '@shared/algogen/chromosome';
 import {crossover} from '@shared/algogen/crossover';
 import {getBest, getGoodBuildOrders} from '@shared/algogen/good_build_orders';
 import {mutationByInsert, mutationByRemove, mutationBySwap} from '@shared/algogen/mutation';
-import {buildItemToString} from '@shared/lib/build_items';
 import {
   generateBuildOrder,
   randomWeightedNextBuildableRequirement,
@@ -164,7 +163,6 @@ export function generateInitialPopulation(options: GeneticOptions): Population {
       options.startAccount,
       randomWeightedNextBuildableRequirement
     );
-    console.log(buildOrder);
     try {
       const chromosome = {
         buildOrder,
@@ -195,7 +193,7 @@ export function injectGoodChromosomes(population: Population, options: GeneticOp
   }
 }
 
-export function injectBest(population: Population, options: GeneticOptions) {
+export function injectBest(population: Population, options: GeneticOptions): void {
   const best = getBest(Array.from(options.startAccount.planets.values())[0].id);
   const accountTimeline = createAccountTimeline(options.startAccount, best);
   const chromosome = {

@@ -1,28 +1,13 @@
-import {
-  Chromosome,
-  getAccountAtBuildOrderIndex,
-  getLastAccount,
-  sliceChromosome,
-} from '@shared/algogen/chromosome';
-import {buildItemToString} from '@shared/lib/build_items';
-import {
-  canBeNextBuildItemAppliedOnAccountTimeline,
-  flattenedRequirements,
-  isBuildItemAvailable,
-} from '@shared/lib/requirement_tree';
+import {Chromosome} from '@shared/algogen/chromosome';
+import {flattenedRequirements} from '@shared/lib/requirement_tree';
 import {accountTimelineLibInPerfMode} from '@shared/lib/timeline';
 import {BuildItem} from '@shared/models/build_item';
 import {AllBuildings, Building} from '@shared/models/building';
 import {PlanetId} from '@shared/models/planet';
 import {AllTechnologies, Technology} from '@shared/models/technology';
-import {NEVER} from '@shared/models/time';
 import {rand} from '@shared/utils/rand';
 
-const {
-  advanceAccountTowardBuildItem,
-  finishAllInProgress,
-  createAccountTimeline,
-} = accountTimelineLibInPerfMode;
+const {createAccountTimeline} = accountTimelineLibInPerfMode;
 
 function getInsertableBuildItem(chromosome: Chromosome): BuildItem[] {
   const usefulTechno = AllTechnologies.filter(t => t.isUseful);

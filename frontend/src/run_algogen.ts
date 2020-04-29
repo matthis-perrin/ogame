@@ -1,5 +1,4 @@
 /* eslint-disable no-console */
-import {Chromosome} from '@shared/algogen/chromosome';
 import {
   generateInitialPopulation,
   GeneticOptions,

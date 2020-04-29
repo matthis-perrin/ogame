@@ -1,5 +1,5 @@
+/* eslint-disable no-console */
 import {Chromosome} from '@shared/algogen/chromosome';
-import {crossover} from '@shared/algogen/crossover';
 import {getGoodBuildOrders} from '@shared/algogen/good_build_orders';
 import {mutationByInsert, mutationByRemove, mutationBySwap} from '@shared/algogen/mutation';
 import {createNewAccount} from '@shared/lib/account';
@@ -18,7 +18,6 @@ import {SmallCargo} from '@shared/models/ships';
 import {CombustionDrive, EnergyTechnology} from '@shared/models/technology';
 import {timeToString} from '@shared/models/time';
 import {Rosalind} from '@shared/models/universe';
-import {rand} from '@shared/utils/rand';
 
 const {createAccountTimeline} = accountTimelineLibInPerfMode;
 
@@ -44,23 +43,26 @@ export function localOptim(): void {
     chromosomes = chromosomes.map(c => {
       let mutated = c;
       let mutationApplied = true;
+      const mutationProba = 0.2;
       try {
         while (mutationApplied) {
           mutationApplied = false;
-          if (Math.random() < 0.2) {
+          if (Math.random() < mutationProba) {
             mutated = mutationBySwap(c);
             mutationApplied = true;
           }
-          if (Math.random() < 0.2) {
+          if (Math.random() < mutationProba) {
             mutated = mutationByInsert(c);
             mutationApplied = true;
           }
-          if (Math.random() < 0.2) {
+          if (Math.random() < mutationProba) {
             mutated = mutationByRemove(c);
             mutationApplied = true;
           }
         }
-      } catch {}
+      } catch {
+        // Ok
+      }
 
       if (
         mutated.accountTimeline.currentAccount.currentTime <
@@ -75,11 +77,11 @@ export function localOptim(): void {
     if (i % (1 * 100) === 0) {
       console.log(chromosomes.map(c => timeToString(c.accountTimeline.currentAccount.currentTime)));
       const best = chromosomes.reduce(
-        (best, curr) =>
+        (currentBest, curr) =>
           curr.accountTimeline.currentAccount.currentTime <
-          best.accountTimeline.currentAccount.currentTime
+          currentBest.accountTimeline.currentAccount.currentTime
             ? curr
-            : best,
+            : currentBest,
         chromosomes[0]
       );
       console.log(
