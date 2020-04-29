@@ -91,7 +91,7 @@ export const CrystalStorage = makeBuilding(
   23,
   'Hangar de cristal',
   'Hangar de cristal',
-  '6.84% 0',
+  '36.84% 0',
   makeResources({m: 1000, c: 500, d: 0}),
   'supplies',
   false, // TODO - Automatically injected in the timeline
@@ -102,7 +102,7 @@ export const DeuteriumSynthesizer = makeBuilding(
   3,
   'Synthétiseur de deutérium',
   'Synth. de deut',
-  '0.52% 0',
+  '10.52% 0',
   makeResources({m: 225, c: 75, d: 0}),
   'supplies',
   true, // Increases prod
@@ -113,7 +113,7 @@ export const DeuteriumTank = makeBuilding(
   24,
   'Réservoir de deutérium',
   'Rés. de deut',
-  '2.1% 0',
+  '42.1% 0',
   makeResources({m: 1000, c: 1000, d: 0}),
   'supplies',
   false, // TODO - Automatically injected in the timeline
@@ -146,7 +146,7 @@ export const ResearchLab = makeBuilding(
   31,
   'Laboratoire de recherche',
   'Laboratoire',
-  '0.52% 17.24%',
+  '10.52% 17.24%',
   makeResources({m: 200, c: 400, d: 200}),
   'facilities',
   true, // Faster research time
@@ -197,18 +197,23 @@ export const MissileSilo = makeBuilding(
   2
 );
 
-export const AllBuildings: Building[] = [
+export const ResourcesBuilding = [
   MetalMine,
-  MetalStorage,
   CrystalMine,
-  CrystalStorage,
   DeuteriumSynthesizer,
-  DeuteriumTank,
   SolarPlant,
   FusionReactor,
-  ResearchLab,
+  MetalStorage,
+  CrystalStorage,
+  DeuteriumTank,
+];
+
+export const InstallationBuildings = [
   RoboticsFactory,
   Shipyard,
-  NaniteFactory,
+  ResearchLab,
   MissileSilo,
+  NaniteFactory,
 ];
+
+export const AllBuildings: Building[] = [...ResourcesBuilding, ...InstallationBuildings];

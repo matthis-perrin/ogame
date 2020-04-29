@@ -17,25 +17,27 @@ export const ResourcesView: FC<{
   resources: Resources;
   energy?: EnergyAmount;
   showAll?: boolean;
-}> = ({resources, energy, showAll}) => {
+  small?: boolean;
+}> = ({resources, energy, showAll, small}) => {
   const {metal, crystal, deuterium} = resources;
   const elements: JSX.Element[] = [];
   if (metal > 0 || showAll) {
-    elements.push(<Metal key="metal" amount={metal} />);
+    elements.push(<Metal key="metal" amount={metal} small={small} />);
   }
   if (crystal > 0 || showAll) {
-    elements.push(<Crystal key="crystal" amount={crystal} />);
+    elements.push(<Crystal key="crystal" amount={crystal} small={small} />);
   }
   if (deuterium > 0 || showAll) {
-    elements.push(<Deuterium key="deuterium" amount={deuterium} />);
+    elements.push(<Deuterium key="deuterium" amount={deuterium} small={small} />);
   }
   if (energy !== undefined && (energy > 0 || showAll)) {
-    elements.push(<Energy key="energy" amount={energy} />);
+    elements.push(<Energy key="energy" amount={energy} small={small} />);
   }
   return (
     <ResourcesWrapper>
       {arrayJoin(elements, i => (
-        <Separator key={i} />
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        <Separator style={{width: small ? 12 : 16}} key={i} />
       ))}
     </ResourcesWrapper>
   );
@@ -46,23 +48,21 @@ const ResourcesWrapper = styled.div`
   display: flex;
 `;
 
-const Separator = styled.div`
-  width: 16px;
-`;
+const Separator = styled.div``;
 
 //
 
-export const Metal: FC<{amount: MetalAmount}> = ({amount}) => (
-  <UnitView type="metal" amount={amount} />
+export const Metal: FC<{amount: MetalAmount; small?: boolean}> = ({amount, small}) => (
+  <UnitView type="metal" amount={amount} small={small} />
 );
-export const Crystal: FC<{amount: CrystalAmount}> = ({amount}) => (
-  <UnitView type="crystal" amount={amount} />
+export const Crystal: FC<{amount: CrystalAmount; small?: boolean}> = ({amount, small}) => (
+  <UnitView type="crystal" amount={amount} small={small} />
 );
-export const Deuterium: FC<{amount: DeuteriumAmount}> = ({amount}) => (
-  <UnitView type="deuterium" amount={amount} />
+export const Deuterium: FC<{amount: DeuteriumAmount; small?: boolean}> = ({amount, small}) => (
+  <UnitView type="deuterium" amount={amount} small={small} />
 );
-export const Energy: FC<{amount: EnergyAmount}> = ({amount}) => (
-  <UnitView type="energy" amount={amount} />
+export const Energy: FC<{amount: EnergyAmount; small?: boolean}> = ({amount, small}) => (
+  <UnitView type="energy" amount={amount} small={small} />
 );
 
 //
@@ -89,13 +89,13 @@ function amountToString(amount: number): string {
   let amountToDisplay = amount;
   let suffix = '';
 
-  if (amount > 1000 * 1000 * 1000) {
+  if (amount >= 1000 * 1000 * 1000) {
     amountToDisplay = amount / (1000 * 1000 * 1000);
     suffix = 'G';
-  } else if (amount > 1000 * 1000) {
+  } else if (amount >= 1000 * 1000) {
     amountToDisplay = amount / (1000 * 1000);
     suffix = 'M';
-  } else if (amount > 10 * 1000) {
+  } else if (amount >= 10 * 1000) {
     amountToDisplay = amount / 1000;
     suffix = 'K';
   } else {
@@ -109,31 +109,49 @@ function amountToString(amount: number): string {
 const UnitView: FC<{
   type: UnitType;
   amount: number;
-}> = ({type, amount}) => {
-  const AmountClass = amount < 0 ? NegativeAmount : PositiveAmount;
+  small?: boolean;
+}> = ({type, amount, small}) => {
+  const Amount = amount < 0 ? NegativeAmount : PositiveAmount;
+  const UnitViewWrapper = small ? RowUnitViewWrapper : ColumnUnitViewWrapper;
+  const AmountWrapper = small ? RowAmountWrapper : ColumnAmountWrapper;
   return (
     <UnitViewWrapper>
-      <UnitSprite style={{backgroundPosition: getBackgroundPosition(type)}} />
-      <AmountClass>{amountToString(Math.floor(amount))}</AmountClass>
+      <UnitSprite
+        size={small ? 'small' : 'normal'}
+        style={{backgroundPosition: getBackgroundPosition(type)}}
+      />
+      <AmountWrapper>
+        <Amount>{amountToString(Math.floor(amount))}</Amount>
+      </AmountWrapper>
     </UnitViewWrapper>
   );
 };
 UnitView.displayName = 'UnitView';
 
-const UnitViewWrapper = styled.div`
+const ColumnUnitViewWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
 `;
 
-const Amount = styled.div`
-  font-size: 14px;
-  margin-top: 4px;
+const RowUnitViewWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 `;
 
-const NegativeAmount = styled(Amount)`
+const ColumnAmountWrapper = styled.div`
+  margin-top: 4px;
+  font-size: 14px;
+`;
+const RowAmountWrapper = styled.div`
+  margin-left: 4px;
+  font-size: 13px;
+`;
+
+const NegativeAmount = styled.div`
   color: #f44;
 `;
-const PositiveAmount = styled(Amount)`
+const PositiveAmount = styled.div`
   color: #999;
 `;

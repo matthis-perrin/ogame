@@ -58,7 +58,30 @@ export function generateBuildOrder(
       buildOrder.push(nextAsBuildItem);
     }
   }
-  buildOrder.push(target);
+
+  if (target.type === 'building' || target.type === 'technology') {
+    let targetBuildables: BuildableRequirement[] = [];
+    for (let i = 1; i <= target.level; i++) {
+      targetBuildables.push({entity: target.buildable, level: i});
+    }
+    while (targetBuildables.length > 0) {
+      const next = nextBuildableRequirement(account, getMainPlanet().id, [targetBuildables[0]]);
+      if (next.entity.type === 'building') {
+        account = updateAccountPlanet(
+          account,
+          updatePlanetBuilding(getMainPlanet(), next.entity, next.level)
+        );
+      } else {
+        account = updateAccountTechnology(account, next.entity, next.level);
+      }
+      const nextAsBuildItem = buildRequirementToBuildItem(next, getMainPlanet().id);
+      targetBuildables = targetBuildables.filter(b => !buildableRequirementAreEqual(b, next));
+      buildOrder.push(nextAsBuildItem);
+    }
+  } else {
+    return [...buildOrder, target];
+  }
+
   return buildOrder;
 }
 

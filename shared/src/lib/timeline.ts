@@ -55,7 +55,7 @@ import {
   SolarPlant,
 } from '@shared/models/building';
 import {Defense} from '@shared/models/defense';
-import {Planet} from '@shared/models/planet';
+import {Planet, PlanetId} from '@shared/models/planet';
 import {
   addResources,
   hasNegativeAmount,
@@ -365,7 +365,8 @@ function getAccountTimelineLib(mode: 'perf' | 'debug'): AccountTimelineLib {
   const APPLY_NOW = {time: ZERO, reason: noReason};
 
   function timeBeforeBuildingTechnologyRelatedItem(
-    account: Account
+    account: Account,
+    onlyCheckPlanet?: PlanetId
   ): {time: Milliseconds; reason: string} {
     // Check if already a technology in progress on the account
     if (account.inProgressTechnology) {
@@ -378,6 +379,9 @@ function getAccountTimelineLib(mode: 'perf' | 'debug'): AccountTimelineLib {
     }
     // Check if any planet is upgrading the research lab
     for (const planet of account.planets.values()) {
+      if (onlyCheckPlanet !== undefined && onlyCheckPlanet !== planet.id) {
+        continue;
+      }
       if (planet.inProgressBuilding?.building === ResearchLab) {
         return {
           time: substract(planet.inProgressBuilding.endTime, account.currentTime),

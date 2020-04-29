@@ -17,6 +17,7 @@ export const BuildItemView: FC<{buildItem: BuildItem}> = ({buildItem}) => {
     <Wrapper>
       <Left>
         <Sprite
+          size="normal"
           style={{
             backgroundPosition: buildItem.buildable.sprite,
           }}
@@ -29,19 +30,6 @@ export const BuildItemView: FC<{buildItem: BuildItem}> = ({buildItem}) => {
         </Title>
         <ResourcesView resources={getBuildItemCost(buildItem)} />
       </Right>
-
-      {/* <Separator />
-    <Reason>
-      <ReasonTitle>Reason: </ReasonTitle>
-      <ReasonContent>{transition.reason}</ReasonContent>
-    </Reason>
-    <Separator />
-    <Events>
-      <EventTitle>Events: </EventTitle>
-      {transition.events.map(e => (
-        <Event>{`- ${e}`}</Event>
-      ))}
-    </Events> */}
     </Wrapper>
   );
 };

@@ -1,6 +1,8 @@
 import {Chromosome} from '@shared/algogen/chromosome';
 import {crossover} from '@shared/algogen/crossover';
+import {getBest, getGoodBuildOrders} from '@shared/algogen/good_build_orders';
 import {mutationByInsert, mutationByRemove, mutationBySwap} from '@shared/algogen/mutation';
+import {buildItemToString} from '@shared/lib/build_items';
 import {
   generateBuildOrder,
   randomWeightedNextBuildableRequirement,
@@ -32,7 +34,7 @@ export interface GeneticOptions {
   deleteMutationRate: number;
 }
 
-interface Population {
+export interface Population {
   generation: number;
   topChromosomes: Chromosome[];
   chromosomes: Chromosome[];
@@ -61,7 +63,7 @@ export function nextGeneration(population: Population, options: GeneticOptions):
     try {
       const chromosome = {
         buildOrder,
-        source: {ancestors: [], reason: 'initial population'},
+        source: {ancestors: [], reason: 'new random per generation'},
         accountTimeline: createAccountTimeline(options.startAccount, buildOrder),
       };
       population.chromosomes.push(chromosome);
@@ -115,7 +117,7 @@ export function nextGeneration(population: Population, options: GeneticOptions):
     newChromosomes.push(...children);
   }
   const newTopChromosomes = getTopChromosomes(
-    population.topChromosomes.concat(newChromosomes),
+    population.topChromosomes.concat(newChromosomes).concat(population.chromosomes),
     options.topChromosomeCount
   );
 
@@ -155,12 +157,14 @@ export function nextGeneration(population: Population, options: GeneticOptions):
 
 export function generateInitialPopulation(options: GeneticOptions): Population {
   const chromosomes: Chromosome[] = [];
+
   while (chromosomes.length < options.populationSize) {
     const buildOrder = generateBuildOrder(
       options.target,
       options.startAccount,
       randomWeightedNextBuildableRequirement
     );
+    console.log(buildOrder);
     try {
       const chromosome = {
         buildOrder,
@@ -175,4 +179,29 @@ export function generateInitialPopulation(options: GeneticOptions): Population {
 
   const topChromosomes = getTopChromosomes(chromosomes, options.topChromosomeCount);
   return {generation: 0, chromosomes, topChromosomes};
+}
+
+export function injectGoodChromosomes(population: Population, options: GeneticOptions): void {
+  for (const buildOrder of getGoodBuildOrders(
+    Array.from(options.startAccount.planets.values())[0].id
+  )) {
+    const accountTimeline = createAccountTimeline(options.startAccount, buildOrder);
+    const chromosome = {
+      buildOrder,
+      source: {ancestors: [], reason: 'from hardcoded build order'},
+      accountTimeline,
+    };
+    population.chromosomes.push(chromosome);
+  }
+}
+
+export function injectBest(population: Population, options: GeneticOptions) {
+  const best = getBest(Array.from(options.startAccount.planets.values())[0].id);
+  const accountTimeline = createAccountTimeline(options.startAccount, best);
+  const chromosome = {
+    buildOrder: best,
+    source: {ancestors: [], reason: 'from hardcoded build order'},
+    accountTimeline,
+  };
+  population.chromosomes.push(chromosome);
 }
