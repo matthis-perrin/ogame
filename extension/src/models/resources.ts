@@ -38,10 +38,6 @@ export interface ResourcesWithSum extends BaseResources {
   sum: ResourceAmount;
 }
 
-export interface ResourcesWithSumAndArrivalTime extends ResourcesWithSum {
-  arrivalTimeSeconds: number;
-}
-
 export interface BaseResources {
   metal: ResourceAmount;
   crystal: ResourceAmount;
