@@ -87,8 +87,8 @@ export function sendGhostUrl(
   const url =
     `${document.location.origin}${document.location.pathname}?page=ingame&component=fleetdispatch` +
     `&galaxy=${coords.galaxy}&system=${coords.solarSystem}&position=${coords.position}&type=1` +
-    `&mission=${MissionTypeEnum.Deployment}&am203=999999&am${slowTechId}=999999&cp=${from}` +
-    `&metal=999999999&crystal=999999999&deuterium=999999999&speed=${speedModifier * 10}`;
+    `&mission=${MissionTypeEnum.Deployment}&am203=999999&am210=999999&am${slowTechId}=999999&cp=${from}` +
+    `&resources=all&speed=${speedModifier * 10}`;
   return url;
 }
 
