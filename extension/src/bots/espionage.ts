@@ -10,7 +10,7 @@ import {NUMBER_OF_SS, PROBES_AMOUNT} from '@src/models/constants';
 import {findPlanetCoords, getCoords, PlanetCoords} from '@src/models/planets';
 import {getAccount, setAccount} from '@src/stores/account';
 
-const BOT_LOOP_TIME = 5000;
+const BOT_LOOP_TIME = 3000;
 let interval: number | undefined;
 
 export interface BotProbes {

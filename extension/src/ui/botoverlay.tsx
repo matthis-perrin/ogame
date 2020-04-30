@@ -1,10 +1,22 @@
 import React, {FC, Fragment} from 'react';
 import styled from 'styled-components';
 
+import {getAccount} from '@src/stores/account';
+
 export const BotOverlay: FC = () => (
   <Fragment>
     <Overlay>
       <Text>BOT IS WORKING</Text>
+      <Button
+        onClick={() => {
+          const account = getAccount();
+          if (account !== undefined) {
+            account.bots.objectives = undefined;
+          }
+        }}
+      >
+        OVERRIDE
+      </Button>
     </Overlay>
   </Fragment>
 );
@@ -22,4 +34,9 @@ const Text = styled.div`
   font-size: 40px;
   margin-left: 200px;
   margin-top: 200px;
+`;
+
+const Button = styled.button`
+  margin-top: 20px;
+  margin-left: 200px;
 `;

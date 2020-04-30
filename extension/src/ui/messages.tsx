@@ -13,7 +13,7 @@ import {PlanetCoords} from '@src/models/planets';
 import {getFretCapacity} from '@src/models/technologies';
 import {EmptyLine, HoverTD, Table, Title} from '@src/ui/common';
 import {Resource} from '@src/ui/components/resource';
-import {sum, time} from '@src/ui/utils';
+import {sum, thousands, time} from '@src/ui/utils';
 
 interface MessagesProps {
   account: Account;
@@ -81,7 +81,7 @@ export const Messages: FC<MessagesProps> = ({account}) => {
   }
 
   const lootMargin = 20000;
-  const resourcesLimit = 95000;
+  const resourcesLimit = 100000;
 
   return (
     <Fragment>
@@ -109,7 +109,7 @@ export const Messages: FC<MessagesProps> = ({account}) => {
                   }
                 }}
               >
-                Clean
+                Clean ({thousands(resourcesLimit)})
               </HoverTD>
             </tr>
             <tr>
