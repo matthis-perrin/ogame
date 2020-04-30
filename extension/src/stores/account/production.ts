@@ -37,6 +37,7 @@ export function applyProduction(): void {
     objectives: currentAccount.objectives,
     bots: currentAccount.bots,
     ghosts: currentAccount.ghosts,
+    emptyPlanets: currentAccount.emptyPlanets,
   };
 
   // Using milliseconds to have below second UI refresh

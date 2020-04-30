@@ -30,3 +30,7 @@ export const Stock = styled.div`
     text-decoration: underline;
   }
 `;
+
+export const EmptyLine = styled.td`
+  height: 10px;
+`;

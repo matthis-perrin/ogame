@@ -2,11 +2,11 @@ import React, {FC, Fragment} from 'react';
 import styled from 'styled-components';
 
 import {goToGalaxy} from '@src/controllers/navigator';
-import {PlanetCoords, PlanetName} from '@src/models/planets';
+import {PlanetCoords} from '@src/models/planets';
 
 interface PlanetCoordsProps {
   coords: PlanetCoords;
-  name: PlanetName;
+  name: string;
 }
 
 export const PlanetCoordsC: FC<PlanetCoordsProps> = ({coords, name}) => (

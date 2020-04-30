@@ -26,6 +26,7 @@ export interface Account {
     espionage: BotProbes | undefined;
   };
   ghosts: {[planetId: string]: Ghost};
+  emptyPlanets: {[planetCoords: string]: boolean};
 }
 
 export interface ResourcesWithServerTime extends BaseResources {

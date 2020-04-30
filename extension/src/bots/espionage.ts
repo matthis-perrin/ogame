@@ -10,7 +10,7 @@ import {NUMBER_OF_SS, PROBES_AMOUNT} from '@src/models/constants';
 import {findPlanetCoords, getCoords, PlanetCoords} from '@src/models/planets';
 import {getAccount, setAccount} from '@src/stores/account';
 
-const BOT_LOOP_TIME = 2000;
+const BOT_LOOP_TIME = 5000;
 let interval: number | undefined;
 
 export interface BotProbes {
@@ -115,6 +115,23 @@ function loop(): void {
       return;
     }
 
+    const newCoords = transformCoords({
+      galaxy: coords.galaxy,
+      solarSystem: coords.solarSystem,
+      position: index + 1,
+    });
+
+    if (
+      element.classList.length === 2 &&
+      element.classList[0] === 'row' &&
+      element.classList[1] === 'empty_filter'
+    ) {
+      account.emptyPlanets[newCoords] = true;
+    } else {
+      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+      delete account.emptyPlanets[newCoords];
+    }
+
     if (
       element.classList.length !== 2 ||
       element.classList[0] !== 'row' ||
@@ -122,12 +139,6 @@ function loop(): void {
     ) {
       return;
     }
-
-    const newCoords = transformCoords({
-      galaxy: coords.galaxy,
-      solarSystem: coords.solarSystem,
-      position: index + 1,
-    });
 
     if (botProbes.sent.includes(newCoords)) {
       return;
@@ -138,9 +149,7 @@ function loop(): void {
 
     shouldStop = true;
     sendProbes(newCoords);
-    if (slotsTotal - slotsUsed === 1) {
-      setTimeout(() => refreshButton.click(), BOT_LOOP_TIME / 2);
-    }
+    setTimeout(() => refreshButton.click(), BOT_LOOP_TIME / 2);
   });
 
   if (shouldStop) {

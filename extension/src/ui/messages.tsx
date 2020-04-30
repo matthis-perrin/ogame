@@ -11,12 +11,26 @@ import {MissionTypeEnum} from '@src/models/fleets';
 import {Message} from '@src/models/messages';
 import {PlanetCoords} from '@src/models/planets';
 import {getFretCapacity} from '@src/models/technologies';
-import {Table, Title} from '@src/ui/common';
+import {EmptyLine, HoverTD, Table, Title} from '@src/ui/common';
 import {Resource} from '@src/ui/components/resource';
 import {sum, time} from '@src/ui/utils';
 
 interface MessagesProps {
   account: Account;
+}
+
+const deleteMessageAsyncTimeout = 200;
+async function deleteMessageAsync(
+  account: Account,
+  message: Message,
+  withTimeout: boolean
+): Promise<void> {
+  return new Promise(resolve => {
+    deleteMessage(message.messageId);
+    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+    delete account.messages[message.messageId];
+    setTimeout(resolve, withTimeout ? deleteMessageAsyncTimeout : 0);
+  });
 }
 
 export const Messages: FC<MessagesProps> = ({account}) => {
@@ -67,6 +81,7 @@ export const Messages: FC<MessagesProps> = ({account}) => {
   }
 
   const lootMargin = 20000;
+  const resourcesLimit = 95000;
 
   return (
     <Fragment>
@@ -82,6 +97,24 @@ export const Messages: FC<MessagesProps> = ({account}) => {
             </tr>
           </thead>
           <tbody>
+            <tr>
+              <HoverTD
+                onClick={async () => {
+                  for (const message of messages) {
+                    const isDuplicate = duplicatesList.has(message.messageId);
+                    if (message.resources.sum < resourcesLimit || !message.noUnits || isDuplicate) {
+                      await deleteMessageAsync(account, message, true);
+                      refreshComponent({});
+                    }
+                  }
+                }}
+              >
+                Clean
+              </HoverTD>
+            </tr>
+            <tr>
+              <EmptyLine></EmptyLine>
+            </tr>
             {messages.map(message => {
               const isDuplicate = duplicatesList.has(message.messageId);
               return (
@@ -98,10 +131,8 @@ export const Messages: FC<MessagesProps> = ({account}) => {
                   <td>
                     <Hover onClick={() => sendProbes(message.planetCoords)}>Esp</Hover>{' '}
                     <Hover
-                      onClick={() => {
-                        deleteMessage(message.messageId);
-                        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-                        delete account.messages[message.messageId];
+                      onClick={async () => {
+                        await deleteMessageAsync(account, message, false);
                         refreshComponent({});
                       }}
                     >
