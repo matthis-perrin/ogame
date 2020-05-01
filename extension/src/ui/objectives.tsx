@@ -194,7 +194,7 @@ export const ObjectivesC: FC<ObjectivesProps> = ({account}) => {
                         : ''
                     }
                   >
-                    <td
+                    <HoverTD
                       onClick={e => {
                         e.stopPropagation();
                         if (account.objectives !== undefined) {
@@ -204,7 +204,7 @@ export const ObjectivesC: FC<ObjectivesProps> = ({account}) => {
                       }}
                     >
                       {findPlanetName(account.planetList, transfer.from)}
-                    </td>
+                    </HoverTD>
                     <td>
                       <Resource name="M" amount={transfer.resources.metal} />
                     </td>

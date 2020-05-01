@@ -3,7 +3,6 @@ import styled from 'styled-components';
 
 import {goToUrl, sendGhostUrl} from '@src/controllers/navigator';
 import {Account} from '@src/models/account';
-import {COLOR_WHITE, COLOR_WHITEDARK} from '@src/models/constants';
 import {Ghost, GhostSpeed} from '@src/models/ghost';
 import {findPlanetCoords, findPlanetName, PlanetId} from '@src/models/planets';
 import {thousands, time} from '@src/ui/utils';
@@ -23,9 +22,9 @@ export const GhostC: FC<GhostProps> = ({ghosts, planetId, account}) => {
   let ghostSpeed: GhostSpeed | undefined;
   if (ghost !== undefined) {
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-    const minSeconds = 7 * 3600;
+    const minSeconds = 7.5 * 3600;
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-    const maxSeconds = 9 * 3600;
+    const maxSeconds = 8 * 3600;
     for (const gs of ghost.speeds) {
       if (gs.timeSeconds > minSeconds && gs.timeSeconds < maxSeconds) {
         ghostSpeed = gs;
@@ -51,11 +50,11 @@ export const GhostC: FC<GhostProps> = ({ghosts, planetId, account}) => {
           <div>
             {findPlanetName(account.planetList, ghost.destination)} > {thousands(ghost.distance)}
           </div>
-          {ghost.speeds.map(gs => (
-            <Speed key={gs.name} className={gs === ghostSpeed ? 'active' : ''}>
-              {gs.name}: {time(gs.timeSeconds)}
-            </Speed>
-          ))}
+          <div>
+            {ghostSpeed === undefined
+              ? 'Nothing compatible'
+              : `${ghostSpeed.name}: ${time(ghostSpeed.timeSeconds)}`}
+          </div>
         </Hover>
       )}
     </Fragment>
@@ -66,12 +65,5 @@ const Hover = styled.div`
   cursor: pointer;
   &:hover {
     text-decoration: underline;
-  }
-`;
-
-const Speed = styled.div`
-  color: ${COLOR_WHITEDARK};
-  &.active {
-    color: ${COLOR_WHITE};
   }
 `;

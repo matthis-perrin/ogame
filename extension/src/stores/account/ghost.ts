@@ -54,15 +54,6 @@ export function updateGhosts(account: Account): void {
       distance,
       speeds: [
         {
-          name: 'REC 10%',
-          techId: Recycler.id,
-          timeSeconds: Math.floor(
-            getFlightDuration(distance, recyclerDrive.speed, SpeedModifier.TenPercent, Rosalind) /
-              1000
-          ),
-          speedModifier: SpeedModifier.TenPercent,
-        },
-        {
           name: 'REC 20%',
           techId: Recycler.id,
           timeSeconds: Math.floor(

@@ -12,6 +12,9 @@ export const BotOverlay: FC = () => (
           const account = getAccount();
           if (account !== undefined) {
             account.bots.objectives = undefined;
+            if (account.objectives !== undefined) {
+              account.objectives.botEnabled = false;
+            }
           }
         }}
       >
