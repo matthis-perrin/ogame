@@ -118,8 +118,10 @@ function loop(): void {
   const nowSeconds = Math.floor(new Date().getTime() / 1000);
   const fretGt = getFretCapacity(account.accountTechnologies, LargeCargo);
 
+  let transferringCount = 0;
   for (const transfer of account.objectives.resourceTransfers) {
     if (transfer.isTransferring) {
+      transferringCount++;
       continue;
     }
 
@@ -148,6 +150,11 @@ function loop(): void {
     account.bots.objectives = {transfer, step: BotTransferStep.GoToFleet};
     setAccount(account);
     return;
+  }
+
+  if (transferringCount === account.objectives.resourceTransfers.length) {
+    account.objectives.botEnabled = false;
+    setAccount(account);
   }
 }
 

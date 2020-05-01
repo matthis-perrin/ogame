@@ -194,7 +194,17 @@ export const ObjectivesC: FC<ObjectivesProps> = ({account}) => {
                         : ''
                     }
                   >
-                    <td>{findPlanetName(account.planetList, transfer.from)}</td>
+                    <td
+                      onClick={e => {
+                        e.stopPropagation();
+                        if (account.objectives !== undefined) {
+                          account.objectives.bannedPlanets.push(transfer.from);
+                          updateObjectives(account);
+                        }
+                      }}
+                    >
+                      {findPlanetName(account.planetList, transfer.from)}
+                    </td>
                     <td>
                       <Resource name="M" amount={transfer.resources.metal} />
                     </td>

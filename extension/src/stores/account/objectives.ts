@@ -150,6 +150,9 @@ export function updateObjectives(account: Account): void {
   const planetCoords = account.planetList.find(p => p.id === objectives?.planetId)?.coords;
   if (planetCoords !== undefined) {
     for (const planet of account.planetList) {
+      if (objectives.bannedPlanets.includes(planet.id)) {
+        continue;
+      }
       let timeFromOriginSeconds = 0;
       if (planet.id !== objectives.planetId) {
         const distance = getDistance(getCoords(planetCoords), getCoords(planet.coords), Rosalind);
@@ -344,6 +347,7 @@ export function addObjectives(planetId: PlanetId, newTechnology: Technology): vo
       },
       startTime: undefined,
       botEnabled: false,
+      bannedPlanets: [],
     };
   }
 

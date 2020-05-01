@@ -21,8 +21,9 @@ export interface Ghost {
 export const DefaultGhosts: Map<string, string> = new Map();
 // RECYCLER
 DefaultGhosts.set('3-1', '5-1');
-DefaultGhosts.set('5-1', '5-4');
-DefaultGhosts.set('5-4', '3-1');
+DefaultGhosts.set('5-1', '3-2');
+DefaultGhosts.set('3-2', '5-4');
+DefaultGhosts.set('5-1', '3-1');
 // BOMBER
 DefaultGhosts.set('4-1', '5-2');
 DefaultGhosts.set('5-2', '4-2');
