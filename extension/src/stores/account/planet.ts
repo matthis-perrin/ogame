@@ -70,7 +70,8 @@ export function addPlanet(
         if (
           (fleet.missionType === MissionTypeEnum.Attacking ||
             fleet.missionType === MissionTypeEnum.Transport ||
-            fleet.missionType === MissionTypeEnum.Expedition) &&
+            fleet.missionType === MissionTypeEnum.Expedition ||
+            fleet.missionType === MissionTypeEnum.Colonization) &&
           fleet.returnFlight &&
           document.location.search.includes('component=fleetdispatch') &&
           destPlanetId === planetId
@@ -98,6 +99,7 @@ export function addPlanet(
           (fleet.missionType === MissionTypeEnum.Attacking ||
             fleet.missionType === MissionTypeEnum.Expedition ||
             fleet.missionType === MissionTypeEnum.Espionage ||
+            fleet.missionType === MissionTypeEnum.Colonization ||
             (fleet.missionType === MissionTypeEnum.Transport && destPlanetId === undefined)) &&
           !fleet.returnFlight &&
           document.location.search.includes('page=messages')

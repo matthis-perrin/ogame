@@ -11,6 +11,7 @@ export enum MissionTypeEnum {
   Transport = 3,
   Deployment = 4,
   Espionage = 6,
+  Colonization = 7,
   Expedition = 15,
 }
 
@@ -56,6 +57,8 @@ export function missionTypeString(fleet: Fleet): string {
       return 'Espionner';
     case MissionTypeEnum.Expedition:
       return 'Expédition';
+    case MissionTypeEnum.Colonization:
+      return 'Coloniser';
     default:
       return `MISSION_${fleet.missionType}`;
   }

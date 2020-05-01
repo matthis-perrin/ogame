@@ -18,7 +18,7 @@ export const PlanetCoordsC: FC<PlanetCoordsProps> = ({coords, name}) => (
       }}
       title={coords}
     >
-      {name !== 'profondeurs de l`espace' ? name : coords}
+      {name.length > 0 && name !== 'profondeurs de l`espace' ? name : coords}
     </PlanetCoordsContainer>
   </Fragment>
 );
