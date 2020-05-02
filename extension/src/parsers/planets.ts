@@ -2,7 +2,7 @@ import $ from 'jquery';
 
 import {Planet, PlanetCoords, PlanetId, PlanetName} from '@src/models/planets';
 
-const temperatureRegex = /<br>(-?\d+) °C à (-?\d+)°C<br\/>/;
+const titleRegex = /<br\/>.*km \((\d+)\/(\d+)\)<br>(-?\d+) °C à (-?\d+)°C<br\/>/;
 
 export function parsePlanets(): Planet[] {
   const res: Planet[] = [];
@@ -16,7 +16,7 @@ export function parsePlanets(): Planet[] {
     if (title === undefined) {
       return;
     }
-    const match = temperatureRegex.exec(title);
+    const match = titleRegex.exec(title);
     // eslint-disable-next-line no-null/no-null
     if (match === null) {
       return;
@@ -30,8 +30,12 @@ export function parsePlanets(): Planet[] {
       coords: $(element)
         .find('.planet-koords')
         .text() as PlanetCoords,
-      tempLow: parseFloat(match[1]),
-      tempHigh: parseFloat(match[2]),
+      usedSpace: parseFloat(match[1]),
+      totalSpace: parseFloat(match[2]),
+      // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+      tempLow: parseFloat(match[3]),
+      // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+      tempHigh: parseFloat(match[4]),
     });
   });
   return res;

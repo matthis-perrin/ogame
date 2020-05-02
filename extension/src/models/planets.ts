@@ -8,6 +8,8 @@ export interface Planet {
   id: PlanetId;
   name: PlanetName;
   coords: PlanetCoords;
+  usedSpace: number;
+  totalSpace: number;
   tempLow: number;
   tempHigh: number;
 }

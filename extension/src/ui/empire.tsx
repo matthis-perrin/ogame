@@ -284,6 +284,9 @@ export const Empire: FC<EmpireProps> = ({account}) => (
                       required={requiredSat}
                     />
                     <Energy name="E" amount={planet.resources.energy} />
+                    <div>
+                      {p.usedSpace}/{p.totalSpace}
+                    </div>
                   </Line>
                 </td>
                 <td onClick={() => goToMines(planet.planetId)} style={{cursor: 'pointer'}}>
