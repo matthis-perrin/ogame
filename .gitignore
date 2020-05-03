@@ -4,3 +4,4 @@ dist
 .idea
 .eslintcache
 npm-debug.log*
+storage.txt

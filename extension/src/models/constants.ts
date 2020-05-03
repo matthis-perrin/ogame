@@ -30,11 +30,14 @@ import {
   WeaponTechnology,
 } from '@shared/models/technology';
 
+import {setItem} from '@src/controllers/networkstorage';
+
 export const SESSION_ID = Math.random()
   .toString()
   .substr(2);
 export const SESSION_ID_LOCAL_STORAGE_KEY = 'titanraccoonid';
-localStorage.setItem(SESSION_ID_LOCAL_STORAGE_KEY, SESSION_ID);
+// eslint-disable-next-line no-console
+setItem(SESSION_ID_LOCAL_STORAGE_KEY, SESSION_ID).catch(console.error);
 
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 export const INACTIVITY_TIME = 7.75; // 7h45

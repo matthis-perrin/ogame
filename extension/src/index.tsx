@@ -3,9 +3,14 @@ import {parseUI} from '@src/controllers/parse';
 import {resetUI} from '@src/controllers/reset';
 import {initStorage} from '@src/controllers/storage';
 
-if (document.location.hostname !== 'lobby.ogame.gameforge.com') {
-  resetUI();
-  initStorage();
-  parseUI();
-  injectUI();
+async function run(): Promise<void> {
+  if (document.location.hostname !== 'lobby.ogame.gameforge.com') {
+    resetUI();
+    await initStorage();
+    parseUI();
+    injectUI();
+  }
 }
+
+// eslint-disable-next-line no-console
+run().catch(console.error);

@@ -9,7 +9,8 @@ const accountListeners: ((account: Account) => void)[] = [];
 export function setAccount(account: Account, persistent = true): void {
   currentAccount = account;
   if (persistent) {
-    persist(account);
+    // eslint-disable-next-line no-console
+    persist(account).catch(console.error);
   }
   for (const listener of accountListeners) {
     listener(currentAccount);
