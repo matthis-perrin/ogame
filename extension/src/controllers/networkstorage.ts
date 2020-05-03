@@ -1,6 +1,6 @@
 import $ from 'jquery';
 
-const url = 'http://localhost:3000';
+const url = 'http://192.168.0.42:3000';
 
 export async function getItem(key: string): Promise<string> {
   return $.get({url: `${url}/${key}`, method: 'GET'})

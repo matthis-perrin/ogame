@@ -96,7 +96,7 @@ export const Empire: FC<EmpireProps> = ({account}) => (
           <th colSpan={2}>
             <Title>Défense</Title>
           </th>
-          <th colSpan={2}>
+          <th>
             <Title>Flotte</Title>
           </th>
           <th>
