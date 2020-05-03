@@ -31,7 +31,6 @@ import {
   EspionageProbe,
   LargeCargo,
   Recycler,
-  SmallCargo,
   SolarSatellite,
 } from '@shared/models/ships';
 import {Crystal, Deuterium, Metal} from '@shared/models/stock';
@@ -128,12 +127,19 @@ export const Empire: FC<EmpireProps> = ({account}) => (
               ? planet.technologies[SolarSatellite.id].value * DEBRIS_SAT * DEBRIS_PERCENTAGE
               : 0;
             const totalLoot = inactivityLoot + satelliteLoot;
-            const ptAmount = planet.ships.hasOwnProperty(SmallCargo.id)
-              ? planet.ships[SmallCargo.id].value
-              : 0;
-            const fretPt = getFretCapacity(account.accountTechnologies, SmallCargo);
-            const fretGt = getFretCapacity(account.accountTechnologies, LargeCargo);
-            const requiredGt = Math.ceil((planet.resources.sum - ptAmount * fretPt) / fretGt);
+            const inFlight = account.inFlightResources.hasOwnProperty(p.coords)
+              ? account.inFlightResources[p.coords]
+              : {
+                  metal: 0 as ResourceAmount,
+                  crystal: 0 as ResourceAmount,
+                  deuterium: 0 as ResourceAmount,
+                  sum: 0 as ResourceAmount,
+                  largeCargos: 0,
+                };
+            const fretLargeCargo = getFretCapacity(account.accountTechnologies, LargeCargo);
+            const requiredLargeCargos = Math.ceil(
+              sum([planet.resources.sum, inFlight.sum]) / fretLargeCargo
+            );
             let requiredSat = 0;
             if (planet.resources.energy < 0) {
               const satEnergy = getSatelliteEnergyProductionPerHour(
@@ -207,24 +213,12 @@ export const Empire: FC<EmpireProps> = ({account}) => (
                   </Line>
                 </td>
                 <td>
-                  {(() => {
-                    const inFlight = account.inFlightResources.hasOwnProperty(p.coords)
-                      ? account.inFlightResources[p.coords]
-                      : {
-                          metal: 0 as ResourceAmount,
-                          crystal: 0 as ResourceAmount,
-                          deuterium: 0 as ResourceAmount,
-                          sum: 0 as ResourceAmount,
-                        };
-                    return (
-                      <Line>
-                        <Resource name="M" amount={inFlight.metal} />
-                        <Resource name="C" amount={inFlight.crystal} />
-                        <Resource name="D" amount={inFlight.deuterium} />
-                        <Resource name="Σ" amount={inFlight.sum} />
-                      </Line>
-                    );
-                  })()}
+                  <Line>
+                    <Resource name="M" amount={inFlight.metal} />
+                    <Resource name="C" amount={inFlight.crystal} />
+                    <Resource name="D" amount={inFlight.deuterium} />
+                    <Resource name="Σ" amount={inFlight.sum} />
+                  </Line>
                 </td>
                 <td onClick={() => goToMines(planet.planetId)} style={{cursor: 'pointer'}}>
                   <Line>
@@ -453,17 +447,12 @@ export const Empire: FC<EmpireProps> = ({account}) => (
                 <td onClick={() => goToShips(planet.planetId)} style={{cursor: 'pointer'}}>
                   <Line>
                     <TechnologyC
-                      name="PT"
-                      technologies={planet.ships}
-                      techId={SmallCargo.id}
-                      planetId={planet.planetId}
-                    />
-                    <TechnologyC
                       name="GT"
                       technologies={planet.ships}
                       techId={LargeCargo.id}
                       planetId={planet.planetId}
-                      required={requiredGt}
+                      required={requiredLargeCargos}
+                      additional={inFlight.largeCargos}
                     />
                     <TechnologyC
                       name="ESP"
@@ -471,10 +460,6 @@ export const Empire: FC<EmpireProps> = ({account}) => (
                       techId={EspionageProbe.id}
                       planetId={planet.planetId}
                     />
-                  </Line>
-                </td>
-                <td onClick={() => goToShips(planet.planetId)} style={{cursor: 'pointer'}}>
-                  <Line>
                     <TechnologyC
                       name="REC"
                       technologies={planet.ships}

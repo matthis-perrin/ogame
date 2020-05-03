@@ -38,6 +38,11 @@ export interface ResourcesWithSum extends BaseResources {
   sum: ResourceAmount;
 }
 
+export interface ResourcesWithSumAndLargeCargos extends BaseResources {
+  sum: ResourceAmount;
+  largeCargos: number;
+}
+
 export interface BaseResources {
   metal: ResourceAmount;
   crystal: ResourceAmount;

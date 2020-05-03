@@ -12,13 +12,15 @@ interface TechnologyProps {
   techId: number;
   planetId: PlanetId;
   required?: number;
+  additional?: number;
 }
 
 const SubTechnology: FC<{
   technology: Technology;
   missingAmount: number | undefined;
   planetId: PlanetId;
-}> = ({technology, missingAmount, planetId}) => {
+  additionalAmount: number;
+}> = ({technology, missingAmount, planetId, additionalAmount}) => {
   const smartTech = TechnologyIndex.get(technology.techId);
   return (
     <Fragment>
@@ -40,7 +42,7 @@ const SubTechnology: FC<{
           smartTech?.type === 'building' || smartTech?.type === 'technology' ? 'hoverable' : ''
         }
       >
-        {technology.value}
+        {technology.value + additionalAmount}
       </Value>
       {technology.target !== undefined ? <span>+{technology.target - technology.value}</span> : ''}
 
@@ -58,8 +60,8 @@ const SubTechnology: FC<{
               e.stopPropagation();
               addObjectives(planetId, {
                 techId: technology.techId,
-                value: technology.value,
-                target: technology.value + missingAmount,
+                value: technology.value + additionalAmount,
+                target: technology.value + additionalAmount + missingAmount,
               });
             }}
             className={
@@ -81,6 +83,7 @@ export const TechnologyC: FC<TechnologyProps> = ({
   techId,
   planetId,
   required,
+  additional,
 }) => {
   let technology: Technology | undefined;
   if (technologies.hasOwnProperty(techId)) {
@@ -89,10 +92,11 @@ export const TechnologyC: FC<TechnologyProps> = ({
 
   let missingAmount: number | undefined;
   let className = '';
+  const additionalAmount = additional ?? 0;
 
   if (required !== undefined && technology !== undefined) {
     const target = technology.target === undefined ? technology.value : technology.target;
-    missingAmount = required - target;
+    missingAmount = required - target - additionalAmount;
     if (missingAmount > 0) {
       className = 'red';
     } else if (technology.target !== undefined && target === required) {
@@ -109,6 +113,7 @@ export const TechnologyC: FC<TechnologyProps> = ({
             technology={technology}
             missingAmount={missingAmount}
             planetId={planetId}
+            additionalAmount={additionalAmount}
           />
         ) : (
           <span>0</span>

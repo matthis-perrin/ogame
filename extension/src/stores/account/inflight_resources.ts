@@ -1,6 +1,10 @@
 import {Fleet} from '@src/models/fleets';
 import {Planet} from '@src/models/planets';
-import {ResourceAmount, ResourcesWithSum} from '@src/models/resources';
+import {
+  ResourceAmount,
+  ResourcesWithSum,
+  ResourcesWithSumAndLargeCargos,
+} from '@src/models/resources';
 import {sum} from '@src/ui/utils';
 
 export function calcInFlightResources(
@@ -8,8 +12,8 @@ export function calcInFlightResources(
   fleets: {
     [fleetId: string]: Fleet;
   }
-): [{[planetCoords: string]: ResourcesWithSum}, ResourcesWithSum] {
-  const inFlightResources: {[planetCoords: string]: ResourcesWithSum} = {};
+): [{[planetCoords: string]: ResourcesWithSumAndLargeCargos}, ResourcesWithSum] {
+  const inFlightResources: {[planetCoords: string]: ResourcesWithSumAndLargeCargos} = {};
   const inFlightSum: ResourcesWithSum = {
     metal: 0 as ResourceAmount,
     crystal: 0 as ResourceAmount,
@@ -30,11 +34,13 @@ export function calcInFlightResources(
             crystal: 0 as ResourceAmount,
             deuterium: 0 as ResourceAmount,
             sum: 0 as ResourceAmount,
+            largeCargos: 0,
           };
       inFlight.metal = sum([inFlight.metal, fleet.resources.metal]);
       inFlight.crystal = sum([inFlight.crystal, fleet.resources.crystal]);
       inFlight.deuterium = sum([inFlight.deuterium, fleet.resources.deuterium]);
       inFlight.sum = sum([inFlight.metal, inFlight.crystal, inFlight.deuterium]);
+      inFlight.largeCargos += fleet.ships.transporterLarge;
       inFlightResources[fleet.destinationCoords] = inFlight;
       if (planetIndex.has(fleet.destinationCoords)) {
         inFlightSum.metal = sum([inFlightSum.metal, fleet.resources.metal]);

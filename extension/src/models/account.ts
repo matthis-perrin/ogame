@@ -5,7 +5,12 @@ import {Ghost} from '@src/models/ghost';
 import {Message} from '@src/models/messages';
 import {Objectives} from '@src/models/objectives';
 import {Planet, PlanetId} from '@src/models/planets';
-import {BaseResources, ResourcesWithEnergyAndSum, ResourcesWithSum} from '@src/models/resources';
+import {
+  BaseResources,
+  ResourcesWithEnergyAndSum,
+  ResourcesWithSum,
+  ResourcesWithSumAndLargeCargos,
+} from '@src/models/resources';
 import {Construction, Technology} from '@src/models/technologies';
 
 export interface Account {
@@ -17,7 +22,7 @@ export interface Account {
   fleets: {[fleetId: string]: Fleet};
   planetSum: AccountPlanet | undefined;
   constructions: {[constructionId: string]: Construction};
-  inFlightResources: {[planetCoords: string]: ResourcesWithSum};
+  inFlightResources: {[planetCoords: string]: ResourcesWithSumAndLargeCargos};
   inFlightSum: ResourcesWithSum;
   messages: {[messageId: string]: Message};
   objectives: Objectives | undefined;
