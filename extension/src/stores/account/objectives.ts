@@ -1,6 +1,7 @@
-import {getDistance, getFlightDuration} from '@shared/lib/formula';
+import {getDistance, getFlightDuration, getFuelConsumption} from '@shared/lib/formula';
 import {getShipDrive} from '@shared/lib/ships';
 import {Class} from '@shared/models/account';
+import {Distance} from '@shared/models/coordinates';
 import {multiplyResources, Resources} from '@shared/models/resource';
 import {LargeCargo} from '@shared/models/ships';
 import {CombustionDrive, HyperspaceDrive, ImpulseDrive} from '@shared/models/technology';
@@ -10,7 +11,7 @@ import {Account} from '@src/models/account';
 import {MissionTypeEnum} from '@src/models/fleets';
 import {findPlanetCoords, findPlanetName, getCoords, PlanetId} from '@src/models/planets';
 import {ResourceAmount} from '@src/models/resources';
-import {Technology, TechnologyIndex} from '@src/models/technologies';
+import {getFretCapacity, Technology, TechnologyIndex} from '@src/models/technologies';
 import {getAccount, setAccount} from '@src/stores/account';
 import {calcInFlightResources} from '@src/stores/account/inflight_resources';
 import {sum} from '@src/ui/utils';
@@ -26,6 +27,7 @@ interface ResourceInfo {
 
 interface PlanetInfo {
   planetId: PlanetId;
+  distance: Distance;
   timeFromOriginSeconds: number;
   resources: Map<ResourceType, ResourceInfo>;
 }
@@ -86,7 +88,7 @@ function remainingResourcePerPlanet(
   return remaining;
 }
 
-export function updateObjectives(account: Account): void {
+export function updateObjectives(account: Account, neededFuel = 0): void {
   const objectives = account.objectives;
   if (objectives === undefined) {
     return;
@@ -99,6 +101,7 @@ export function updateObjectives(account: Account): void {
     crystal: 0 as ResourceAmount,
     deuterium: 0 as ResourceAmount,
     sum: 0 as ResourceAmount,
+    fuel: neededFuel as ResourceAmount,
   };
   for (const technology of objectives.technologies) {
     const smartTech = TechnologyIndex.get(technology.techId);
@@ -153,9 +156,10 @@ export function updateObjectives(account: Account): void {
       if (objectives.bannedPlanets.includes(planet.id)) {
         continue;
       }
+      let distance = 0 as Distance;
       let timeFromOriginSeconds = 0;
       if (planet.id !== objectives.planetId) {
-        const distance = getDistance(getCoords(planetCoords), getCoords(planet.coords), Rosalind);
+        distance = getDistance(getCoords(planetCoords), getCoords(planet.coords), Rosalind);
         timeFromOriginSeconds = Math.floor(
           getFlightDuration(distance, shipDrive.speed, 1, Rosalind) / 1000
         );
@@ -192,6 +196,7 @@ export function updateObjectives(account: Account): void {
       }
       planetInfos.push({
         planetId: planet.id,
+        distance,
         timeFromOriginSeconds,
         resources,
       });
@@ -221,7 +226,7 @@ export function updateObjectives(account: Account): void {
   objectives.readyTimeSeconds.deuterium =
     nowSeconds +
     timeBeforeSendingSeconds(
-      objectives.neededResources.deuterium,
+      sum([objectives.neededResources.deuterium, objectives.neededResources.fuel]),
       longestTimeSeconds,
       planetInfos,
       'deuterium'
@@ -260,7 +265,7 @@ export function updateObjectives(account: Account): void {
   const remainingDeuteriumPerPlanet = remainingResourcePerPlanet(
     'deuterium',
     planetInfos,
-    objectives.neededResources.deuterium
+    sum([objectives.neededResources.deuterium, objectives.neededResources.fuel])
   );
 
   // Calculating resource transfers
@@ -275,6 +280,7 @@ export function updateObjectives(account: Account): void {
       : 1;
   });
   objectives.resourceTransfers = [];
+  let requiredFuel = 0;
   // We don't iterate on the last planet
   let canChange = true;
   for (let i = 0; i < planetInfos.length - 1; i++) {
@@ -313,11 +319,25 @@ export function updateObjectives(account: Account): void {
         metal: metalToSend as ResourceAmount,
         crystal: crystalToSend as ResourceAmount,
         deuterium: deuteriumToSend as ResourceAmount,
-        sum: sum([metalToSend, crystalToSend, deuteriumToSend]),
+        sum: sumToSend,
       },
       timeFromOriginSeconds: planetInfo.timeFromOriginSeconds,
       isTransferring: false,
     });
+    const fretLargeCargo = getFretCapacity(account.accountTechnologies, LargeCargo);
+    const requiredLargeCargos = Math.ceil(sumToSend / fretLargeCargo);
+    requiredFuel += getFuelConsumption(
+      shipDrive.fuelConsumption,
+      planetInfo.distance,
+      shipDrive.speed,
+      shipDrive.speed,
+      requiredLargeCargos
+    );
+  }
+  if (neededFuel !== requiredFuel) {
+    updateObjectives(account, requiredFuel);
+  } else {
+    setAccount(account);
   }
 }
 
@@ -337,6 +357,7 @@ export function addObjectives(planetId: PlanetId, newTechnology: Technology): vo
         crystal: 0 as ResourceAmount,
         deuterium: 0 as ResourceAmount,
         sum: 0 as ResourceAmount,
+        fuel: 0 as ResourceAmount,
       },
       resourceTransfers: [],
       readyTimeSeconds: {
@@ -381,7 +402,6 @@ export function addObjectives(planetId: PlanetId, newTechnology: Technology): vo
   objectives.technologies.push(newTechnology);
   currentAccount.objectives = objectives;
   updateObjectives(currentAccount);
-  setAccount(currentAccount);
 }
 
 export function updateObjectivesTransfers(account: Account): void {

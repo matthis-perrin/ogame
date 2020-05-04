@@ -38,6 +38,10 @@ export interface ResourcesWithSum extends BaseResources {
   sum: ResourceAmount;
 }
 
+export interface ResourcesWithSumAndFuel extends ResourcesWithSum {
+  fuel: ResourceAmount;
+}
+
 export interface ResourcesWithSumAndLargeCargos extends BaseResources {
   sum: ResourceAmount;
   largeCargos: number;

@@ -116,7 +116,6 @@ function loop(): void {
   }
 
   const nowSeconds = Math.floor(new Date().getTime() / 1000);
-  const fretGt = getFretCapacity(account.accountTechnologies, LargeCargo);
 
   let transferringCount = 0;
   for (const transfer of account.objectives.resourceTransfers) {
@@ -134,16 +133,6 @@ function loop(): void {
           : 0) + transfer.sendInSeconds
       );
     if (sendInSeconds !== 0) {
-      continue;
-    }
-
-    const requiredGt = Math.ceil(transfer.resources.sum / fretGt);
-    let gtAmount = 0;
-    if (account.planetDetails.hasOwnProperty(transfer.from)) {
-      const planet = account.planetDetails[transfer.from];
-      gtAmount = planet.ships.hasOwnProperty(LargeCargo.id) ? planet.ships[LargeCargo.id].value : 0;
-    }
-    if (requiredGt > gtAmount) {
       continue;
     }
 

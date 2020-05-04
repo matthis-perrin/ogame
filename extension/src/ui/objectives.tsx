@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import {LargeCargo} from '@shared/models/ships';
 
 import {goToTechnology, goToUrl, sendLargeCargosUrl} from '@src/controllers/navigator';
-import {Account} from '@src/models/account';
+import {Account, AccountPlanet} from '@src/models/account';
 import {COLOR_GREEN, COLOR_RED} from '@src/models/constants';
 import {MissionTypeEnum} from '@src/models/fleets';
 import {findPlanetCoords, findPlanetName} from '@src/models/planets';
@@ -141,6 +141,11 @@ export const ObjectivesC: FC<ObjectivesProps> = ({account}) => {
                     : 'Disponible'}
                 </td>
               </Status>
+              <Status>
+                <td colSpan={2}>
+                  <Resource name="F" amount={account.objectives.neededResources.fuel} />
+                </td>
+              </Status>
               <tr>
                 <EmptyLine></EmptyLine>
               </tr>
@@ -153,12 +158,14 @@ export const ObjectivesC: FC<ObjectivesProps> = ({account}) => {
           <Table>
             <tbody>
               {account.objectives.resourceTransfers.map(transfer => {
-                const fretGt = getFretCapacity(account.accountTechnologies, LargeCargo);
-                const requiredGt = Math.ceil(transfer.resources.sum / fretGt);
-                let gtAmount = 0;
+                const coords = findPlanetCoords(account.planetList, transfer.from);
+                const fretLargeCargo = getFretCapacity(account.accountTechnologies, LargeCargo);
+                const requiredLargeCargos = Math.ceil(transfer.resources.sum / fretLargeCargo);
+                let largeCargoAmount = 0;
+                let planet: AccountPlanet | undefined;
                 if (account.planetDetails.hasOwnProperty(transfer.from)) {
-                  const planet = account.planetDetails[transfer.from];
-                  gtAmount = planet.ships.hasOwnProperty(LargeCargo.id)
+                  planet = account.planetDetails[transfer.from];
+                  largeCargoAmount = planet.ships.hasOwnProperty(LargeCargo.id)
                     ? planet.ships[LargeCargo.id].value
                     : 0;
                 }
@@ -179,9 +186,9 @@ export const ObjectivesC: FC<ObjectivesProps> = ({account}) => {
                       }
                       const url = sendLargeCargosUrl(
                         transfer.from,
-                        findPlanetCoords(account.planetList, transfer.to),
+                        coords,
                         MissionTypeEnum.Deployment,
-                        requiredGt,
+                        requiredLargeCargos,
                         transfer.resources
                       );
                       goToUrl(url);
@@ -205,17 +212,43 @@ export const ObjectivesC: FC<ObjectivesProps> = ({account}) => {
                     >
                       {findPlanetName(account.planetList, transfer.from)}
                     </HoverTD>
-                    <td>
+                    <td
+                      className={
+                        planet !== undefined && planet.resources.metal < transfer.resources.metal
+                          ? 'red'
+                          : ''
+                      }
+                    >
                       <Resource name="M" amount={transfer.resources.metal} />
                     </td>
-                    <td>
+                    <td
+                      className={
+                        planet !== undefined &&
+                        planet.resources.crystal < transfer.resources.crystal
+                          ? 'red'
+                          : ''
+                      }
+                    >
                       <Resource name="C" amount={transfer.resources.crystal} />
                     </td>
-                    <td>
+                    <td
+                      className={
+                        planet !== undefined &&
+                        planet.resources.deuterium < transfer.resources.deuterium
+                          ? 'red'
+                          : ''
+                      }
+                    >
                       <Resource name="D" amount={transfer.resources.deuterium} />
                     </td>
-                    <td className={requiredGt > gtAmount && !transfer.isTransferring ? 'red' : ''}>
-                      GT: {requiredGt}
+                    <td
+                      className={
+                        requiredLargeCargos > largeCargoAmount && !transfer.isTransferring
+                          ? 'red'
+                          : ''
+                      }
+                    >
+                      GT: {requiredLargeCargos}
                     </td>
                     <td>{sendInSeconds === 0 ? 'Prêt' : time(sendInSeconds)}</td>
                   </HoverGT>

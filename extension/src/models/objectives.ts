@@ -1,5 +1,5 @@
 import {PlanetId} from '@src/models/planets';
-import {ResourcesWithSum} from '@src/models/resources';
+import {ResourcesWithSum, ResourcesWithSumAndFuel} from '@src/models/resources';
 import {Technology} from '@src/models/technologies';
 
 export interface ResourceTransfer {
@@ -14,7 +14,7 @@ export interface ResourceTransfer {
 export interface Objectives {
   planetId: PlanetId;
   technologies: Technology[];
-  neededResources: ResourcesWithSum;
+  neededResources: ResourcesWithSumAndFuel;
   readyTimeSeconds: {
     metal: number;
     crystal: number;
