@@ -70,7 +70,7 @@ export function sendLargeCargosUrl(
     coords.solarSystem
   }&position=${
     coords.position
-  }&type=1&mission=${missionType}&am203=${amount}&cp=${from}&auto=${auto}&speed=10${
+  }&type=1&mission=${missionType}&am203=${amount}&cp=${from}&auto=${auto}${
     resources !== undefined
       ? `&metal=${Math.ceil(resources.metal)}&crystal=${Math.ceil(
           resources.crystal

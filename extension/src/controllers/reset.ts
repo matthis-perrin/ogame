@@ -8,21 +8,21 @@ const resourcesRegex = /metal=(\d+)&crystal=(\d+)&deuterium=(\d+)/;
 function handleResourcesToSend(): void {
   if (document.location.search.includes('component=fleetdispatch')) {
     $('input[name=transporterLarge]').focus();
-    const resourcesMatch = resourcesRegex.exec(document.location.search);
-    const allResources = document.location.search.includes('resources=all');
-    if (resourcesMatch !== null || allResources) {
-      const resourcesTarget = document.getElementById('fleet3');
-      if (resourcesTarget !== null) {
-        new MutationObserver(mutations =>
-          mutations.forEach(() => {
-            const ressourceInputs = document.querySelector('#sendfleet #resources');
-            if (ressourceInputs === null) {
-              return;
-            }
-            let scriptStr = '';
-            if (allResources) {
-              scriptStr = 'fleetDispatcher.selectMaxAll();fleetDispatcher.refresh();';
-            } else if (resourcesMatch !== null) {
+    const resourcesTarget = document.getElementById('fleet3');
+    if (resourcesTarget !== null) {
+      new MutationObserver(mutations =>
+        mutations.forEach(() => {
+          const ressourceInputs = document.querySelector('#sendfleet #resources');
+          if (ressourceInputs === null) {
+            return;
+          }
+          let scriptStr = '';
+          const allResources = document.location.search.includes('resources=all');
+          if (allResources) {
+            scriptStr = 'fleetDispatcher.selectMaxAll();fleetDispatcher.refresh();';
+          } else {
+            const resourcesMatch = resourcesRegex.exec(document.location.search);
+            if (resourcesMatch !== null) {
               const metalInput = ressourceInputs.querySelector('input[name="metal"]');
               const crystalInput = ressourceInputs.querySelector('input[name="crystal"]');
               const deuteriumInput = ressourceInputs.querySelector('input[name="deuterium"]');
@@ -37,20 +37,20 @@ function handleResourcesToSend(): void {
                 scriptStr += `fleetDispatcher.cargoDeuterium = ${resourcesMatch[3]};formatNumber($('#deuterium'),${resourcesMatch[3]});`;
               }
             }
-            if (scriptStr.length > 0) {
-              runScript(scriptStr);
-              if (document.location.search.includes('auto=true')) {
-                if (!$('#fleet3').is(':visible')) {
-                  return;
-                }
-                runScript(
-                  'fleetDispatcher.updateCargo();fleetDispatcher.refreshCargo();fleetDispatcher.trySubmitFleet3();'
-                );
-              }
+          }
+          if (scriptStr.length > 0) {
+            runScript(scriptStr);
+          }
+          if (document.location.search.includes('auto=true')) {
+            if (!$('#fleet3').is(':visible')) {
+              return;
             }
-          })
-        ).observe(resourcesTarget, {attributes: true, attributeFilter: ['style']});
-      }
+            runScript(
+              'fleetDispatcher.updateCargo();fleetDispatcher.refreshCargo();fleetDispatcher.trySubmitFleet3();'
+            );
+          }
+        })
+      ).observe(resourcesTarget, {attributes: true, attributeFilter: ['style']});
     }
   }
 }
@@ -58,24 +58,24 @@ function handleResourcesToSend(): void {
 const speedRegex = /speed=(\d+)/;
 function handleSpeedToSend(): void {
   if (document.location.search.includes('component=fleetdispatch')) {
-    const speedMatch = speedRegex.exec(document.location.search);
-    if (speedMatch !== null) {
-      const resourcesTarget = document.getElementById('fleet2');
-      if (resourcesTarget !== null) {
-        new MutationObserver(mutations =>
-          mutations.forEach(() => {
+    const resourcesTarget = document.getElementById('fleet2');
+    if (resourcesTarget !== null) {
+      new MutationObserver(mutations =>
+        mutations.forEach(() => {
+          const speedMatch = speedRegex.exec(document.location.search);
+          if (speedMatch !== null) {
             runScript(
               `fleetDispatcher.setFleetPercent(${speedMatch[1]});fleetDispatcher.refresh();`
             );
-            if (document.location.search.includes('auto=true')) {
-              if (!$('#fleet2').is(':visible')) {
-                return;
-              }
-              runScript('fleetDispatcher.trySubmitFleet2();');
+          }
+          if (document.location.search.includes('auto=true')) {
+            if (!$('#fleet2').is(':visible')) {
+              return;
             }
-          })
-        ).observe(resourcesTarget, {attributes: true, attributeFilter: ['style']});
-      }
+            runScript('fleetDispatcher.trySubmitFleet2();');
+          }
+        })
+      ).observe(resourcesTarget, {attributes: true, attributeFilter: ['style']});
     }
   }
 }
