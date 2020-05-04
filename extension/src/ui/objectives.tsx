@@ -13,7 +13,7 @@ import {setAccount} from '@src/stores/account';
 import {updateObjectives} from '@src/stores/account/objectives';
 import {EmptyLine, HoverTD, Table, Title} from '@src/ui/common';
 import {Resource} from '@src/ui/components/resource';
-import {time} from '@src/ui/utils';
+import {sum, time} from '@src/ui/utils';
 
 interface ObjectivesProps {
   account: Account;
@@ -83,7 +83,7 @@ export const ObjectivesC: FC<ObjectivesProps> = ({account}) => {
                         }
                       }}
                     >
-                      Del
+                      Delete
                     </td>
                   </HoverLine>
                 );
@@ -234,12 +234,16 @@ export const ObjectivesC: FC<ObjectivesProps> = ({account}) => {
                     <td
                       className={
                         planet !== undefined &&
-                        planet.resources.deuterium < transfer.resources.deuterium
+                        planet.resources.deuterium <
+                          sum([transfer.resources.deuterium, transfer.resources.fuel])
                           ? 'red'
                           : ''
                       }
                     >
-                      <Resource name="D" amount={transfer.resources.deuterium} />
+                      <Resource
+                        name="D"
+                        amount={sum([transfer.resources.deuterium, transfer.resources.fuel])}
+                      />
                     </td>
                     <td
                       className={

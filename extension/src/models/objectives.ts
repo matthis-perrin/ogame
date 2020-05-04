@@ -1,12 +1,12 @@
 import {PlanetId} from '@src/models/planets';
-import {ResourcesWithSum, ResourcesWithSumAndFuel} from '@src/models/resources';
+import {ResourcesWithSumAndFuel} from '@src/models/resources';
 import {Technology} from '@src/models/technologies';
 
 export interface ResourceTransfer {
   from: PlanetId;
   to: PlanetId;
   sendInSeconds: number;
-  resources: ResourcesWithSum;
+  resources: ResourcesWithSumAndFuel;
   timeFromOriginSeconds: number;
   isTransferring: boolean;
 }

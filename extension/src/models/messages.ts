@@ -9,3 +9,6 @@ export interface Message {
   noUnits: boolean;
   timeSeconds: number;
 }
+
+export type MessageSort = 'metal' | 'crystal' | 'deuterium' | 'sum';
+export const DefaultMessageSort: MessageSort = 'sum';

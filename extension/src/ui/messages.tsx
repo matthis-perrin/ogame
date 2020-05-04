@@ -8,12 +8,12 @@ import {goToMessages, goToUrl, sendLargeCargosUrl} from '@src/controllers/naviga
 import {Account} from '@src/models/account';
 import {COLOR_ORANGE, COLOR_RED} from '@src/models/constants';
 import {MissionTypeEnum} from '@src/models/fleets';
-import {Message} from '@src/models/messages';
+import {Message, MessageSort} from '@src/models/messages';
 import {PlanetCoords} from '@src/models/planets';
 import {getFretCapacity} from '@src/models/technologies';
 import {EmptyLine, HoverTD, Table, Title} from '@src/ui/common';
 import {Resource} from '@src/ui/components/resource';
-import {sum, thousands, time} from '@src/ui/utils';
+import {sum, thousands} from '@src/ui/utils';
 
 interface MessagesProps {
   account: Account;
@@ -34,7 +34,8 @@ async function deleteMessageAsync(
 }
 
 export const Messages: FC<MessagesProps> = ({account}) => {
-  const [, refreshComponent] = useState();
+  const [sort, refreshComponent] = useState<MessageSort>(account.messageSort);
+  account.messageSort = sort;
 
   const messages: Message[] = [];
   const duplicatesByCoords: Map<PlanetCoords, Message[]> = new Map();
@@ -48,6 +49,21 @@ export const Messages: FC<MessagesProps> = ({account}) => {
       duplicatesByCoords.set(message.planetCoords, dups);
     }
   }
+
+  messages.sort((a, b) => {
+    switch (sort) {
+      case 'metal':
+        return b.resources.metal - a.resources.metal;
+      case 'crystal':
+        return b.resources.crystal - a.resources.crystal;
+      case 'deuterium':
+        return b.resources.deuterium - a.resources.deuterium;
+      case 'sum':
+        return b.resources.sum - a.resources.sum;
+      default:
+        return -1;
+    }
+  });
 
   const duplicatesList: Set<string> = new Set();
   duplicatesByCoords.forEach(messageList => {
@@ -65,9 +81,6 @@ export const Messages: FC<MessagesProps> = ({account}) => {
     }
   });
 
-  messages.sort((a, b) => b.resources.sum - a.resources.sum);
-  const now = Math.floor(new Date().getTime() / 1000);
-
   const attackingFleets: Set<PlanetCoords> = new Set();
   for (const fleetId in account.fleets) {
     if (account.fleets.hasOwnProperty(fleetId)) {
@@ -81,7 +94,9 @@ export const Messages: FC<MessagesProps> = ({account}) => {
   }
 
   const lootMargin = 20000;
-  const resourcesLimit = 100000;
+  const sumLimit = 100000;
+  const cristalLimit = 50000;
+  const deuteriumLimit = 20000;
 
   return (
     <Fragment>
@@ -102,19 +117,57 @@ export const Messages: FC<MessagesProps> = ({account}) => {
                 onClick={async () => {
                   for (const message of messages) {
                     const isDuplicate = duplicatesList.has(message.messageId);
-                    if (message.resources.sum < resourcesLimit || !message.noUnits || isDuplicate) {
+                    if (message.resources.sum < sumLimit || !message.noUnits || isDuplicate) {
                       await deleteMessageAsync(account, message, true);
-                      refreshComponent({});
+                      refreshComponent(sort);
                     }
                   }
                 }}
               >
-                Clean ({thousands(resourcesLimit)})
+                Σ {thousands(sumLimit)}
+              </HoverTD>
+              <HoverTD
+                onClick={async () => {
+                  for (const message of messages) {
+                    const isDuplicate = duplicatesList.has(message.messageId);
+                    if (
+                      message.resources.crystal < cristalLimit ||
+                      !message.noUnits ||
+                      isDuplicate
+                    ) {
+                      await deleteMessageAsync(account, message, true);
+                      refreshComponent(sort);
+                    }
+                  }
+                }}
+              >
+                C {thousands(cristalLimit)}
+              </HoverTD>
+              <HoverTD
+                onClick={async () => {
+                  for (const message of messages) {
+                    const isDuplicate = duplicatesList.has(message.messageId);
+                    if (
+                      message.resources.crystal < deuteriumLimit ||
+                      !message.noUnits ||
+                      isDuplicate
+                    ) {
+                      await deleteMessageAsync(account, message, true);
+                      refreshComponent(sort);
+                    }
+                  }
+                }}
+              >
+                D {thousands(deuteriumLimit)}
               </HoverTD>
             </tr>
             <tr>
               <EmptyLine></EmptyLine>
             </tr>
+          </tbody>
+        </Table>
+        <Table>
+          <tbody>
             {messages.map(message => {
               const isDuplicate = duplicatesList.has(message.messageId);
               return (
@@ -122,18 +175,25 @@ export const Messages: FC<MessagesProps> = ({account}) => {
                   key={message.messageId}
                   className={!message.noUnits || isDuplicate ? 'red' : ''}
                 >
-                  <td>{message.planetCoords}</td>
-                  <td>
+                  <td onClick={() => refreshComponent('metal')}>
+                    <Resource name="M" amount={message.resources.metal} />
+                  </td>
+                  <td onClick={() => refreshComponent('crystal')}>
+                    <Resource name="C" amount={message.resources.crystal} />
+                  </td>
+                  <td onClick={() => refreshComponent('deuterium')}>
+                    <Resource name="D" amount={message.resources.deuterium} />
+                  </td>
+                  <td onClick={() => refreshComponent('sum')}>
                     <Resource name="Σ" amount={message.resources.sum} />
                   </td>
-                  <td>{time(now - message.timeSeconds)}</td>
                   <td>{!message.noUnits ? 'KO' : isDuplicate ? 'DUP' : 'OK'}</td>
                   <td>
                     <Hover onClick={() => sendProbes(message.planetCoords)}>Esp</Hover>{' '}
                     <Hover
                       onClick={async () => {
                         await deleteMessageAsync(account, message, false);
-                        refreshComponent({});
+                        refreshComponent(sort);
                       }}
                     >
                       Del

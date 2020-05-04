@@ -4,7 +4,7 @@ import {SolarSatellite} from '@shared/models/ships';
 import {Account} from '@src/models/account';
 import {ACCOUNT_TECHNOLOGIES, MAX_TECHNOLOGIES} from '@src/models/constants';
 import {Fleet, MissionTypeEnum} from '@src/models/fleets';
-import {Message} from '@src/models/messages';
+import {DefaultMessageSort, Message} from '@src/models/messages';
 import {findPlanetId, Planet, PlanetId} from '@src/models/planets';
 import {ResourceAmount, Resources} from '@src/models/resources';
 import {generateConstructionId, Technology} from '@src/models/technologies';
@@ -46,6 +46,7 @@ export function addPlanet(
     bots: currentAccount?.bots ?? {objectives: undefined, espionage: undefined},
     ghosts: currentAccount?.ghosts ?? {},
     emptyPlanets: currentAccount?.emptyPlanets ?? {},
+    messageSort: currentAccount?.messageSort ?? DefaultMessageSort,
   };
 
   // Retrieve messages or replace with new ones

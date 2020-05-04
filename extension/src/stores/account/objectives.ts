@@ -34,7 +34,6 @@ interface PlanetInfo {
 
 function timeBeforeSendingSeconds(
   targetAmount: number,
-  longestTimeSeconds: number,
   planetInfos: PlanetInfo[],
   resourceType: ResourceType
 ): number {
@@ -45,10 +44,7 @@ function timeBeforeSendingSeconds(
     if (resourceInfo === undefined) {
       continue;
     }
-    resourceSum +=
-      (longestTimeSeconds - planetInfo.timeFromOriginSeconds) * resourceInfo.production +
-      resourceInfo.amount +
-      resourceInfo.inflight;
+    resourceSum += resourceInfo.amount + resourceInfo.inflight;
     productionSum += resourceInfo.production;
   }
   return Math.max(0, Math.ceil((targetAmount - resourceSum) / productionSum));
@@ -208,26 +204,14 @@ export function updateObjectives(account: Account, neededFuel = 0): void {
 
   // Calculating resources timings
   objectives.readyTimeSeconds.metal =
-    nowSeconds +
-    timeBeforeSendingSeconds(
-      objectives.neededResources.metal,
-      longestTimeSeconds,
-      planetInfos,
-      'metal'
-    );
+    nowSeconds + timeBeforeSendingSeconds(objectives.neededResources.metal, planetInfos, 'metal');
   objectives.readyTimeSeconds.crystal =
     nowSeconds +
-    timeBeforeSendingSeconds(
-      objectives.neededResources.crystal,
-      longestTimeSeconds,
-      planetInfos,
-      'crystal'
-    );
+    timeBeforeSendingSeconds(objectives.neededResources.crystal, planetInfos, 'crystal');
   objectives.readyTimeSeconds.deuterium =
     nowSeconds +
     timeBeforeSendingSeconds(
       sum([objectives.neededResources.deuterium, objectives.neededResources.fuel]),
-      longestTimeSeconds,
       planetInfos,
       'deuterium'
     );
@@ -243,11 +227,7 @@ export function updateObjectives(account: Account, neededFuel = 0): void {
       resourceInfo.future =
         resourceInfo.amount +
         resourceInfo.inflight +
-        resourceInfo.production *
-          (objectives.readyTimeSeconds.max -
-            nowSeconds +
-            longestTimeSeconds -
-            planetInfo.timeFromOriginSeconds);
+        resourceInfo.production * (objectives.readyTimeSeconds.max - nowSeconds);
     }
   }
 
@@ -311,6 +291,16 @@ export function updateObjectives(account: Account, neededFuel = 0): void {
       continue;
     }
     canChange = false;
+    const fretLargeCargo = getFretCapacity(account.accountTechnologies, LargeCargo);
+    const requiredLargeCargos = Math.ceil(sumToSend / fretLargeCargo);
+    const fuel = getFuelConsumption(
+      shipDrive.fuelConsumption,
+      planetInfo.distance,
+      shipDrive.speed,
+      shipDrive.speed,
+      requiredLargeCargos
+    );
+    requiredFuel += fuel;
     objectives.resourceTransfers.push({
       from: planetInfo.planetId,
       to: objectives.planetId,
@@ -320,19 +310,11 @@ export function updateObjectives(account: Account, neededFuel = 0): void {
         crystal: crystalToSend as ResourceAmount,
         deuterium: deuteriumToSend as ResourceAmount,
         sum: sumToSend,
+        fuel: (fuel as number) as ResourceAmount,
       },
       timeFromOriginSeconds: planetInfo.timeFromOriginSeconds,
       isTransferring: false,
     });
-    const fretLargeCargo = getFretCapacity(account.accountTechnologies, LargeCargo);
-    const requiredLargeCargos = Math.ceil(sumToSend / fretLargeCargo);
-    requiredFuel += getFuelConsumption(
-      shipDrive.fuelConsumption,
-      planetInfo.distance,
-      shipDrive.speed,
-      shipDrive.speed,
-      requiredLargeCargos
-    );
   }
   if (neededFuel !== requiredFuel) {
     updateObjectives(account, requiredFuel);
