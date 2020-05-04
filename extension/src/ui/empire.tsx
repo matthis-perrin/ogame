@@ -25,14 +25,7 @@ import {
   RocketLauncher,
   SmallShieldDome,
 } from '@shared/models/defense';
-import {
-  Bomber,
-  ColonyShip,
-  EspionageProbe,
-  LargeCargo,
-  Recycler,
-  SolarSatellite,
-} from '@shared/models/ships';
+import {EspionageProbe, LargeCargo, SolarSatellite} from '@shared/models/ships';
 import {Crystal, Deuterium, Metal} from '@shared/models/stock';
 
 import {
@@ -46,6 +39,7 @@ import {Account} from '@src/models/account';
 import {
   COLLECTOR_BONUS_ENERGY,
   COLOR_GREEN,
+  COLOR_RED,
   DEBRIS_PERCENTAGE,
   DEBRIS_SAT,
   INACTIVITY_TIME,
@@ -97,7 +91,7 @@ export const Empire: FC<EmpireProps> = ({account}) => (
             <Title>Défense</Title>
           </th>
           <th>
-            <Title>Flotte</Title>
+            <Title>Transport</Title>
           </th>
           <th>
             <Title>Prod</Title>
@@ -137,7 +131,11 @@ export const Empire: FC<EmpireProps> = ({account}) => (
                   largeCargos: 0,
                 };
             const fretLargeCargo = getFretCapacity(account.accountTechnologies, LargeCargo);
-            const requiredLargeCargos = Math.ceil(
+            const requiredLargeCargos = Math.ceil(planet.resources.sum / fretLargeCargo);
+            const totalLargeCargos =
+              (planet.ships.hasOwnProperty(LargeCargo.id) ? planet.ships[LargeCargo.id].value : 0) +
+              inFlight.largeCargos;
+            const totalRequiredLargeCargos = Math.ceil(
               sum([planet.resources.sum, inFlight.sum]) / fretLargeCargo
             );
             let requiredSat = 0;
@@ -446,38 +444,24 @@ export const Empire: FC<EmpireProps> = ({account}) => (
                 </td>
                 <td onClick={() => goToShips(planet.planetId)} style={{cursor: 'pointer'}}>
                   <Line>
+                    <div>REQUIS: {requiredLargeCargos}</div>
                     <TechnologyC
-                      name="GT"
+                      name="A QUAI"
                       technologies={planet.ships}
                       techId={LargeCargo.id}
                       planetId={planet.planetId}
                       required={requiredLargeCargos}
-                      additional={inFlight.largeCargos}
                     />
-                    <TechnologyC
-                      name="ESP"
-                      technologies={planet.ships}
-                      techId={EspionageProbe.id}
-                      planetId={planet.planetId}
-                    />
-                    <TechnologyC
-                      name="REC"
-                      technologies={planet.ships}
-                      techId={Recycler.id}
-                      planetId={planet.planetId}
-                    />
-                    <TechnologyC
-                      name="BOM"
-                      technologies={planet.ships}
-                      techId={Bomber.id}
-                      planetId={planet.planetId}
-                    />
-                    <TechnologyC
-                      name="COL"
-                      technologies={planet.ships}
-                      techId={ColonyShip.id}
-                      planetId={planet.planetId}
-                    />
+                    <div>ARRIVE: {inFlight.largeCargos}</div>
+                    <Total className={totalRequiredLargeCargos > totalLargeCargos ? 'red' : ''}>
+                      EXTRA: {totalLargeCargos - totalRequiredLargeCargos}
+                    </Total>
+                    {planet.ships.hasOwnProperty(EspionageProbe.id) &&
+                    planet.ships[EspionageProbe.id].value > 0 ? (
+                      <div>- SONDES -</div>
+                    ) : (
+                      ''
+                    )}
                   </Line>
                 </td>
                 <td onClick={() => goToResources(planet.planetId)} style={{cursor: 'pointer'}}>
@@ -524,4 +508,10 @@ const PlanetLine = styled.tr`
 
 const Line = styled.div`
   height: 70px;
+`;
+
+const Total = styled.div`
+  &.red {
+    color: ${COLOR_RED};
+  }
 `;
