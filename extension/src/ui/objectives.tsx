@@ -189,6 +189,7 @@ export const ObjectivesC: FC<ObjectivesProps> = ({account}) => {
                         coords,
                         MissionTypeEnum.Deployment,
                         requiredLargeCargos,
+                        false,
                         transfer.resources
                       );
                       goToUrl(url);

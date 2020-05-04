@@ -44,7 +44,9 @@ export const GhostC: FC<GhostProps> = ({ghosts, planetId, account}) => {
               return;
             }
             const coords = findPlanetCoords(account.planetList, ghost.destination);
-            goToUrl(sendGhostUrl(planetId, coords, ghostSpeed.techId, ghostSpeed.speedModifier));
+            goToUrl(
+              sendGhostUrl(planetId, coords, ghostSpeed.techId, ghostSpeed.speedModifier, true)
+            );
           }}
         >
           <div>

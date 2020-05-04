@@ -39,6 +39,14 @@ function handleResourcesToSend(): void {
             }
             if (scriptStr.length > 0) {
               runScript(scriptStr);
+              if (document.location.search.includes('auto=true')) {
+                if (!$('#fleet3').is(':visible')) {
+                  return;
+                }
+                runScript(
+                  'fleetDispatcher.updateCargo();fleetDispatcher.refreshCargo();fleetDispatcher.trySubmitFleet3();'
+                );
+              }
             }
           })
         ).observe(resourcesTarget, {attributes: true, attributeFilter: ['style']});
@@ -59,8 +67,29 @@ function handleSpeedToSend(): void {
             runScript(
               `fleetDispatcher.setFleetPercent(${speedMatch[1]});fleetDispatcher.refresh();`
             );
+            if (document.location.search.includes('auto=true')) {
+              if (!$('#fleet2').is(':visible')) {
+                return;
+              }
+              runScript('fleetDispatcher.trySubmitFleet2();');
+            }
           })
         ).observe(resourcesTarget, {attributes: true, attributeFilter: ['style']});
+      }
+    }
+  }
+}
+
+function handleShips(): void {
+  if (document.location.search.includes('component=fleetdispatch')) {
+    const shipsTarget = document.getElementById('fleet1');
+    if (shipsTarget !== null) {
+      if (document.location.search.includes('auto=true')) {
+        const inputVal = $('input[name="transporterLarge"]').val();
+        if (!$('#fleet1').is(':visible') || inputVal === undefined || inputVal === '') {
+          return;
+        }
+        runScript('fleetDispatcher.trySubmitFleet1();');
       }
     }
   }
@@ -77,4 +106,5 @@ export function resetUI(): void {
   $('#siteHeader,#mmonetbar,#banner_skyscraper,#siteFooter').css({display: 'none'});
   handleResourcesToSend();
   handleSpeedToSend();
+  handleShips();
 }

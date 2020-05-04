@@ -205,7 +205,8 @@ export const Messages: FC<MessagesProps> = ({account}) => {
                           account.currentPlanetId,
                           message.planetCoords,
                           MissionTypeEnum.Attacking,
-                          Math.ceil(sum([message.resources.sum, lootMargin]) / fretGt)
+                          Math.ceil(sum([message.resources.sum, lootMargin]) / fretGt),
+                          true
                         );
                         goToUrl(url);
                       }}

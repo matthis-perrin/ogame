@@ -1,8 +1,5 @@
-import $ from 'jquery';
-
 import {LargeCargo} from '@shared/models/ships';
 
-import {runScript} from '@src/controllers/function';
 import {goToUrl, sendLargeCargosUrl} from '@src/controllers/navigator';
 import {Account} from '@src/models/account';
 import {MissionTypeEnum} from '@src/models/fleets';
@@ -13,9 +10,6 @@ import {getAccount, setAccount} from '@src/stores/account';
 
 export enum BotTransferStep {
   GoToFleet,
-  ValidateShips,
-  ValidateCoords,
-  ValidateResources,
   WaitingValidation,
 }
 
@@ -35,6 +29,7 @@ function getUrl(account: Account, bt: BotTransfer): string {
     findPlanetCoords(account.planetList, bt.transfer.to),
     MissionTypeEnum.Deployment,
     requiredGt,
+    true,
     bt.transfer.resources
   );
 }
@@ -45,45 +40,11 @@ function handleTransfer(account: Account): void {
     return;
   }
 
-  const url = getUrl(account, bt);
-
   switch (bt.step) {
     case BotTransferStep.GoToFleet:
-      bt.step = BotTransferStep.ValidateShips;
-      setAccount(account);
-      goToUrl(getUrl(account, bt));
-      break;
-    case BotTransferStep.ValidateShips:
-      const inputVal = $('input[name="transporterLarge"]').val();
-      if (
-        document.location.href !== url ||
-        !$('#fleet1').is(':visible') ||
-        inputVal === undefined ||
-        inputVal === ''
-      ) {
-        return;
-      }
-      bt.step = BotTransferStep.ValidateCoords;
-      setAccount(account);
-      runScript(`if($('#fleet1').is(':visible')){fleetDispatcher.trySubmitFleet1();}`);
-      break;
-    case BotTransferStep.ValidateCoords:
-      if (document.location.href !== url || !$('#fleet2').is(':visible')) {
-        return;
-      }
-      bt.step = BotTransferStep.ValidateResources;
-      setAccount(account);
-      runScript(`if($('#fleet2').is(':visible')){fleetDispatcher.trySubmitFleet2();}`);
-      break;
-    case BotTransferStep.ValidateResources:
-      if (document.location.href !== url || !$('#fleet3').is(':visible')) {
-        return;
-      }
       bt.step = BotTransferStep.WaitingValidation;
       setAccount(account);
-      runScript(
-        `fleetDispatcher.updateCargo();fleetDispatcher.refreshCargo();fleetDispatcher.trySubmitFleet3();`
-      );
+      goToUrl(getUrl(account, bt));
       break;
     case BotTransferStep.WaitingValidation:
       if (account.objectives !== undefined) {

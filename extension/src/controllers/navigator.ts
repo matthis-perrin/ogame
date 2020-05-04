@@ -60,6 +60,7 @@ export function sendLargeCargosUrl(
   planetCoords: PlanetCoords,
   missionType: MissionTypeEnum,
   amount: number,
+  auto: boolean,
   resources?: BaseResources
 ): string {
   const coords = getCoords(planetCoords);
@@ -67,7 +68,9 @@ export function sendLargeCargosUrl(
     document.location.pathname
   }?page=ingame&component=fleetdispatch&galaxy=${coords.galaxy}&system=${
     coords.solarSystem
-  }&position=${coords.position}&type=1&mission=${missionType}&am203=${amount}&cp=${from}${
+  }&position=${
+    coords.position
+  }&type=1&mission=${missionType}&am203=${amount}&cp=${from}&auto=${auto}&speed=10${
     resources !== undefined
       ? `&metal=${Math.ceil(resources.metal)}&crystal=${Math.ceil(
           resources.crystal
@@ -81,14 +84,15 @@ export function sendGhostUrl(
   from: PlanetId,
   planetCoords: PlanetCoords,
   slowTechId: number,
-  speedModifier: SpeedModifier
+  speedModifier: SpeedModifier,
+  auto: boolean
 ): string {
   const coords = getCoords(planetCoords);
   const url =
     `${document.location.origin}${document.location.pathname}?page=ingame&component=fleetdispatch` +
     `&galaxy=${coords.galaxy}&system=${coords.solarSystem}&position=${coords.position}&type=1` +
     `&mission=${MissionTypeEnum.Deployment}&am203=999999&am210=999999&am${slowTechId}=999999&cp=${from}` +
-    `&resources=all&speed=${speedModifier * 10}`;
+    `&resources=all&speed=${speedModifier * 10}&auto=${auto}`;
   return url;
 }
 
