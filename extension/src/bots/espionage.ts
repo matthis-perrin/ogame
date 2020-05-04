@@ -6,9 +6,10 @@ import {EspionageProbe} from '@shared/models/ships';
 
 import {sendProbes} from '@src/controllers/function';
 import {Account} from '@src/models/account';
-import {NUMBER_OF_SS, PROBES_AMOUNT} from '@src/models/constants';
+import {PROBES_AMOUNT} from '@src/models/constants';
 import {findPlanetCoords, getCoords, PlanetCoords} from '@src/models/planets';
 import {getAccount, setAccount} from '@src/stores/account';
+import {Rosalind} from '@shared/models/universe';
 
 const BOT_LOOP_TIME = 2000;
 let interval: number | undefined;
@@ -158,7 +159,7 @@ function loop(): void {
 
   const nextCoords = transformCoords({
     galaxy: coords.galaxy,
-    solarSystem: (coords.solarSystem + 1) % NUMBER_OF_SS,
+    solarSystem: (coords.solarSystem % Rosalind.numberOfSystem) + 1,
     position: coords.position,
   });
 

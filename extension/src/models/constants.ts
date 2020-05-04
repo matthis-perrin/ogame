@@ -41,19 +41,17 @@ setItem(SESSION_ID_LOCAL_STORAGE_KEY, SESSION_ID).catch(console.error);
 
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 export const INACTIVITY_TIME = 7.75; // 7h45
-export const DEBRIS_PERCENTAGE = 0.3;
 export const UI_REFRESH_RATE = 500;
 export const PROBES_AMOUNT = 5;
-export const NUMBER_OF_SS = 500;
 
 // Class bonus
 export const COLLECTOR_BONUS_FRET = 0.25;
 export const COLLECTOR_BONUS_ENERGY = 0.1;
 
 // Defense ratio for 1M lootable resource
-export const RATIO_LM = 2000 / 1000000;
-export const RATIO_ALO = 600 / 1000000;
-export const RATIO_GAU = 143 / 1000000;
+export const RATIO_LM = 3000 / 1000000;
+export const RATIO_ALO = 450 / 1000000;
+export const RATIO_GAU = 100 / 1000000;
 export const RATIO_PLA = 50 / 1000000;
 
 // Sum of units that goes into debris field (all but deut)
@@ -107,7 +105,3 @@ export const COLOR_WHITEDARK = '#555';
 export const COLOR_GREEN = '#9c0';
 export const COLOR_RED = '#d43635';
 export const COLOR_ORANGE = '#d29d00';
-
-export const NAME_METAL = 'Métal';
-export const NAME_CRYSTAL = 'Cristal';
-export const NAME_DEUTERIUM = 'Deutérium';

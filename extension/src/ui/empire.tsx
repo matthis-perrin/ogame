@@ -40,7 +40,6 @@ import {
   COLLECTOR_BONUS_ENERGY,
   COLOR_GREEN,
   COLOR_RED,
-  DEBRIS_PERCENTAGE,
   DEBRIS_SAT,
   INACTIVITY_TIME,
   RATIO_ALO,
@@ -59,6 +58,7 @@ import {Production} from '@src/ui/components/production';
 import {Resource} from '@src/ui/components/resource';
 import {TechnologyC} from '@src/ui/components/technology';
 import {sum} from '@src/ui/utils';
+import {Rosalind} from '@shared/models/universe';
 
 interface EmpireProps {
   account: Account;
@@ -118,7 +118,9 @@ export const Empire: FC<EmpireProps> = ({account}) => (
               INACTIVITY_TIME;
             const inactivityLoot = inactivityProduction / 2;
             const satelliteLoot = planet.technologies.hasOwnProperty(SolarSatellite.id)
-              ? planet.technologies[SolarSatellite.id].value * DEBRIS_SAT * DEBRIS_PERCENTAGE
+              ? planet.technologies[SolarSatellite.id].value *
+                DEBRIS_SAT *
+                Rosalind.shipInDebrisFieldRatio
               : 0;
             const totalLoot = inactivityLoot + satelliteLoot;
             const inFlight = account.inFlightResources.hasOwnProperty(p.coords)

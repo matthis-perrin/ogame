@@ -2,11 +2,11 @@ import $ from 'jquery';
 
 import {ColonyShip, EspionageProbe, LargeCargo, Recycler, SmallCargo} from '@shared/models/ships';
 
-import {NAME_CRYSTAL, NAME_DEUTERIUM, NAME_METAL} from '@src/models/constants';
 import {Fleet, FleetId, FleetTime, MissionType, ReturnFlight} from '@src/models/fleets';
 import {PlanetCoords, PlanetName} from '@src/models/planets';
 import {ResourceAmount} from '@src/models/resources';
 import {sum} from '@src/ui/utils';
+import {Metal, Crystal, Deuterium} from '@shared/models/stock';
 
 export function parseFleets(): Fleet[] {
   const res: Fleet[] = [];
@@ -123,15 +123,15 @@ export function parseFleets(): Fleet[] {
           fleet.ships.espionageProbe = value;
           return;
         }
-        if (tr.innerText.includes(NAME_METAL)) {
+        if (tr.innerText.includes(Metal.name)) {
           fleet.resources.metal = value as ResourceAmount;
           return;
         }
-        if (tr.innerText.includes(NAME_CRYSTAL)) {
+        if (tr.innerText.includes(Crystal.name)) {
           fleet.resources.crystal = value as ResourceAmount;
           return;
         }
-        if (tr.innerText.includes(NAME_DEUTERIUM)) {
+        if (tr.innerText.includes(Deuterium.name)) {
           fleet.resources.deuterium = value as ResourceAmount;
           return;
         }

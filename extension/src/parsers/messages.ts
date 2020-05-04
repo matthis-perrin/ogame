@@ -1,10 +1,10 @@
 import $ from 'jquery';
 
-import {NAME_CRYSTAL, NAME_DEUTERIUM, NAME_METAL} from '@src/models/constants';
 import {Message} from '@src/models/messages';
 import {PlanetCoords, PlanetName} from '@src/models/planets';
 import {ResourceAmount} from '@src/models/resources';
 import {sum} from '@src/ui/utils';
+import {Metal, Crystal, Deuterium} from '@shared/models/stock';
 
 const refresh = 500;
 
@@ -89,13 +89,13 @@ export async function parseMessages(): Promise<Message[] | undefined> {
           }
           const resource = (parseFloat(match2[2].replace(/\./g, '')) / 2) as ResourceAmount;
           switch (match2[1]) {
-            case NAME_METAL:
+            case Metal.name:
               metal = resource;
               break;
-            case NAME_CRYSTAL:
+            case Crystal.name:
               crystal = resource;
               break;
-            case NAME_DEUTERIUM:
+            case Deuterium.name:
               deuterium = resource;
               break;
             default:
