@@ -95,7 +95,7 @@ export const Messages: FC<MessagesProps> = ({account}) => {
 
   const lootMargin = 20000;
   const sumLimit = 100000;
-  const cristalLimit = 50000;
+  const cristalLimit = 40000;
   const deuteriumLimit = 20000;
 
   return (
