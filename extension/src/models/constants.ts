@@ -49,7 +49,7 @@ export const COLLECTOR_BONUS_FRET = 0.25;
 export const COLLECTOR_BONUS_ENERGY = 0.1;
 
 // Defense ratio for 1M lootable resource
-export const RATIO_LM = 3000 / 1000000;
+export const RATIO_LM = 4000 / 1000000;
 export const RATIO_ALO = 450 / 1000000;
 export const RATIO_GAU = 100 / 1000000;
 export const RATIO_PLA = 50 / 1000000;
