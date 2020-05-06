@@ -47,6 +47,7 @@ import {
   RATIO_GAU,
   RATIO_LM,
   RATIO_PLA,
+  ResearchLabPlanets,
 } from '@src/models/constants';
 import {ResourceAmount} from '@src/models/resources';
 import {getFretCapacity, Technology} from '@src/models/technologies';
@@ -369,6 +370,12 @@ export const Empire: FC<EmpireProps> = ({account}) => (
                       technologies={planet.technologies}
                       techId={ResearchLab.id}
                       planetId={planet.planetId}
+                      required={
+                        account.maxTechnologies.hasOwnProperty(ResearchLab.id) &&
+                        ResearchLabPlanets.includes(p.name)
+                          ? account.maxTechnologies[ResearchLab.id]
+                          : undefined
+                      }
                     />
                     <TechnologyC
                       name="Nan"

@@ -7,6 +7,7 @@ import {
   MetalStorage,
   MissileSilo,
   NaniteFactory,
+  ResearchLab,
   RoboticsFactory,
   Shipyard,
   SolarPlant,
@@ -70,6 +71,7 @@ export const MAX_TECHNOLOGIES = [
   RoboticsFactory.id,
   Shipyard.id,
   NaniteFactory.id,
+  ResearchLab.id,
 ];
 
 export const PAGES_TECHNOLOGIES = [
@@ -99,6 +101,8 @@ export const ACCOUNT_TECHNOLOGIES = [
   IntergalacticResearchNetworkTechnology.id,
   GravitonTechnology.id,
 ];
+
+export const ResearchLabPlanets = ['3-1', '3-2', '4-1', '5-1', '5-2'];
 
 export const COLOR_WHITE = '#aaa';
 export const COLOR_WHITEDARK = '#555';
