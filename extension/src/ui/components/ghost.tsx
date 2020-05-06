@@ -5,7 +5,7 @@ import {goToUrl, sendGhostUrl} from '@src/controllers/navigator';
 import {Account} from '@src/models/account';
 import {Ghost, GhostSpeed} from '@src/models/ghost';
 import {findPlanetCoords, findPlanetName, PlanetId} from '@src/models/planets';
-import {thousands, time} from '@src/ui/utils';
+import {thousands, timeEl} from '@src/ui/utils';
 
 interface GhostProps {
   ghosts: {[planetId: string]: Ghost};
@@ -53,9 +53,13 @@ export const GhostC: FC<GhostProps> = ({ghosts, planetId, account}) => {
             {findPlanetName(account.planetList, ghost.destination)} > {thousands(ghost.distance)}
           </div>
           <div>
-            {ghostSpeed === undefined
-              ? 'Nothing compatible'
-              : `${ghostSpeed.name}: ${time(ghostSpeed.timeSeconds)}`}
+            {ghostSpeed === undefined ? (
+              'Nothing compatible'
+            ) : (
+              <span>
+                {ghostSpeed.name}: {timeEl(ghostSpeed.timeSeconds)}
+              </span>
+            )}
           </div>
         </Hover>
       )}

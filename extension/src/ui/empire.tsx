@@ -27,6 +27,7 @@ import {
 } from '@shared/models/defense';
 import {EspionageProbe, LargeCargo, SolarSatellite} from '@shared/models/ships';
 import {Crystal, Deuterium, Metal} from '@shared/models/stock';
+import {Rosalind} from '@shared/models/universe';
 
 import {
   goToDefenses,
@@ -48,7 +49,7 @@ import {
   RATIO_PLA,
 } from '@src/models/constants';
 import {ResourceAmount} from '@src/models/resources';
-import {getFretCapacity} from '@src/models/technologies';
+import {getFretCapacity, Technology} from '@src/models/technologies';
 import {addObjectives} from '@src/stores/account/objectives';
 import {Stock, Table, Title} from '@src/ui/common';
 import {Energy} from '@src/ui/components/energy';
@@ -58,7 +59,6 @@ import {Production} from '@src/ui/components/production';
 import {Resource} from '@src/ui/components/resource';
 import {TechnologyC} from '@src/ui/components/technology';
 import {sum} from '@src/ui/utils';
-import {Rosalind} from '@shared/models/universe';
 
 interface EmpireProps {
   account: Account;
@@ -134,9 +134,10 @@ export const Empire: FC<EmpireProps> = ({account}) => (
                 };
             const fretLargeCargo = getFretCapacity(account.accountTechnologies, LargeCargo);
             const requiredLargeCargos = Math.ceil(planet.resources.sum / fretLargeCargo);
-            const totalLargeCargos =
-              (planet.ships.hasOwnProperty(LargeCargo.id) ? planet.ships[LargeCargo.id].value : 0) +
-              inFlight.largeCargos;
+            const largeCargos: Technology = planet.ships.hasOwnProperty(LargeCargo.id)
+              ? planet.ships[LargeCargo.id]
+              : {techId: LargeCargo.id, value: 0};
+            const totalLargeCargos = largeCargos.value + inFlight.largeCargos;
             const totalRequiredLargeCargos = Math.ceil(
               sum([planet.resources.sum, inFlight.sum]) / fretLargeCargo
             );
@@ -442,6 +443,12 @@ export const Empire: FC<EmpireProps> = ({account}) => (
                           : 0
                       }
                     />
+                    {planet.ships.hasOwnProperty(EspionageProbe.id) &&
+                    planet.ships[EspionageProbe.id].value > 0 ? (
+                      <div>SONDES</div>
+                    ) : (
+                      ''
+                    )}
                   </Line>
                 </td>
                 <td onClick={() => goToShips(planet.planetId)} style={{cursor: 'pointer'}}>
@@ -455,15 +462,13 @@ export const Empire: FC<EmpireProps> = ({account}) => (
                       required={requiredLargeCargos}
                     />
                     <div>ARRIVE: {inFlight.largeCargos}</div>
+                    <div>TOTAL: {totalLargeCargos}</div>
                     <Total className={totalRequiredLargeCargos > totalLargeCargos ? 'red' : ''}>
                       EXTRA: {totalLargeCargos - totalRequiredLargeCargos}
+                      {largeCargos.target !== undefined
+                        ? `+${largeCargos.target - largeCargos.value}`
+                        : ''}
                     </Total>
-                    {planet.ships.hasOwnProperty(EspionageProbe.id) &&
-                    planet.ships[EspionageProbe.id].value > 0 ? (
-                      <div>- SONDES -</div>
-                    ) : (
-                      ''
-                    )}
                   </Line>
                 </td>
                 <td onClick={() => goToResources(planet.planetId)} style={{cursor: 'pointer'}}>

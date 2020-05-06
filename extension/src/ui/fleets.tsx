@@ -9,7 +9,7 @@ import {findPlanetId} from '@src/models/planets';
 import {Table, Title} from '@src/ui/common';
 import {PlanetCoordsC} from '@src/ui/components/planetcoords';
 import {Resource} from '@src/ui/components/resource';
-import {time} from '@src/ui/utils';
+import {timeEl} from '@src/ui/utils';
 
 interface FleetsProps {
   account: Account;
@@ -35,7 +35,7 @@ export const Fleets: FC<FleetsProps> = ({account}) => {
             <tr>
               <th colSpan={4}>
                 <Title onClick={() => goToFleets()} style={{cursor: 'pointer'}}>
-                  Flottes
+                  Flottes ({fleets.length})
                 </Title>
               </th>
             </tr>
@@ -61,7 +61,8 @@ export const Fleets: FC<FleetsProps> = ({account}) => {
                       const planetId = findPlanetId(account.planetList, fleet.destinationName);
                       if (
                         planetId === undefined ||
-                        (fleet.missionType === MissionTypeEnum.Transport && !fleet.returnFlight)
+                        (fleet.missionType === MissionTypeEnum.Transport && !fleet.returnFlight) ||
+                        fleet.missionType === MissionTypeEnum.Market
                       ) {
                         goToMessages(planetId);
                         return;
@@ -70,7 +71,7 @@ export const Fleets: FC<FleetsProps> = ({account}) => {
                     }}
                   >
                     {seconds > 0 ? (
-                      time(seconds)
+                      timeEl(seconds)
                     ) : (
                       <span style={{color: COLOR_GREEN}}>Arrivée</span>
                     )}

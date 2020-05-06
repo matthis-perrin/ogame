@@ -13,7 +13,7 @@ import {setAccount} from '@src/stores/account';
 import {updateObjectives} from '@src/stores/account/objectives';
 import {EmptyLine, HoverTD, Table, Title} from '@src/ui/common';
 import {Resource} from '@src/ui/components/resource';
-import {sum, time} from '@src/ui/utils';
+import {sum, timeEl} from '@src/ui/utils';
 
 interface ObjectivesProps {
   account: Account;
@@ -109,7 +109,7 @@ export const ObjectivesC: FC<ObjectivesProps> = ({account}) => {
                 </td>
                 <td>
                   {account.objectives.readyTimeSeconds.metal - nowSeconds > 0
-                    ? time(account.objectives.readyTimeSeconds.metal - nowSeconds)
+                    ? timeEl(account.objectives.readyTimeSeconds.metal - nowSeconds)
                     : 'Disponible'}
                 </td>
               </Status>
@@ -123,7 +123,7 @@ export const ObjectivesC: FC<ObjectivesProps> = ({account}) => {
                 </td>
                 <td>
                   {account.objectives.readyTimeSeconds.crystal - nowSeconds > 0
-                    ? time(account.objectives.readyTimeSeconds.crystal - nowSeconds)
+                    ? timeEl(account.objectives.readyTimeSeconds.crystal - nowSeconds)
                     : 'Disponible'}
                 </td>
               </Status>
@@ -137,7 +137,7 @@ export const ObjectivesC: FC<ObjectivesProps> = ({account}) => {
                 </td>
                 <td>
                   {account.objectives.readyTimeSeconds.deuterium - nowSeconds > 0
-                    ? time(account.objectives.readyTimeSeconds.deuterium - nowSeconds)
+                    ? timeEl(account.objectives.readyTimeSeconds.deuterium - nowSeconds)
                     : 'Disponible'}
                 </td>
               </Status>
@@ -255,7 +255,7 @@ export const ObjectivesC: FC<ObjectivesProps> = ({account}) => {
                     >
                       GT: {requiredLargeCargos}
                     </td>
-                    <td>{sendInSeconds === 0 ? 'Prêt' : time(sendInSeconds)}</td>
+                    <td>{sendInSeconds === 0 ? 'Prêt' : timeEl(sendInSeconds)}</td>
                   </HoverGT>
                 );
               })}

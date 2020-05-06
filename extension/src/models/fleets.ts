@@ -13,6 +13,7 @@ export enum MissionTypeEnum {
   Espionage = 6,
   Colonization = 7,
   Expedition = 15,
+  Market = 16,
 }
 
 // Attacking : to raid another player or to crash any fleet stationed at the target.
@@ -59,6 +60,8 @@ export function missionTypeString(fleet: Fleet): string {
       return 'Expédition';
     case MissionTypeEnum.Colonization:
       return 'Coloniser';
+    case MissionTypeEnum.Market:
+      return 'Marchand';
     default:
       return `MISSION_${fleet.missionType}`;
   }

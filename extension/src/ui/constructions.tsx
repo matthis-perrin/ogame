@@ -7,7 +7,7 @@ import {COLOR_GREEN} from '@src/models/constants';
 import {findPlanetName} from '@src/models/planets';
 import {Construction, techShortName} from '@src/models/technologies';
 import {Table, Title} from '@src/ui/common';
-import {time} from '@src/ui/utils';
+import {timeEl} from '@src/ui/utils';
 
 interface ConstructionsProps {
   account: Account;
@@ -32,7 +32,7 @@ export const Constructions: FC<ConstructionsProps> = ({account}) => {
           <thead>
             <tr>
               <th colSpan={3}>
-                <Title>Constructions</Title>
+                <Title>Constructions ({constructions.length})</Title>
               </th>
             </tr>
           </thead>
@@ -48,7 +48,7 @@ export const Constructions: FC<ConstructionsProps> = ({account}) => {
                   <td>{techShortName(construction.techId)}</td>
                   <td>
                     {seconds > 0 ? (
-                      time(seconds)
+                      timeEl(seconds)
                     ) : (
                       <span style={{color: COLOR_GREEN}}>Terminé</span>
                     )}

@@ -101,6 +101,7 @@ export function addPlanet(
             fleet.missionType === MissionTypeEnum.Expedition ||
             fleet.missionType === MissionTypeEnum.Espionage ||
             fleet.missionType === MissionTypeEnum.Colonization ||
+            fleet.missionType === MissionTypeEnum.Market ||
             (fleet.missionType === MissionTypeEnum.Transport && destPlanetId === undefined)) &&
           !fleet.returnFlight &&
           document.location.search.includes('page=messages')

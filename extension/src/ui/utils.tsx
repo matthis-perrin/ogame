@@ -1,3 +1,5 @@
+import * as React from 'react';
+
 import {ResourceAmount} from '@src/models/resources';
 
 export function sum(amounts: (ResourceAmount | number)[]): ResourceAmount {
@@ -33,11 +35,16 @@ export function padTime(value: number, length = 2): string {
   return res;
 }
 
-export function time(totalSeconds: number): string {
+function time(totalSeconds: number): string {
   const hours = Math.floor(totalSeconds / 3600);
   const minutes = Math.floor((totalSeconds - hours * 3600) / 60);
   const seconds = totalSeconds - hours * 3600 - minutes * 60;
   return `${padTime(hours)}:${padTime(minutes)}:${padTime(seconds)}`;
+}
+
+export function timeEl(totalSeconds: number): JSX.Element {
+  const titleDate = new Date(new Date().getTime() + totalSeconds * 1000);
+  return <span title={titleDate.toLocaleString()}>{time(totalSeconds)}</span>;
 }
 
 export function thousands(value: number): string {
