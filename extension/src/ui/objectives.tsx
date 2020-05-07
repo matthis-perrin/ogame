@@ -259,6 +259,34 @@ export const ObjectivesC: FC<ObjectivesProps> = ({account}) => {
                   </HoverGT>
                 );
               })}
+              <EmptyLine />
+            </tbody>
+          </Table>
+        )}
+        {account.objectives === undefined ? (
+          ''
+        ) : (
+          <Table>
+            <tbody>
+              <tr>
+                <td>Planètes ignorées</td>
+              </tr>
+              <EmptyLine />
+              {account.objectives.bannedPlanets.map((bannedPlanet, index) => (
+                <tr>
+                  <HoverTD
+                    onClick={e => {
+                      e.stopPropagation();
+                      if (account.objectives !== undefined) {
+                        account.objectives.bannedPlanets.splice(index, 1);
+                        updateObjectives(account);
+                      }
+                    }}
+                  >
+                    {findPlanetName(account.planetList, bannedPlanet)}
+                  </HoverTD>
+                </tr>
+              ))}
             </tbody>
           </Table>
         )}
