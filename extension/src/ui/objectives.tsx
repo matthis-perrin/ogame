@@ -259,7 +259,6 @@ export const ObjectivesC: FC<ObjectivesProps> = ({account}) => {
                   </HoverGT>
                 );
               })}
-              <EmptyLine />
             </tbody>
           </Table>
         )}
@@ -269,9 +268,10 @@ export const ObjectivesC: FC<ObjectivesProps> = ({account}) => {
           <Table>
             <tbody>
               <tr>
+                <EmptyLine />
                 <td>Planètes ignorées</td>
+                <EmptyLine />
               </tr>
-              <EmptyLine />
               {account.objectives.bannedPlanets.map((bannedPlanet, index) => (
                 <tr>
                   <HoverTD

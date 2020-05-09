@@ -5,6 +5,7 @@ import {COLOR_WHITE} from '@src/models/constants';
 import {useAccount} from '@src/stores/account';
 import {Aggregation} from '@src/ui/aggregation';
 import {BotOverlay} from '@src/ui/botoverlay';
+import {Colonies} from '@src/ui/components/colonies';
 import {Separator} from '@src/ui/components/separator';
 import {Constructions} from '@src/ui/constructions';
 import {Empire} from '@src/ui/empire';
@@ -36,8 +37,8 @@ export const App: FC = () => {
               <Constructions account={account} />
               <Separator />
               <ObjectivesC account={account} />
-              {/* <Separator />
-              <Colonies account={account} /> */}
+              {account.bots.colonies ? <Separator /> : ''}
+              {account.bots.colonies ? <Colonies account={account} /> : ''}
             </Bottom>
           </div>
         )}

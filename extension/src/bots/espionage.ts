@@ -3,13 +3,13 @@ import $ from 'jquery';
 
 import {Coordinates} from '@shared/models/coordinates';
 import {EspionageProbe} from '@shared/models/ships';
+import {Rosalind} from '@shared/models/universe';
 
 import {sendProbes} from '@src/controllers/function';
 import {Account} from '@src/models/account';
 import {PROBES_AMOUNT} from '@src/models/constants';
 import {findPlanetCoords, getCoords, PlanetCoords} from '@src/models/planets';
 import {getAccount, setAccount} from '@src/stores/account';
-import {Rosalind} from '@shared/models/universe';
 
 const BOT_LOOP_TIME = 2000;
 let interval: number | undefined;
@@ -122,15 +122,17 @@ function loop(): void {
       position: index + 1,
     });
 
-    if (
-      element.classList.length === 2 &&
-      element.classList[0] === 'row' &&
-      element.classList[1] === 'empty_filter'
-    ) {
-      account.emptyPlanets[newCoords] = true;
-    } else {
-      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-      delete account.emptyPlanets[newCoords];
+    if (account.bots.colonies) {
+      if (
+        element.classList.length === 2 &&
+        element.classList[0] === 'row' &&
+        element.classList[1] === 'empty_filter'
+      ) {
+        account.emptyPlanets[newCoords] = true;
+      } else {
+        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+        delete account.emptyPlanets[newCoords];
+      }
     }
 
     if (

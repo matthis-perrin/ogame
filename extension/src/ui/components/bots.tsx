@@ -25,6 +25,18 @@ export const Bots: FC<BotsProps> = ({account}) => (
             Espionage: {account.bots.espionage !== undefined ? 'ON' : 'OFF'}
           </HoverTD>
         </tr>
+        <tr>
+          <HoverTD
+            onClick={() => {
+              account.bots.colonies = !account.bots.colonies;
+              if (!account.bots.colonies) {
+                account.emptyPlanets = {};
+              }
+            }}
+          >
+            Colonies: {account.bots.colonies ? 'ON' : 'OFF'}
+          </HoverTD>
+        </tr>
       </tbody>
     </Table>
   </Fragment>
