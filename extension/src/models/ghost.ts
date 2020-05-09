@@ -29,3 +29,4 @@ DefaultGhosts.set('4-1', '5-2');
 DefaultGhosts.set('5-2', '4-2');
 DefaultGhosts.set('4-2', '5-3');
 DefaultGhosts.set('5-3', '4-1');
+DefaultGhosts.set('4-3', '5-1');

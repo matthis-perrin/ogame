@@ -259,6 +259,9 @@ export const ObjectivesC: FC<ObjectivesProps> = ({account}) => {
                   </HoverGT>
                 );
               })}
+              <tr>
+                <EmptyLine />
+              </tr>
             </tbody>
           </Table>
         )}
@@ -268,7 +271,6 @@ export const ObjectivesC: FC<ObjectivesProps> = ({account}) => {
           <Table>
             <tbody>
               <tr>
-                <EmptyLine />
                 <td>Planètes ignorées</td>
                 <EmptyLine />
               </tr>
