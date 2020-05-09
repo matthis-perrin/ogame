@@ -224,10 +224,11 @@ export function updateObjectives(account: Account, neededFuel = 0): void {
   // Calculating future resources
   for (const planetInfo of planetInfos) {
     for (const resourceInfo of planetInfo.resources.values()) {
-      resourceInfo.future =
+      resourceInfo.future = Math.floor(
         resourceInfo.amount +
-        resourceInfo.inflight +
-        resourceInfo.production * (objectives.readyTimeSeconds.max - nowSeconds);
+          resourceInfo.inflight +
+          resourceInfo.production * (objectives.readyTimeSeconds.max - nowSeconds)
+      );
     }
   }
 
@@ -262,7 +263,6 @@ export function updateObjectives(account: Account, neededFuel = 0): void {
   objectives.resourceTransfers = [];
   let requiredFuel = 0;
   // We don't iterate on the last planet
-  let canChange = true;
   for (let i = 0; i < planetInfos.length - 1; i++) {
     const planetInfo = planetInfos[i];
     const metalToSend = Math.ceil(
@@ -278,19 +278,6 @@ export function updateObjectives(account: Account, neededFuel = 0): void {
       )
     );
     const sumToSend = sum([metalToSend, crystalToSend, deuteriumToSend]);
-    if (
-      canChange &&
-      sumToSend === 0 &&
-      objectives.readyTimeSeconds.max === nowSeconds &&
-      i < planetInfos.length
-    ) {
-      longestTimeSeconds = planetInfos[i + 1].timeFromOriginSeconds;
-      continue;
-    }
-    if (sumToSend === 0) {
-      continue;
-    }
-    canChange = false;
     const fretLargeCargo = getFretCapacity(account.accountTechnologies, LargeCargo);
     const requiredLargeCargos = Math.ceil(sumToSend / fretLargeCargo);
     const fuel = getFuelConsumption(

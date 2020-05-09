@@ -158,7 +158,7 @@ export const ObjectivesC: FC<ObjectivesProps> = ({account}) => {
           <Table>
             <tbody>
               {account.objectives.resourceTransfers.map(transfer => {
-                const coords = findPlanetCoords(account.planetList, transfer.from);
+                const destinationCoords = findPlanetCoords(account.planetList, transfer.to);
                 const fretLargeCargo = getFretCapacity(account.accountTechnologies, LargeCargo);
                 const requiredLargeCargos = Math.ceil(transfer.resources.sum / fretLargeCargo);
                 let largeCargoAmount = 0;
@@ -186,7 +186,7 @@ export const ObjectivesC: FC<ObjectivesProps> = ({account}) => {
                       }
                       const url = sendLargeCargosUrl(
                         transfer.from,
-                        coords,
+                        destinationCoords,
                         MissionTypeEnum.Deployment,
                         requiredLargeCargos,
                         false,
@@ -241,10 +241,7 @@ export const ObjectivesC: FC<ObjectivesProps> = ({account}) => {
                           : ''
                       }
                     >
-                      <Resource
-                        name="D"
-                        amount={sum([transfer.resources.deuterium, transfer.resources.fuel])}
-                      />
+                      <Resource name="D" amount={transfer.resources.deuterium} />
                     </td>
                     <td
                       className={
@@ -265,13 +262,15 @@ export const ObjectivesC: FC<ObjectivesProps> = ({account}) => {
             </tbody>
           </Table>
         )}
-        {account.objectives === undefined ? (
+        {account.objectives === undefined || account.objectives.bannedPlanets.length === 0 ? (
           ''
         ) : (
           <Table>
             <tbody>
               <tr>
-                <td>Planètes ignorées</td>
+                <td>Planètes ignorées :</td>
+              </tr>
+              <tr>
                 <EmptyLine />
               </tr>
               {account.objectives.bannedPlanets.map((bannedPlanet, index) => (
