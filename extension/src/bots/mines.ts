@@ -1,6 +1,7 @@
 import $ from 'jquery';
 
 import {
+  AllBuildings,
   CrystalMine,
   CrystalStorage,
   DeuteriumSynthesizer,
@@ -28,6 +29,8 @@ const mineTechnologies = [
   DeuteriumTank,
 ];
 
+const buildingTechnologies = AllBuildings.map(_ => _.id);
+
 function loop(): void {
   const account = getAccount();
   if (account === undefined || !account.bots.mines) {
@@ -45,7 +48,7 @@ function loop(): void {
     for (const techId in planetDetail.technologies) {
       if (planetDetail.technologies.hasOwnProperty(techId)) {
         const technology = planetDetail.technologies[techId];
-        if (technology.target !== undefined) {
+        if (technology.target !== undefined && buildingTechnologies.includes(technology.techId)) {
           planetIsBuilding = true;
           break;
         }
