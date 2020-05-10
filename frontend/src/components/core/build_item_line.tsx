@@ -12,9 +12,9 @@ export const BuildItemLine: FC<{
   buildable: Buildable;
   current?: number;
   inProgress?: number;
-  endTime?: Milliseconds;
+  timeLeft?: Milliseconds;
 }> = props => {
-  const {buildable, current, inProgress, endTime} = props;
+  const {buildable, current, inProgress, timeLeft} = props;
   const metricValue = current ?? 0;
   const metricText =
     buildable.type === 'building' || buildable.type === 'technology'
@@ -41,8 +41,8 @@ export const BuildItemLine: FC<{
       buildable.type === 'building' || buildable.type === 'technology'
         ? `Level ${metricValue + 1} in progress`
         : `${metricValue}x in progress`;
-    if (endTime !== undefined) {
-      inProgressStr += ` (end in ${timeToString(endTime)})`;
+    if (timeLeft !== undefined) {
+      inProgressStr += ` (end in ${timeToString(timeLeft)})`;
     }
     subtitle = <InProgressText>{inProgressStr}</InProgressText>;
   } else {

@@ -1,4 +1,9 @@
-import {getBuildingBuildTime, getTechnologyBuildTime} from '@shared/lib/formula';
+import {
+  getBuildingBuildTime,
+  getDefensesBuildTime,
+  getShipsBuildTime,
+  getTechnologyBuildTime,
+} from '@shared/lib/formula';
 import {getPlanetProductionPerHour} from '@shared/lib/production';
 import {isBuildItemAvailable} from '@shared/lib/requirement_tree';
 import {Account} from '@shared/models/account';
@@ -12,6 +17,7 @@ import {
   NaniteFactory,
   ResearchLab,
   RoboticsFactory,
+  Shipyard,
   SolarPlant,
 } from '@shared/models/building';
 import {Planet} from '@shared/models/planet';
@@ -342,4 +348,59 @@ export function buildItemsAreEqual(buildItem1: BuildItem, buildItem2: BuildItem)
     return buildItem1.quantity === buildItem2.quantity;
   }
   return false;
+}
+
+export function getBuildItemBuildTime(account: Account, buildItem: BuildItem): Milliseconds {
+  const planet = account.planets.get(buildItem.planetId);
+  if (!planet) {
+    throw new Error(`No planet with id ${buildItem.planetId} on the account`);
+  }
+
+  const researchLabLevel = planet.buildingLevels.get(ResearchLab) ?? 0;
+  const roboticsLevel = planet.buildingLevels.get(RoboticsFactory) ?? 0;
+  const naniteLevel = planet.buildingLevels.get(NaniteFactory) ?? 0;
+  const shipyardLevel = planet.buildingLevels.get(Shipyard) ?? 0;
+
+  if (buildItem.type === 'technology') {
+    return getTechnologyBuildTime(
+      buildItem.buildable,
+      buildItem.level,
+      researchLabLevel,
+      account.universe.researchSpeed
+    );
+  }
+  if (buildItem.type === 'building') {
+    return getBuildingBuildTime(
+      buildItem.buildable,
+      buildItem.level,
+      roboticsLevel,
+      naniteLevel,
+      account.universe.economySpeed
+    );
+  }
+  if (buildItem.type === 'ship') {
+    return getShipsBuildTime(
+      buildItem.buildable,
+      buildItem.quantity,
+      shipyardLevel,
+      naniteLevel,
+      account.universe.economySpeed
+    );
+  }
+
+  if (buildItem.type === 'defense') {
+    return getDefensesBuildTime(
+      buildItem.buildable,
+      buildItem.quantity,
+      shipyardLevel,
+      naniteLevel,
+      account.universe.economySpeed
+    );
+  }
+
+  if (buildItem.type === 'stock') {
+    return ZERO;
+  }
+
+  neverHappens(buildItem, `Unknown build item type ${buildItem['type']}`);
 }

@@ -95,7 +95,7 @@ export function naiveAccountTimeline(
     startAccount: account,
     target: {...target, planetId: mainPlanet.id} as BuildItem,
     newRandomPerGeneration: 0,
-    populationSize: 10,
+    populationSize: 1,
     elitismCount: 0,
     topChromosomeCount: 1,
     swapMutationRate: 0,

@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import {Account} from '@shared/models/account';
 import {AllTechnologies} from '@shared/models/technology';
 import {arrayJoin} from '@shared/utils/array_utils';
+import {substract} from '@shared/utils/type_utils';
 
 import {BuildItemLine} from '@src/components/core/build_item_line';
 import {PlanetView} from '@src/components/planet/planet_view';
@@ -29,7 +30,9 @@ export const AccountView: FC<{account: Account}> = ({account}) => {
                   buildable={t}
                   current={account.technologyLevels.get(t)}
                   inProgress={inProgress?.level}
-                  endTime={inProgress?.endTime}
+                  timeLeft={
+                    inProgress ? substract(inProgress.endTime, account.currentTime) : undefined
+                  }
                 />
               );
             }),

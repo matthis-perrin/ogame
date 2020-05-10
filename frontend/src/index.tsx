@@ -5,9 +5,13 @@ import ReactDOM from 'react-dom';
 import {setupRapidFire, setupRequirements} from '@shared/models/dependencies';
 import {AstrophysicsTechnology} from '@shared/models/technology';
 
-import {App} from '@src/lib/app';
+import {App} from '@src/components/app';
 import {setAppState} from '@src/lib/store';
 import {naiveAccountTimeline} from '@src/run_algogen';
+
+// eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
+const {registerObserver} = require('react-perf-devtool');
+registerObserver();
 
 // import {run} from '@src/run_algogen';
 

@@ -10,7 +10,7 @@ import {arrayJoin} from '@shared/utils/array_utils';
 import {substract} from '@shared/utils/type_utils';
 
 import {BuildItemLine} from '@src/components/core/build_item_line';
-import {CustomDiv} from '@src/components/core/props';
+import {CustomDiv} from '@src/components/core/react';
 import {ResourcesView} from '@src/components/core/resources_view';
 
 export const PlanetView: CustomDiv<{account: Account; planet: Planet}> = ({
@@ -45,7 +45,9 @@ export const PlanetView: CustomDiv<{account: Account; planet: Planet}> = ({
                 buildable={b}
                 current={planet.buildingLevels.get(b)}
                 inProgress={inProgress?.level}
-                endTime={inProgress?.endTime}
+                timeLeft={
+                  inProgress ? substract(inProgress.endTime, account.currentTime) : undefined
+                }
               />
             );
           }),
@@ -63,7 +65,9 @@ export const PlanetView: CustomDiv<{account: Account; planet: Planet}> = ({
                 buildable={b}
                 current={planet.buildingLevels.get(b)}
                 inProgress={inProgress?.level}
-                endTime={inProgress?.endTime}
+                timeLeft={
+                  inProgress ? substract(inProgress.endTime, account.currentTime) : undefined
+                }
               />
             );
           }),

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 import {neverHappens} from '@shared/utils/type_utils';
 
-import {CustomDiv} from '@src/components/core/props';
+import {CustomDiv} from '@src/components/core/react';
 
 const SpriteBase = styled.div`
   background-repeat: no-repeat;

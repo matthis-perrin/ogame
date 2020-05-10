@@ -183,3 +183,9 @@ export function min<T>(...args: Brand<number, T>[]): Brand<number, T> {
 export function max<T>(...args: Brand<number, T>[]): Brand<number, T> {
   return Math.max(...args) as Brand<number, T>;
 }
+
+export type DeepPartial<T> = T extends Function
+  ? T
+  : T extends object
+  ? {[P in keyof T]?: DeepPartial<T[P]>}
+  : T;
