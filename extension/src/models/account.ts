@@ -30,6 +30,7 @@ export interface Account {
     objectives: BotTransfer | undefined;
     espionage: BotProbes | undefined;
     colonies: boolean;
+    mines: boolean;
   };
   ghosts: {[planetId: string]: Ghost};
   emptyPlanets: {[planetCoords: string]: boolean};

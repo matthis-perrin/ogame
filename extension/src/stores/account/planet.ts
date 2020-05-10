@@ -43,7 +43,12 @@ export function addPlanet(
     },
     messages: {},
     objectives: currentAccount?.objectives,
-    bots: currentAccount?.bots ?? {objectives: undefined, espionage: undefined, colonies: false},
+    bots: currentAccount?.bots ?? {
+      objectives: undefined,
+      espionage: undefined,
+      colonies: false,
+      mines: false,
+    },
     ghosts: currentAccount?.ghosts ?? {},
     emptyPlanets: currentAccount?.emptyPlanets ?? {},
     messageSort: currentAccount?.messageSort ?? DefaultMessageSort,

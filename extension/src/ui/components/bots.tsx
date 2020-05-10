@@ -37,6 +37,15 @@ export const Bots: FC<BotsProps> = ({account}) => (
             Colonies: {account.bots.colonies ? 'ON' : 'OFF'}
           </HoverTD>
         </tr>
+        <tr>
+          <HoverTD
+            onClick={() => {
+              account.bots.mines = !account.bots.mines;
+            }}
+          >
+            Mines: {account.bots.mines ? 'ON' : 'OFF'}
+          </HoverTD>
+        </tr>
       </tbody>
     </Table>
   </Fragment>

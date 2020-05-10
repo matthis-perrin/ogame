@@ -1,4 +1,5 @@
 import {startEspionageBot} from '@src/bots/espionage';
+import {startMinesBot} from '@src/bots/mines';
 import {startObjectivesBot} from '@src/bots/objectives';
 import {Account} from '@src/models/account';
 import {MissionTypeEnum} from '@src/models/fleets';
@@ -108,6 +109,7 @@ export function applyProduction(): void {
   // Start bots
   startObjectivesBot();
   startEspionageBot();
+  startMinesBot();
 
   setAccount(account);
 }
