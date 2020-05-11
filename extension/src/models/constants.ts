@@ -44,19 +44,22 @@ setItem(SESSION_ID_LOCAL_STORAGE_KEY, SESSION_ID).catch(console.error);
 export const INACTIVITY_TIME = 7.75; // 7h45
 export const UI_REFRESH_RATE = 500;
 export const PROBES_AMOUNT = 5;
+export const MAX_CRAWLERS_FACTOR = 8;
+export const MAX_CRAWLERS_AMOUNT = 1680;
 
 // Class bonus
 export const COLLECTOR_BONUS_FRET = 0.25;
 export const COLLECTOR_BONUS_ENERGY = 0.1;
 
 // Defense ratio for 1M lootable resource
-export const RATIO_LM = 5000 / 1000000;
+export const RATIO_LM = 2000 / 1000000;
 export const RATIO_ALO = 450 / 1000000;
 export const RATIO_GAU = 100 / 1000000;
 export const RATIO_PLA = 50 / 1000000;
 
 // Sum of units that goes into debris field (all but deut)
 export const DEBRIS_SAT = 2000;
+export const DEBRIS_FOR = 4000;
 
 // Required max technologies
 export const MAX_TECHNOLOGIES = [

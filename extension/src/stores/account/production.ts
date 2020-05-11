@@ -33,6 +33,7 @@ export function applyProduction(): void {
       crystal: 0 as ResourceAmount,
       deuterium: 0 as ResourceAmount,
       sum: 0 as ResourceAmount,
+      largeCargos: 0,
     },
     messages: currentAccount.messages,
     objectives: currentAccount.objectives,

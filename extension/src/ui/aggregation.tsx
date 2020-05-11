@@ -6,6 +6,7 @@ import {Bots} from '@src/ui/components/bots';
 import {PlanetSum} from '@src/ui/components/planetsum';
 import {PlanetSumProd} from '@src/ui/components/planetsumprod';
 import {Research} from '@src/ui/components/research';
+import {Resource} from '@src/ui/components/resource';
 
 interface AggregationProps {
   account: Account;
@@ -16,8 +17,14 @@ export const Aggregation: FC<AggregationProps> = ({account}) => (
     <Table>
       <thead>
         <tr>
-          <th colSpan={3}>
+          <th>
             <Title>Total</Title>
+          </th>
+          <th>
+            <Title>Vol</Title>
+          </th>
+          <th colSpan={2}>
+            <Title>Production</Title>
           </th>
           <th>
             <Title>Technologies</Title>
@@ -35,6 +42,13 @@ export const Aggregation: FC<AggregationProps> = ({account}) => (
             ) : (
               <PlanetSum planetSum={account.planetSum} account={account} />
             )}
+          </td>
+          <td>
+            <Resource name="M" amount={account.inFlightSum.metal} />
+            <Resource name="C" amount={account.inFlightSum.crystal} />
+            <Resource name="D" amount={account.inFlightSum.deuterium} />
+            <Resource name="Σ" amount={account.inFlightSum.sum} />
+            <div>GT: {account.inFlightSum.largeCargos}</div>
           </td>
           <td>
             {account.planetSum === undefined ? (

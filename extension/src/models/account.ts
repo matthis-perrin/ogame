@@ -23,7 +23,7 @@ export interface Account {
   planetSum: AccountPlanet | undefined;
   constructions: {[constructionId: string]: Construction};
   inFlightResources: {[planetCoords: string]: ResourcesWithSumAndLargeCargos};
-  inFlightSum: ResourcesWithSum;
+  inFlightSum: ResourcesWithSumAndLargeCargos;
   messages: {[messageId: string]: Message};
   objectives: Objectives | undefined;
   bots: {

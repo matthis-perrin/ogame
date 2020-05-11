@@ -25,7 +25,7 @@ import {
   RocketLauncher,
   SmallShieldDome,
 } from '@shared/models/defense';
-import {EspionageProbe, LargeCargo, SolarSatellite} from '@shared/models/ships';
+import {Crawler, EspionageProbe, LargeCargo, SolarSatellite} from '@shared/models/ships';
 import {Crystal, Deuterium, Metal} from '@shared/models/stock';
 import {Rosalind} from '@shared/models/universe';
 
@@ -41,8 +41,11 @@ import {
   COLLECTOR_BONUS_ENERGY,
   COLOR_GREEN,
   COLOR_RED,
+  DEBRIS_FOR,
   DEBRIS_SAT,
   INACTIVITY_TIME,
+  MAX_CRAWLERS_AMOUNT,
+  MAX_CRAWLERS_FACTOR,
   RATIO_ALO,
   RATIO_GAU,
   RATIO_LM,
@@ -123,7 +126,10 @@ export const Empire: FC<EmpireProps> = ({account}) => (
                 DEBRIS_SAT *
                 Rosalind.shipInDebrisFieldRatio
               : 0;
-            const totalLoot = inactivityLoot + satelliteLoot;
+            const crawlerLoot = planet.technologies.hasOwnProperty(Crawler.id)
+              ? planet.technologies[Crawler.id].value * DEBRIS_FOR * Rosalind.shipInDebrisFieldRatio
+              : 0;
+            const totalLoot = inactivityLoot + satelliteLoot + crawlerLoot;
             const inFlight = account.inFlightResources.hasOwnProperty(p.coords)
               ? account.inFlightResources[p.coords]
               : {
@@ -154,6 +160,17 @@ export const Empire: FC<EmpireProps> = ({account}) => (
                 : 0;
               requiredSat = satNumber + Math.ceil(-planet.resources.energy / satEnergy);
             }
+            let requiredFor = 0;
+            if (planet.technologies.hasOwnProperty(MetalMine.id)) {
+              requiredFor += planet.technologies[MetalMine.id].value;
+            }
+            if (planet.technologies.hasOwnProperty(CrystalMine.id)) {
+              requiredFor += planet.technologies[CrystalMine.id].value;
+            }
+            if (planet.technologies.hasOwnProperty(DeuteriumSynthesizer.id)) {
+              requiredFor += planet.technologies[DeuteriumSynthesizer.id].value;
+            }
+            requiredFor = Math.min(requiredFor * MAX_CRAWLERS_FACTOR, MAX_CRAWLERS_AMOUNT);
             return (
               <PlanetLine key={p.id} className={p.id === account.currentPlanetId ? 'active' : ''}>
                 <td>
@@ -256,6 +273,13 @@ export const Empire: FC<EmpireProps> = ({account}) => (
                           ? account.maxTechnologies[DeuteriumSynthesizer.id]
                           : undefined
                       }
+                    />
+                    <TechnologyC
+                      name="F"
+                      technologies={planet.technologies}
+                      techId={Crawler.id}
+                      planetId={planet.planetId}
+                      required={requiredFor}
                     />
                   </Line>
                 </td>
@@ -490,6 +514,7 @@ export const Empire: FC<EmpireProps> = ({account}) => (
                   <Line>
                     <Loot name="Prod" amount={inactivityLoot} />
                     <Loot name="Sats" amount={satelliteLoot} />
+                    <Loot name="Fors" amount={crawlerLoot} />
                     <Loot name="Total" amount={totalLoot} />
                   </Line>
                 </td>

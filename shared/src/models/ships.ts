@@ -73,7 +73,7 @@ export const Crawler: Ship = {
   fuelConsumption: 0 as ShipFuelConsumption,
   rapidFire: new Map<Unit, number>(),
   requirements: [],
-  component: 'shipyard',
+  component: 'supplies',
   sprite: '84.20% 51.72%',
 };
 

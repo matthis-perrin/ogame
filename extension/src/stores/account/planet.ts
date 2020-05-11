@@ -1,5 +1,5 @@
 import {CrystalMine, DeuteriumSynthesizer, MetalMine, SolarPlant} from '@shared/models/building';
-import {SolarSatellite} from '@shared/models/ships';
+import {Crawler, SolarSatellite} from '@shared/models/ships';
 
 import {Account} from '@src/models/account';
 import {ACCOUNT_TECHNOLOGIES, MAX_TECHNOLOGIES} from '@src/models/constants';
@@ -40,6 +40,7 @@ export function addPlanet(
       crystal: 0 as ResourceAmount,
       deuterium: 0 as ResourceAmount,
       sum: 0 as ResourceAmount,
+      largeCargos: 0,
     },
     messages: {},
     objectives: currentAccount?.objectives,
@@ -209,8 +210,8 @@ export function addPlanet(
   if (ships !== undefined) {
     shipsObj = {};
     for (const ship of ships) {
-      // Exception: solar satellites cannot move, adding them to all other technologies
-      if (ship.techId === SolarSatellite.id) {
+      // Exception: solar satellites/crawlers cannot move, adding them to all other technologies
+      if (ship.techId === SolarSatellite.id || ship.techId === Crawler.id) {
         technologies.push(ship);
       } else {
         shipsObj[ship.techId] = ship;
@@ -252,6 +253,7 @@ export function addPlanet(
           resources.techs[MetalMine.id].consumption.energy,
           resources.techs[CrystalMine.id].consumption.energy,
           resources.techs[DeuteriumSynthesizer.id].consumption.energy,
+          resources.techs[Crawler.id].consumption.energy,
         ]);
 
   // Saving planet data

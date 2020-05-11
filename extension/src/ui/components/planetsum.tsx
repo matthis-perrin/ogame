@@ -1,5 +1,6 @@
 import React, {FC, Fragment} from 'react';
 
+import {LargeCargo} from '@shared/models/ships';
 import {Crystal, Deuterium, Metal} from '@shared/models/stock';
 
 import {Account, AccountPlanet} from '@src/models/account';
@@ -30,7 +31,6 @@ export const PlanetSum: FC<PlanetSumProps> = ({account, planetSum}) => {
         <Resource
           name="M"
           amount={sum([planetSum.resources.metal, account.inFlightSum.metal])}
-          storage={planetSum.storages.metal}
           production={planetSum.productions.metal}
         />
       </Stock>
@@ -46,7 +46,6 @@ export const PlanetSum: FC<PlanetSumProps> = ({account, planetSum}) => {
         <Resource
           name="C"
           amount={sum([planetSum.resources.crystal, account.inFlightSum.crystal])}
-          storage={planetSum.storages.crystal}
           production={planetSum.productions.crystal}
         />
       </Stock>
@@ -62,7 +61,6 @@ export const PlanetSum: FC<PlanetSumProps> = ({account, planetSum}) => {
         <Resource
           name="D"
           amount={sum([planetSum.resources.deuterium, account.inFlightSum.deuterium])}
-          storage={planetSum.storages.deuterium}
           production={planetSum.productions.deuterium}
         />
       </Stock>
@@ -85,13 +83,14 @@ export const PlanetSum: FC<PlanetSumProps> = ({account, planetSum}) => {
           });
         }}
       >
-        <Resource
-          name="Σ"
-          amount={resourcesSum}
-          storage={planetSum.storages.sum}
-          production={planetSum.productions.sum}
-        />
+        <Resource name="Σ" amount={resourcesSum} production={planetSum.productions.sum} />
       </Stock>
+      <div>
+        GT:{' '}
+        {(planetSum.ships.hasOwnProperty(LargeCargo.id)
+          ? planetSum.ships[LargeCargo.id].value
+          : 0) + account.inFlightSum.largeCargos}
+      </div>
     </Fragment>
   );
 };

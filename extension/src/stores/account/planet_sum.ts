@@ -1,3 +1,5 @@
+import {LargeCargo} from '@shared/models/ships';
+
 import {AccountPlanet} from '@src/models/account';
 import {PlanetId} from '@src/models/planets';
 import {ResourceAmount} from '@src/models/resources';
@@ -14,6 +16,7 @@ export function calcPlanetSum(planetDetails: {[planetId: string]: AccountPlanet}
   let metalProductions = 0;
   let crystalProductions = 0;
   let deuteriumProductions = 0;
+  let largeCargos = 0;
 
   for (const planetId in planetDetails) {
     if (planetDetails.hasOwnProperty(planetId)) {
@@ -28,6 +31,9 @@ export function calcPlanetSum(planetDetails: {[planetId: string]: AccountPlanet}
       metalProductions += planetDetail.productions.metal;
       crystalProductions += planetDetail.productions.crystal;
       deuteriumProductions += planetDetail.productions.deuterium;
+      if (planetDetail.ships.hasOwnProperty(LargeCargo.id)) {
+        largeCargos += planetDetail.ships[LargeCargo.id].value;
+      }
     }
   }
 
@@ -59,6 +65,11 @@ export function calcPlanetSum(planetDetails: {[planetId: string]: AccountPlanet}
       sum: sum([metalProductions, crystalProductions, deuteriumProductions]),
     },
     technologies: {},
-    ships: {},
+    ships: {
+      [LargeCargo.id]: {
+        techId: LargeCargo.id,
+        value: largeCargos,
+      },
+    },
   };
 }

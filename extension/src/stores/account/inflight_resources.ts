@@ -1,10 +1,6 @@
 import {Fleet} from '@src/models/fleets';
 import {Planet} from '@src/models/planets';
-import {
-  ResourceAmount,
-  ResourcesWithSum,
-  ResourcesWithSumAndLargeCargos,
-} from '@src/models/resources';
+import {ResourceAmount, ResourcesWithSumAndLargeCargos} from '@src/models/resources';
 import {sum} from '@src/ui/utils';
 
 export function calcInFlightResources(
@@ -12,13 +8,14 @@ export function calcInFlightResources(
   fleets: {
     [fleetId: string]: Fleet;
   }
-): [{[planetCoords: string]: ResourcesWithSumAndLargeCargos}, ResourcesWithSum] {
+): [{[planetCoords: string]: ResourcesWithSumAndLargeCargos}, ResourcesWithSumAndLargeCargos] {
   const inFlightResources: {[planetCoords: string]: ResourcesWithSumAndLargeCargos} = {};
-  const inFlightSum: ResourcesWithSum = {
+  const inFlightSum: ResourcesWithSumAndLargeCargos = {
     metal: 0 as ResourceAmount,
     crystal: 0 as ResourceAmount,
     deuterium: 0 as ResourceAmount,
     sum: 0 as ResourceAmount,
+    largeCargos: 0,
   };
 
   const planetIndex: Set<string> = new Set();
@@ -47,6 +44,7 @@ export function calcInFlightResources(
         inFlightSum.crystal = sum([inFlightSum.crystal, fleet.resources.crystal]);
         inFlightSum.deuterium = sum([inFlightSum.deuterium, fleet.resources.deuterium]);
         inFlightSum.sum = sum([inFlightSum.sum, fleet.resources.sum]);
+        inFlightSum.largeCargos += fleet.ships.transporterLarge;
       }
     }
   }

@@ -10,6 +10,7 @@ export const Table = styled.table`
   border-collapse: collapse;
   th,
   td {
+    vertical-align: top;
     padding-right: 10px;
     &:last-child {
       padding-right: 0;
