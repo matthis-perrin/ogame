@@ -165,7 +165,7 @@ export const IonTechnology = makeTechnology(
 export const PlasmaTechnology = makeTechnology(
   122,
   'Technologie Plasma',
-  'Plasma',
+  'Tech. Plasma',
   '21.05% 68.96%',
   makeResources({m: 2000, c: 4000, d: 1000}),
   2,
