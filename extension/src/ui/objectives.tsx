@@ -146,6 +146,11 @@ export const ObjectivesC: FC<ObjectivesProps> = ({account}) => {
                   <Resource name="F" amount={account.objectives.neededResources.fuel} />
                 </td>
               </Status>
+              <Status>
+                <td colSpan={2}>
+                  <div>T: {timeEl(account.objectives.longestTimeSeconds)}</div>
+                </td>
+              </Status>
               <tr>
                 <EmptyLine></EmptyLine>
               </tr>

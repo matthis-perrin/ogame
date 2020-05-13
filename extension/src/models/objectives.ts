@@ -25,4 +25,5 @@ export interface Objectives {
   startTime: number | undefined;
   botEnabled: boolean;
   bannedPlanets: PlanetId[];
+  longestTimeSeconds: number;
 }

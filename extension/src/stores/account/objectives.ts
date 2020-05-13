@@ -303,6 +303,7 @@ export function updateObjectives(account: Account, neededFuel = 0): void {
       isTransferring: false,
     });
   }
+  objectives.longestTimeSeconds = longestTimeSeconds;
   if (neededFuel !== requiredFuel) {
     updateObjectives(account, requiredFuel);
   } else {
@@ -338,6 +339,7 @@ export function addObjectives(planetId: PlanetId, newTechnology: Technology): vo
       startTime: undefined,
       botEnabled: false,
       bannedPlanets: [],
+      longestTimeSeconds: 0,
     };
   }
 
