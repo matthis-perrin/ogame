@@ -1,5 +1,6 @@
+import {SpeedModifier} from '@shared/models/coordinates';
+
 import {MissionTypeEnum} from '@src/models/fleets';
-import {SpeedModifier} from '@src/models/ghost';
 import {getCoords, PlanetCoords, PlanetId} from '@src/models/planets';
 import {BaseResources} from '@src/models/resources';
 import {TechnologyIndex} from '@src/models/technologies';
@@ -61,7 +62,8 @@ export function sendLargeCargosUrl(
   missionType: MissionTypeEnum,
   amount: number,
   auto: boolean,
-  resources?: BaseResources
+  resources: BaseResources | undefined,
+  speedModifier: SpeedModifier
 ): string {
   const coords = getCoords(planetCoords);
   const url = `${document.location.origin}${
@@ -70,7 +72,8 @@ export function sendLargeCargosUrl(
     coords.solarSystem
   }&position=${
     coords.position
-  }&type=1&mission=${missionType}&am203=${amount}&cp=${from}&auto=${auto}${
+  }&type=1&mission=${missionType}&am203=${amount}&cp=${from}&speed=${speedModifier *
+    10}&auto=${auto}${
     resources !== undefined
       ? `&metal=${Math.ceil(resources.metal)}&crystal=${Math.ceil(
           resources.crystal

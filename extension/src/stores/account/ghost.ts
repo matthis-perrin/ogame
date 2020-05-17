@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import {getDistance, getFlightDuration} from '@shared/lib/formula';
 import {getShipDrive} from '@shared/lib/ships';
 import {Class} from '@shared/models/account';
@@ -6,7 +7,7 @@ import {CombustionDrive, HyperspaceDrive, ImpulseDrive} from '@shared/models/tec
 import {Rosalind} from '@shared/models/universe';
 
 import {Account} from '@src/models/account';
-import {DefaultGhosts, SpeedModifier} from '@src/models/ghost';
+import {DefaultGhosts} from '@src/models/ghost';
 import {getCoords} from '@src/models/planets';
 
 export function updateGhosts(account: Account): void {
@@ -57,23 +58,17 @@ export function updateGhosts(account: Account): void {
           name: 'REC 20%',
           techId: Recycler.id,
           timeSeconds: Math.floor(
-            getFlightDuration(
-              distance,
-              recyclerDrive.speed,
-              SpeedModifier.TwentyPercent,
-              Rosalind
-            ) / 1000
+            getFlightDuration(distance, recyclerDrive.speed, 0.2, Rosalind) / 1000
           ),
-          speedModifier: SpeedModifier.TwentyPercent,
+          speedModifier: 0.2,
         },
         {
           name: 'BOM 10%',
           techId: Bomber.id,
           timeSeconds: Math.floor(
-            getFlightDuration(distance, bomberDrive.speed, SpeedModifier.TenPercent, Rosalind) /
-              1000
+            getFlightDuration(distance, bomberDrive.speed, 0.1, Rosalind) / 1000
           ),
-          speedModifier: SpeedModifier.TenPercent,
+          speedModifier: 0.1,
         },
       ],
     };

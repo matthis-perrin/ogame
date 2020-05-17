@@ -1,3 +1,5 @@
+import {SpeedModifier} from '@shared/models/coordinates';
+
 import {PlanetId} from '@src/models/planets';
 import {ResourcesWithSumAndFuel} from '@src/models/resources';
 import {Technology} from '@src/models/technologies';
@@ -26,4 +28,5 @@ export interface Objectives {
   botEnabled: boolean;
   bannedPlanets: PlanetId[];
   longestTimeSeconds: number;
+  speedModifier: SpeedModifier;
 }

@@ -157,7 +157,7 @@ export function updateObjectives(account: Account, neededFuel = 0): void {
       if (planet.id !== objectives.planetId) {
         distance = getDistance(getCoords(planetCoords), getCoords(planet.coords), Rosalind);
         timeFromOriginSeconds = Math.floor(
-          getFlightDuration(distance, shipDrive.speed, 1, Rosalind) / 1000
+          getFlightDuration(distance, shipDrive.speed, objectives.speedModifier, Rosalind) / 1000
         );
       }
       const resources: Map<ResourceType, ResourceInfo> = new Map();
@@ -340,6 +340,7 @@ export function addObjectives(planetId: PlanetId, newTechnology: Technology): vo
       botEnabled: false,
       bannedPlanets: [],
       longestTimeSeconds: 0,
+      speedModifier: 1,
     };
   }
 

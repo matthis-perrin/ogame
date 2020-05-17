@@ -1,5 +1,7 @@
 import styled from 'styled-components';
 
+import {COLOR_GREEN} from '@src/models/constants';
+
 export const Title = styled.div`
   font-weight: bold;
   padding-bottom: 5px;
@@ -22,6 +24,9 @@ export const HoverTD = styled.td`
   cursor: pointer;
   &:hover {
     text-decoration: underline;
+  }
+  &.green {
+    color: ${COLOR_GREEN};
   }
 `;
 

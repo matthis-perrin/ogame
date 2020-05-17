@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import React, {FC, Fragment} from 'react';
 import styled from 'styled-components';
 
@@ -42,6 +43,7 @@ export const ObjectivesC: FC<ObjectivesProps> = ({account}) => {
                 <td>{findPlanetName(account.planetList, account.objectives.planetId)}</td>
                 <HoverTD onClick={() => updateObjectives(account)}>Refresh</HoverTD>
                 <HoverTD
+                  className={account.objectives.speedModifier === 0.1 ? 'green' : ''}
                   onClick={() => {
                     if (account.objectives !== undefined) {
                       account.objectives.botEnabled = !account.objectives.botEnabled;
@@ -55,6 +57,138 @@ export const ObjectivesC: FC<ObjectivesProps> = ({account}) => {
               <tr>
                 <EmptyLine></EmptyLine>
               </tr>
+            </tbody>
+          )}
+        </Table>
+        <Table>
+          {account.objectives === undefined ? (
+            <tbody></tbody>
+          ) : (
+            <tbody>
+              <tr>
+                <td>Vitesse</td>
+                <HoverTD
+                  className={account.objectives.speedModifier === 0.1 ? 'green' : ''}
+                  onClick={() => {
+                    if (account.objectives !== undefined) {
+                      account.objectives.speedModifier = 0.1;
+                      updateObjectives(account);
+                    }
+                  }}
+                >
+                  10
+                </HoverTD>
+                <HoverTD
+                  className={account.objectives.speedModifier === 0.2 ? 'green' : ''}
+                  onClick={() => {
+                    if (account.objectives !== undefined) {
+                      account.objectives.speedModifier = 0.2;
+                      updateObjectives(account);
+                    }
+                  }}
+                >
+                  20
+                </HoverTD>
+                <HoverTD
+                  className={account.objectives.speedModifier === 0.3 ? 'green' : ''}
+                  onClick={() => {
+                    if (account.objectives !== undefined) {
+                      account.objectives.speedModifier = 0.3;
+                      updateObjectives(account);
+                    }
+                  }}
+                >
+                  30
+                </HoverTD>
+                <HoverTD
+                  className={account.objectives.speedModifier === 0.4 ? 'green' : ''}
+                  onClick={() => {
+                    if (account.objectives !== undefined) {
+                      account.objectives.speedModifier = 0.4;
+                      updateObjectives(account);
+                    }
+                  }}
+                >
+                  40
+                </HoverTD>
+                <HoverTD
+                  className={account.objectives.speedModifier === 0.5 ? 'green' : ''}
+                  onClick={() => {
+                    if (account.objectives !== undefined) {
+                      account.objectives.speedModifier = 0.5;
+                      updateObjectives(account);
+                    }
+                  }}
+                >
+                  50
+                </HoverTD>
+                <HoverTD
+                  className={account.objectives.speedModifier === 0.6 ? 'green' : ''}
+                  onClick={() => {
+                    if (account.objectives !== undefined) {
+                      account.objectives.speedModifier = 0.6;
+                      updateObjectives(account);
+                    }
+                  }}
+                >
+                  60
+                </HoverTD>
+                <HoverTD
+                  className={account.objectives.speedModifier === 0.7 ? 'green' : ''}
+                  onClick={() => {
+                    if (account.objectives !== undefined) {
+                      account.objectives.speedModifier = 0.7;
+                      updateObjectives(account);
+                    }
+                  }}
+                >
+                  70
+                </HoverTD>
+                <HoverTD
+                  className={account.objectives.speedModifier === 0.8 ? 'green' : ''}
+                  onClick={() => {
+                    if (account.objectives !== undefined) {
+                      account.objectives.speedModifier = 0.8;
+                      updateObjectives(account);
+                    }
+                  }}
+                >
+                  80
+                </HoverTD>
+                <HoverTD
+                  className={account.objectives.speedModifier === 0.9 ? 'green' : ''}
+                  onClick={() => {
+                    if (account.objectives !== undefined) {
+                      account.objectives.speedModifier = 0.9;
+                      updateObjectives(account);
+                    }
+                  }}
+                >
+                  90
+                </HoverTD>
+                <HoverTD
+                  className={account.objectives.speedModifier === 1 ? 'green' : ''}
+                  onClick={() => {
+                    if (account.objectives !== undefined) {
+                      account.objectives.speedModifier = 1;
+                      updateObjectives(account);
+                    }
+                  }}
+                >
+                  100
+                </HoverTD>
+              </tr>
+              <tr>
+                <EmptyLine></EmptyLine>
+              </tr>
+            </tbody>
+          )}
+        </Table>
+        <Table>
+          {account.objectives === undefined ? (
+            <tbody></tbody>
+          ) : (
+            <tbody>
               {account.objectives.technologies.map((technology, index, origin) => {
                 const smartTech = TechnologyIndex.get(technology.techId);
                 return (
@@ -195,7 +329,8 @@ export const ObjectivesC: FC<ObjectivesProps> = ({account}) => {
                         MissionTypeEnum.Deployment,
                         requiredLargeCargos,
                         false,
-                        transfer.resources
+                        transfer.resources,
+                        account.objectives?.speedModifier ?? 1
                       );
                       goToUrl(url);
                     }}

@@ -3,6 +3,7 @@ import styled from 'styled-components';
 
 import {goToUrl, sendGhostUrl} from '@src/controllers/navigator';
 import {Account} from '@src/models/account';
+import {COLOR_RED} from '@src/models/constants';
 import {Ghost, GhostSpeed} from '@src/models/ghost';
 import {findPlanetCoords, findPlanetName, PlanetId} from '@src/models/planets';
 import {thousands, timeEl} from '@src/ui/utils';
@@ -56,9 +57,17 @@ export const GhostC: FC<GhostProps> = ({ghosts, planetId, account}) => {
             {ghostSpeed === undefined ? (
               'Nothing compatible'
             ) : (
-              <span>
+              <Reddable
+                className={
+                  !account.planetDetails.hasOwnProperty(planetId) ||
+                  !account.planetDetails[planetId].ships.hasOwnProperty(ghostSpeed.techId) ||
+                  account.planetDetails[planetId].ships[ghostSpeed.techId].value === 0
+                    ? 'red'
+                    : ''
+                }
+              >
                 {ghostSpeed.name}: {timeEl(ghostSpeed.timeSeconds)}
-              </span>
+              </Reddable>
             )}
           </div>
         </Hover>
@@ -71,5 +80,11 @@ const Hover = styled.div`
   cursor: pointer;
   &:hover {
     text-decoration: underline;
+  }
+`;
+
+const Reddable = styled.span`
+  &.red {
+    color: ${COLOR_RED};
   }
 `;

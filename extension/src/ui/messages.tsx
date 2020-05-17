@@ -94,9 +94,9 @@ export const Messages: FC<MessagesProps> = ({account}) => {
   }
 
   const lootMargin = 20000;
-  const sumLimit = 100000;
-  const cristalLimit = 40000;
-  const deuteriumLimit = 20000;
+  const sumLimit = 200000;
+  const cristalLimit = 50000;
+  const deuteriumLimit = 25000;
 
   return (
     <Fragment>
@@ -206,7 +206,9 @@ export const Messages: FC<MessagesProps> = ({account}) => {
                           message.planetCoords,
                           MissionTypeEnum.Attacking,
                           Math.ceil(sum([message.resources.sum, lootMargin]) / fretGt),
-                          true
+                          true,
+                          undefined,
+                          1
                         );
                         goToUrl(url);
                       }}

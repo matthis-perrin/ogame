@@ -30,7 +30,8 @@ function getUrl(account: Account, bt: BotTransfer): string {
     MissionTypeEnum.Deployment,
     requiredGt,
     true,
-    bt.transfer.resources
+    bt.transfer.resources,
+    account.objectives?.speedModifier ?? 1
   );
 }
 
