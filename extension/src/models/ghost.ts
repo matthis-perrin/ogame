@@ -16,14 +16,14 @@ export interface Ghost {
 }
 
 export const DefaultGhosts: Map<string, string> = new Map();
-// Group 1
+// REC
 DefaultGhosts.set('3-1', '5-1');
 DefaultGhosts.set('5-1', '3-2');
-DefaultGhosts.set('3-2', '4-3');
-DefaultGhosts.set('4-3', '5-4');
+DefaultGhosts.set('3-2', '5-4');
 DefaultGhosts.set('5-4', '3-1');
-// Group 2
+// BOM
 DefaultGhosts.set('4-1', '5-2');
 DefaultGhosts.set('5-2', '4-2');
 DefaultGhosts.set('4-2', '5-3');
 DefaultGhosts.set('5-3', '4-1');
+DefaultGhosts.set('4-3', '5-1');

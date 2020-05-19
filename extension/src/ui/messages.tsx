@@ -10,6 +10,7 @@ import {COLOR_ORANGE, COLOR_RED} from '@src/models/constants';
 import {MissionTypeEnum} from '@src/models/fleets';
 import {Message, MessageSort} from '@src/models/messages';
 import {PlanetCoords} from '@src/models/planets';
+import {BaseResources, ResourceAmount} from '@src/models/resources';
 import {getFretCapacity} from '@src/models/technologies';
 import {EmptyLine, HoverTD, Table, Title} from '@src/ui/common';
 import {Resource} from '@src/ui/components/resource';
@@ -50,6 +51,23 @@ export const Messages: FC<MessagesProps> = ({account}) => {
     }
   }
 
+  const lootMargin = 20000;
+  const sumLimit = 300000;
+  const crystalLimit = 100000;
+  const deuteriumLimit = 20000;
+  const unitsLimit = 100000;
+
+  let deuteriumCrystalFactor = 1;
+  if (account.planetSum !== undefined) {
+    deuteriumCrystalFactor =
+      account.planetSum.productions.crystal / account.planetSum.productions.deuterium;
+  }
+
+  function toUnits(resources: BaseResources): ResourceAmount {
+    return (resources.deuterium * deuteriumCrystalFactor +
+      (resources.crystal as number)) as ResourceAmount;
+  }
+
   messages.sort((a, b) => {
     switch (sort) {
       case 'metal':
@@ -60,6 +78,8 @@ export const Messages: FC<MessagesProps> = ({account}) => {
         return b.resources.deuterium - a.resources.deuterium;
       case 'sum':
         return b.resources.sum - a.resources.sum;
+      case 'units':
+        return toUnits(b.resources) - toUnits(a.resources);
       default:
         return -1;
     }
@@ -92,11 +112,6 @@ export const Messages: FC<MessagesProps> = ({account}) => {
       }
     }
   }
-
-  const lootMargin = 20000;
-  const sumLimit = 200000;
-  const cristalLimit = 50000;
-  const deuteriumLimit = 25000;
 
   return (
     <Fragment>
@@ -131,7 +146,7 @@ export const Messages: FC<MessagesProps> = ({account}) => {
                   for (const message of messages) {
                     const isDuplicate = duplicatesList.has(message.messageId);
                     if (
-                      message.resources.crystal < cristalLimit ||
+                      message.resources.crystal < crystalLimit ||
                       !message.noUnits ||
                       isDuplicate
                     ) {
@@ -141,14 +156,14 @@ export const Messages: FC<MessagesProps> = ({account}) => {
                   }
                 }}
               >
-                C {thousands(cristalLimit)}
+                C {thousands(crystalLimit)}
               </HoverTD>
               <HoverTD
                 onClick={async () => {
                   for (const message of messages) {
                     const isDuplicate = duplicatesList.has(message.messageId);
                     if (
-                      message.resources.crystal < deuteriumLimit ||
+                      message.resources.deuterium < deuteriumLimit ||
                       !message.noUnits ||
                       isDuplicate
                     ) {
@@ -159,6 +174,23 @@ export const Messages: FC<MessagesProps> = ({account}) => {
                 }}
               >
                 D {thousands(deuteriumLimit)}
+              </HoverTD>
+              <HoverTD
+                onClick={async () => {
+                  for (const message of messages) {
+                    const isDuplicate = duplicatesList.has(message.messageId);
+                    if (
+                      toUnits(message.resources) < unitsLimit ||
+                      !message.noUnits ||
+                      isDuplicate
+                    ) {
+                      await deleteMessageAsync(account, message, true);
+                      refreshComponent(sort);
+                    }
+                  }
+                }}
+              >
+                U {thousands(unitsLimit)}
               </HoverTD>
             </tr>
             <tr>
@@ -186,6 +218,9 @@ export const Messages: FC<MessagesProps> = ({account}) => {
                   </td>
                   <td onClick={() => refreshComponent('sum')}>
                     <Resource name="Σ" amount={message.resources.sum} />
+                  </td>
+                  <td onClick={() => refreshComponent('units')}>
+                    <Resource name="U" amount={toUnits(message.resources)} />
                   </td>
                   <td>{!message.noUnits ? 'KO' : isDuplicate ? 'DUP' : 'OK'}</td>
                   <td>

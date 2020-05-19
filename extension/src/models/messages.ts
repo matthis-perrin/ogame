@@ -10,5 +10,5 @@ export interface Message {
   timeSeconds: number;
 }
 
-export type MessageSort = 'metal' | 'crystal' | 'deuterium' | 'sum';
+export type MessageSort = 'metal' | 'crystal' | 'deuterium' | 'sum' | 'units';
 export const DefaultMessageSort: MessageSort = 'sum';
